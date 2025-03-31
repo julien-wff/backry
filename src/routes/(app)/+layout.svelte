@@ -7,7 +7,9 @@
 <div class="flex min-h-screen bg-base-300">
     <Navbar/>
 
-    <main class="flex-1 p-4">
-        {@render children()}
+    <main class="flex flex-1 p-4">
+        <div class="mx-auto w-full max-w-5xl">
+            {@render children()}
+        </div>
     </main>
 </div>
