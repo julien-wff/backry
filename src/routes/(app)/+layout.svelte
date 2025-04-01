@@ -8,7 +8,7 @@
     <Navbar/>
 
     <main class="flex flex-1 p-4">
-        <div class="mx-auto w-full max-w-5xl">
+        <div class="mx-auto flex w-full max-w-5xl flex-col gap-6">
             {@render children()}
         </div>
     </main>
