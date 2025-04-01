@@ -18,7 +18,7 @@
     <nav class="flex flex-col flex-1 gap-4">
         <NavbarElement href="/dashboard" icon={LayoutDashboard} label="Dashboard"/>
         <NavbarElement href="/databases" icon={Database} label="Databases"/>
-        <NavbarElement href="/storage" icon={CloudUpload} label="Storage"/>
+        <NavbarElement href="/storages" icon={CloudUpload} label="Storage"/>
         <NavbarElement href="/jobs" icon={Timer} label="Backup jobs"/>
         <NavbarElement href="/executions" icon={RefreshCw} label="Executions"/>
         <NavbarElement href="/restore" icon={History} label="Restore"/>
