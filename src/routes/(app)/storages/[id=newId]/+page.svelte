@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Head from '$lib/components/common/Head.svelte';
     import NewElementCard from '$lib/components/new-elements/NewElementCard.svelte';
     import NewElementsContainer from '$lib/components/new-elements/NewElementsContainer.svelte';
     import NewPageHeader from '$lib/components/new-elements/NewPageHeader.svelte';
@@ -6,6 +7,8 @@
     import PackageOpen from '@lucide/svelte/icons/package-open';
     import ArchiveRestore from '@lucide/svelte/icons/archive-restore';
 </script>
+
+<Head title="New storage backend"/>
 
 <NewPageHeader currentStep={1} icon={CloudUpload} totalSteps={3}>
     Add storage backend - repository status

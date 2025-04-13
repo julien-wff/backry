@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Head from '$lib/components/common/Head.svelte';
     import EnvVarInput from '$lib/components/forms/EnvVarInput.svelte';
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
     import NewPageHeader from '$lib/components/new-elements/NewPageHeader.svelte';
@@ -124,6 +125,8 @@
         }
     }
 </script>
+
+<Head title="New storage backend"/>
 
 <NewPageHeader backText="Back to connection type" currentStep={3} icon={CloudUpload} totalSteps={3}>
     Add storage backend - local

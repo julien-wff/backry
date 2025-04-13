@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Head from '$lib/components/common/Head.svelte';
     import NewElementCard from '$lib/components/new-elements/NewElementCard.svelte';
     import NewElementsContainer from '$lib/components/new-elements/NewElementsContainer.svelte';
     import NewPageHeader from '$lib/components/new-elements/NewPageHeader.svelte';
@@ -6,6 +7,8 @@
     import FolderOpen from '@lucide/svelte/icons/folder-open';
     import FileTerminal from '@lucide/svelte/icons/file-terminal';
 </script>
+
+<Head title="New storage backend"/>
 
 <NewPageHeader backText="Back to state" currentStep={2} icon={CloudUpload} totalSteps={3}>
     Add storage backend - connection type

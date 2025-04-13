@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Head from '$lib/components/common/Head.svelte';
     import DatabaseElement from '$lib/components/databases/DatabaseElement.svelte';
     import TableHeader from '$lib/components/table/TableHeader.svelte';
     import Database from '@lucide/svelte/icons/database';
@@ -11,6 +12,7 @@
     let { data }: Props = $props();
 </script>
 
+<Head title="Databases"/>
 
 <TableHeader icon={Database}>Databases</TableHeader>
 
