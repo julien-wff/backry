@@ -1,4 +1,4 @@
-import { createStorage } from '$lib/queries/databases';
+import { createStorage } from '$lib/queries/storages';
 import type { StoragesCreateRequest } from '$lib/types/api';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
