@@ -29,6 +29,8 @@ export const storages = sqliteTable('storages', {
     error: text('error'),
     created_at: text().default(sql`(CURRENT_TIMESTAMP)`),
     updated_at: text().default(sql`(CURRENT_TIMESTAMP)`).$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
-    connection_string: text('connection_string').notNull(),
+    url: text('url').notNull(),
+    subPath: text('sub_path').default('/'),
     password: text('password'),
+    env: text('env', { mode: 'json' }).notNull().default({}).$type<Record<string, string>>(),
 });
