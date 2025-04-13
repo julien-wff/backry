@@ -32,6 +32,7 @@
 	"dependencies": {
 		"@fontsource/inter": "^5.2.5",
 		"@lucide/svelte": "^0.483.0",
-		"drizzle-orm": "^0.40.1"
+		"drizzle-orm": "^0.40.1",
+		"neverthrow": "^8.2.0"
 	}
 }
