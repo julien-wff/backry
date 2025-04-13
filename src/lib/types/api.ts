@@ -44,3 +44,14 @@ export type StoragesCreateRepositoryResponse = {
     error: null;
     output: ResticInit;
 }
+
+/** `POST /api/jobs` */
+export interface JobsCreateRequest {
+    name: string;
+    storage_id: number;
+    cron: string;
+    databases: Array<{
+        id: number;
+        storagePath: string;
+    }>;
+}
