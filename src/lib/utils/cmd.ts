@@ -7,7 +7,7 @@ interface CommandOptions {
 }
 
 export async function runCommandSync(command: string, args: string[] = [], options?: CommandOptions): Promise<ResultAsync<ShellOutput, ShellOutput>> {
-    const cmd = $`${command} ${{ raw: args.map($.escape).join(' ') }}"`
+    const cmd = $`${command} ${{ raw: args.map($.escape).join(' ') }}`
         .env(options?.env)
         .nothrow()
         .quiet();
