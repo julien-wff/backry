@@ -27,7 +27,7 @@ export const POST: RequestHandler = async ({ request }) => {
     return json(
         {
             error: null,
-            output: res.value,
+            output: res.value[0],
         } as StoragesCreateRepositoryResponse,
         {
             status: 200,
