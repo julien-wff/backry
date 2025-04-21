@@ -11,12 +11,19 @@
 
     let { job }: Props = $props();
     let status = $state(job.status);
+
+    async function handleRunJob() {
+        const res = await fetch(`/api/jobs/${job.id}/run`, {
+            method: 'POST',
+        });
+    }
 </script>
 
 
 <BaseListElement editHref={`/storages/${job.id}`}
                  ondelete={() => console.log('Delete')}
                  onduplicate={() => console.log('Duplicate')}
+                 onrun={handleRunJob}
                  onstatuschange={() => console.log('Status change')}
                  status={status}
                  title={job.name}>

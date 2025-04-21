@@ -20,6 +20,25 @@ export const jobsListFull = async () => db
     });
 
 /**
+ * Get a job with info about the storage and the databases to back up
+ * @param id
+ */
+export const getJob = async (id: number) => db
+    .query
+    .jobs
+    .findFirst({
+        where: (jobs, { eq }) => eq(jobs.id, id),
+        with: {
+            jobsDatabases: {
+                with: {
+                    database: true,
+                },
+            },
+            storage: true,
+        },
+    });
+
+/**
  * Create a new job with its databases to back up
  * @param req
  */

@@ -6,6 +6,7 @@
     import PowerOff from '@lucide/svelte/icons/power-off';
     import Power from '@lucide/svelte/icons/power';
     import Trash2 from '@lucide/svelte/icons/trash-2';
+    import Play from '@lucide/svelte/icons/play';
     import type { Snippet } from 'svelte';
 
     interface Props {
@@ -16,9 +17,10 @@
         onduplicate?: () => void;
         onstatuschange?: () => void;
         ondelete?: () => void;
+        onrun?: () => void;
     }
 
-    let { status, title, children, editHref, onduplicate, onstatuschange, ondelete }: Props = $props();
+    let { status, title, children, editHref, onduplicate, onstatuschange, ondelete, onrun }: Props = $props();
 </script>
 
 <div class="bg-base-100 p-2 flex flex-col gap-2 rounded-box shadow-base-100">
@@ -58,6 +60,12 @@
                 <button class="btn btn-soft btn-sm btn-error" onclick={ondelete}>
                     <Trash2 class="w-4 h-4"/>
                     Delete
+                </button>
+            {/if}
+            {#if onrun}
+                <button class="btn btn-sm btn-success" onclick={onrun}>
+                    <Play class="w-4 h-4"/>
+                    Run now
                 </button>
             {/if}
         </div>
