@@ -1,4 +1,4 @@
-import type { ResticError, ResticInit } from '$lib/storages/restic';
+import type { ResticError, ResticInit } from '$lib/types/restic';
 import type { STORAGE_TYPES } from '$lib/db/schema';
 
 /** `POST /api/storages` */

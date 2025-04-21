@@ -1,6 +1,7 @@
 import { checkPath } from '$lib/storages/checks';
-import { getRepositoryStats, type ResticError } from '$lib/storages/restic';
+import { getRepositoryStats } from '$lib/storages/restic';
 import type { StoragesCheckLocalRequest, StoragesCheckLocalResponse } from '$lib/types/api';
+import type { ResticError } from '$lib/types/restic';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
