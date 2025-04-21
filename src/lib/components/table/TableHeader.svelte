@@ -13,7 +13,7 @@
     let { children, icon: Icon, noNew }: Props = $props();
 </script>
 
-<div class="w-full flex items-center justify-between">
+<div class="w-full flex items-center justify-between h-10">
     <h2 class="text-2xl font-bold flex items-center gap-2">
         <Icon class="w-6 h-6 text-primary"/>
         {@render children()}
