@@ -7,9 +7,10 @@
     interface Props {
         children: Snippet;
         icon: typeof IconType;
+        noNew?: boolean;
     }
 
-    let { children, icon: Icon }: Props = $props();
+    let { children, icon: Icon, noNew }: Props = $props();
 </script>
 
 <div class="w-full flex items-center justify-between">
@@ -17,10 +18,13 @@
         <Icon class="w-6 h-6 text-primary"/>
         {@render children()}
     </h2>
-    <a href="{page.url.pathname}/new">
-        <button class="btn btn-primary">
-            <Plus class="w-4 h-4"/>
-            Add new
-        </button>
-    </a>
+
+    {#if !noNew}
+        <a href="{page.url.pathname}/new">
+            <button class="btn btn-primary">
+                <Plus class="w-4 h-4"/>
+                Add new
+            </button>
+        </a>
+    {/if}
 </div>

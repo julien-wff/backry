@@ -1,6 +1,6 @@
 <script lang="ts">
     import StatusIndicator from '$lib/components/common/StatusIndicator.svelte';
-    import type { ELEMENT_STATUS } from '$lib/db/schema';
+    import { type EXECUTION_STATUS, type ELEMENT_STATUS } from '$lib/db/schema';
     import CopyPlus from '@lucide/svelte/icons/copy-plus';
     import Pencil from '@lucide/svelte/icons/pencil';
     import PowerOff from '@lucide/svelte/icons/power-off';
@@ -10,7 +10,7 @@
     import type { Snippet } from 'svelte';
 
     interface Props {
-        status?: typeof ELEMENT_STATUS[number];
+        status?: typeof ELEMENT_STATUS[number] | typeof EXECUTION_STATUS[number];
         title: string;
         children?: Snippet;
         editHref?: string;
