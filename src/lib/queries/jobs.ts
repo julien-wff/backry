@@ -60,7 +60,6 @@ export async function createJob(req: JobsCreateRequest) {
                 .values({
                     job_id: job.id,
                     database_id: database.id,
-                    storagePath: database.storagePath,
                 })
                 .execute(),
         ),

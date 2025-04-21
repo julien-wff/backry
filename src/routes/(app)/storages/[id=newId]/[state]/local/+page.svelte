@@ -15,7 +15,6 @@
     let repoName = $state('');
     let filePath = $state('');
     let password = $state('');
-    let subPath = $state('/');
 
     let envVars = $state<{ key: string; value: string }[]>([]);
     let envRecords = $derived(envVars.reduce((acc, { key, value }) => {
@@ -112,7 +111,6 @@
                 name: repoName,
                 url: `local:${filePath}`,
                 type: 'local',
-                subPath,
                 password,
                 env: envRecords,
             } as StoragesCreateRequest),
@@ -148,10 +146,6 @@
 
     <InputContainer for="repo-path" label="Repository path">
         <input bind:value={filePath} class="input w-full" id="repo-path" placeholder="/data/repo-path" required>
-    </InputContainer>
-
-    <InputContainer for="repo-sub-path" label="Repository internal sub-path">
-        <input bind:value={subPath} class="input w-full" id="repo-sub-path" placeholder="/" required>
     </InputContainer>
 
     <InputContainer for="repo-password" label="Repository password">

@@ -34,7 +34,6 @@ export const storages = sqliteTable('storages', {
     created_at: text().default(sql`(CURRENT_TIMESTAMP)`),
     updated_at: text().default(sql`(CURRENT_TIMESTAMP)`).$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
     url: text('url').notNull(),
-    subPath: text('sub_path').default('/'),
     password: text('password'),
     env: text('env', { mode: 'json' }).notNull().default({}).$type<Record<string, string>>(),
 });
@@ -69,7 +68,6 @@ export const jobDatabases = sqliteTable('job_databases', {
     updated_at: text().default(sql`(CURRENT_TIMESTAMP)`).$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
     status: text('status', { enum: ELEMENT_STATUS }).notNull().default('active'),
     error: text('error'),
-    storagePath: text('storage_path').notNull(),
 });
 
 export const jobDatabasesRelations = relations(jobDatabases, ({ one }) => ({

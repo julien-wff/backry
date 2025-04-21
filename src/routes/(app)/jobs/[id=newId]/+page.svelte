@@ -19,14 +19,14 @@
     let jobName = $state('');
     let storageBackend = $state<number>(-1);
     let cron = $state('');
-    let databases = $state<Array<{ id: number, storagePath: string }>>([]);
+    let databases = $state<Array<{ id: number }>>([]);
 
     let canAddDatabases = $derived(databases.length < data.databases.length);
 
     function handleAddDatabase() {
         databases = [
             ...databases,
-            { id: -1, storagePath: '/' },
+            { id: -1 },
         ];
     }
 
@@ -103,17 +103,11 @@
                     Remove
                 </button>
 
-                <InputContainer label="Database" for="database-{i}">
-                    <select class="select select-sm w-full" bind:value={databases[i].id} id="database-{i}" required>
-                        {#each data.databases as availableDb (availableDb.id)}
-                            <option value={availableDb.id}>{availableDb.name}</option>
-                        {/each}
-                    </select>
-                </InputContainer>
-
-                <InputContainer label="Storage sub-path" for="path-{i}">
-                    <input bind:value={databases[i].storagePath} class="w-full input input-sm" id="path-{i}" required/>
-                </InputContainer>
+                <select class="select select-sm w-full" bind:value={databases[i].id} id="database-{i}" required>
+                    {#each data.databases as availableDb (availableDb.id)}
+                        <option value={availableDb.id}>{availableDb.name}</option>
+                    {/each}
+                </select>
             </fieldset>
         {/each}
 

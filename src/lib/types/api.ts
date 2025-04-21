@@ -6,7 +6,6 @@ export interface StoragesCreateRequest {
     name: string;
     type: typeof STORAGE_TYPES[number];
     url: string;
-    subPath?: string;
     password: string;
     env: Record<string, string>;
 }
@@ -52,6 +51,5 @@ export interface JobsCreateRequest {
     cron: string;
     databases: Array<{
         id: number;
-        storagePath: string;
     }>;
 }
