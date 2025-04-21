@@ -39,19 +39,19 @@ function formatResticError(shellOutput: ShellOutput) {
     }
 }
 
-async function resticCommandToResult<T>(res: Result<ShellOutput, ShellOutput>): Promise<ResultAsync<T, ResticError>> {
+async function resticCommandToResult<T>(res: Result<ShellOutput, ShellOutput>): Promise<ResultAsync<T[], ResticError>> {
     if (res.isErr()) {
         return err(formatResticError(res.error));
     }
 
-    const output = res.value.text().trim();
+    const output = res.value.text().trim().split('\n').filter((line) => line.length > 0);
     try {
-        return ok(JSON.parse(output) as T);
+        return ok(output.map(o => JSON.parse(o)) as T[]);
     } catch (e) {
         return err({
             message_type: 'unknown',
             code: -1,
-            message: output,
+            message: res.value.text().trim(),
         });
     }
 }
