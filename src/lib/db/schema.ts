@@ -1,5 +1,5 @@
 import { relations, sql } from 'drizzle-orm';
-import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 export const ELEMENT_STATUS = [ 'active', 'inactive', 'error' ] as const;
 export const DATABASE_ENGINES = [ 'postgresql-16' ] as const;
@@ -70,7 +70,7 @@ export const jobDatabases = sqliteTable('job_databases', {
     error: text('error'),
 });
 
-export const jobDatabasesRelations = relations(jobDatabases, ({ one }) => ({
+export const jobDatabasesRelations = relations(jobDatabases, ({ one, many }) => ({
     job: one(jobs, {
         fields: [ jobDatabases.job_id ],
         references: [ jobs.id ],
@@ -78,5 +78,26 @@ export const jobDatabasesRelations = relations(jobDatabases, ({ one }) => ({
     database: one(databases, {
         fields: [ jobDatabases.database_id ],
         references: [ databases.id ],
+    }),
+    executions: many(executions),
+}));
+
+export const executions = sqliteTable('executions', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    job_database_id: integer('job_database_id').notNull().references(() => jobDatabases.id),
+    error: text('error'),
+    started_at: text('started_at').default(sql`(CURRENT_TIMESTAMP)`),
+    updated_at: text('updated_at').default(sql`(CURRENT_TIMESTAMP)`).$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
+    finished_at: text('finished_at'),
+    dump_size: integer('dump_size'),
+    dump_space_added: integer('dump_space_added'),
+    duration: real('duration'),
+    snapshot_id: text('snapshot_id'),
+});
+
+export const executionsRelations = relations(executions, ({ one }) => ({
+    jobDatabase: one(jobDatabases, {
+        fields: [ executions.job_database_id ],
+        references: [ jobDatabases.id ],
     }),
 }));
