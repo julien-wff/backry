@@ -33,7 +33,7 @@ export async function startBackup(job: Awaited<ReturnType<typeof getJob>>) {
         finishedAt: sql`(CURRENT_TIMESTAMP)`,
         error: res.isErr() ? res.error.message : noSummaryErrorMessage,
         dumpSize: backupSummary?.total_bytes_processed,
-        dumpSpaceAdded: backupSummary?.data_added,
+        dumpSpaceAdded: backupSummary?.data_added_packed,
         duration: backupSummary?.total_duration,
         snapshotId: backupSummary?.snapshot_id,
     });
