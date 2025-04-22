@@ -14,7 +14,7 @@ function formatResticError(shellOutput: ShellOutput) {
     const error = shellOutput.stderr.toString().trim();
     try {
         return JSON.parse(error) as ResticError;
-    } catch (e) {
+    } catch {
         return {
             message_type: 'unknown',
             code: -1,
@@ -31,7 +31,7 @@ async function resticCommandToResult<T>(res: Result<ShellOutput, ShellOutput>): 
     const output = res.value.text().trim().split('\n').filter((line) => line.length > 0);
     try {
         return ok(output.map(o => JSON.parse(o)) as T[]);
-    } catch (e) {
+    } catch {
         return err({
             message_type: 'unknown',
             code: -1,
