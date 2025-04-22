@@ -1,9 +1,9 @@
+import { DATABASE_ENGINES } from '$lib/engines';
 import { relations, sql } from 'drizzle-orm';
 import { integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 export const ELEMENT_STATUS = [ 'active', 'inactive', 'error' ] as const;
 export const EXECUTION_STATUS = [ 'running', 'success', 'error' ] as const;
-export const DATABASE_ENGINES = [ 'postgresql-16' ] as const;
 export const STORAGE_TYPES = [ 'local', 'custom' ] as const;
 
 export const databases = sqliteTable('databases', {

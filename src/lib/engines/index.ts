@@ -4,6 +4,8 @@ export const engines = {
     'postgresql': PostgresEngine,
 } as const;
 
+export const DATABASE_ENGINES = Object.keys(engines) as unknown as readonly [ keyof typeof engines ];
+
 export const checkAllEngines = () => Promise.all(
     Object
         .keys(engines)
