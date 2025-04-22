@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { DATABASE_ENGINES } from '$lib/db/schema';
+    import type { DATABASE_ENGINES } from '$lib/engines';
 
     interface Props {
         engine: typeof DATABASE_ENGINES[number];
@@ -9,8 +9,8 @@
 </script>
 
 <div class="flex items-center gap-1">
-    {#if engine === 'postgresql-16'}
+    {#if engine === 'postgresql'}
         <img src="/icons/postgres.svg" alt="Postgres 16" class="w-4 h-4"/>
-        Postgres 16
+        PostgreSQL
     {/if}
 </div>
