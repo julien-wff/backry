@@ -1,7 +1,9 @@
 <script lang="ts">
+    import { invalidateAll } from '$app/navigation';
     import BaseListElement from '$lib/components/common/BaseListElement.svelte';
     import type { EXECUTION_STATUS } from '$lib/db/schema';
     import type { executionsListFull } from '$lib/queries/executions';
+    import { fetchApi } from '$lib/utils/api';
     import { formatDuration, formatSize } from '$lib/utils/format.js';
     import Clock from '@lucide/svelte/icons/clock';
     import Timer from '@lucide/svelte/icons/timer';
@@ -22,10 +24,20 @@
             return 'running';
         }
     })());
+
+    let loading = $state(false);
+
+    async function handleDelete() {
+        loading = true;
+        await fetchApi('DELETE', `/api/executions/${execution.id}`, {});
+        await invalidateAll();
+        loading = false;
+    }
 </script>
 
 
-<BaseListElement ondelete={() => console.log('Delete')}
+<BaseListElement disabled={loading}
+                 ondelete={handleDelete}
                  status={status}
                  title="{execution.jobDatabase.job.name} - {execution.jobDatabase.database.name}">
     <div class="flex items-center gap-1">

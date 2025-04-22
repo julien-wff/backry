@@ -98,3 +98,25 @@ export async function backupFromCommand(url: string,
 
     return resticCommandToResult<ResticBackupStatus | ResticBackupSummary>(res);
 }
+
+
+export async function deleteSnapshot(url: string,
+                                     password: string,
+                                     env: Record<string, string>,
+                                     snapshotId: string) {
+    const res = await runCommandSync(
+        'restic',
+        [
+            '-r', url,
+            'forget',
+            '--prune',
+            '--json',
+            snapshotId,
+        ],
+        {
+            env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env },
+        },
+    );
+
+    return resticCommandToResult<ResticBackupStatus>(res);
+}

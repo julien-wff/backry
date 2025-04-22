@@ -17,6 +17,30 @@ export const executionsListFull = async () => db.query.executions.findMany({
     },
 });
 
+export const getExecution = async (id: number) =>
+    db.query.executions.findFirst({
+        where: eq(executions.id, id),
+        with: {
+            jobDatabase: {
+                with: {
+                    database: true,
+                    job: {
+                        with: {
+                            storage: true,
+                        },
+                    },
+                },
+            },
+        },
+    });
+
+export const deleteExecution = async (id: number) =>
+    db
+        .delete(executions)
+        .where(eq(executions.id, id))
+        .returning()
+        .get();
+
 export const createExecution = async (jobDatabaseId: number, fileName: string) =>
     db
         .insert(executions)

@@ -18,9 +18,10 @@
         onstatuschange?: () => void;
         ondelete?: () => void;
         onrun?: () => void;
+        disabled?: boolean;
     }
 
-    let { status, title, children, editHref, onduplicate, onstatuschange, ondelete, onrun }: Props = $props();
+    let { status, title, children, editHref, onduplicate, onstatuschange, ondelete, onrun, disabled }: Props = $props();
 </script>
 
 <div class="bg-base-100 p-2 flex flex-col gap-2 rounded-box shadow-base-100">
@@ -40,13 +41,13 @@
                 </a>
             {/if}
             {#if onduplicate}
-                <button class="btn btn-soft btn-sm btn-primary" onclick={onduplicate}>
+                <button {disabled} class="btn btn-soft btn-sm btn-primary" onclick={onduplicate}>
                     <CopyPlus class="w-4 h-4"/>
                     Duplicate and edit
                 </button>
             {/if}
             {#if onstatuschange && (status === 'active' || status === 'inactive')}
-                <button class="btn btn-sm btn-warning" onclick={onstatuschange}>
+                <button {disabled} class="btn btn-sm btn-warning" onclick={onstatuschange}>
                     {#if status === 'active'}
                         <PowerOff class="w-4 h-4"/>
                         Disable
@@ -57,13 +58,13 @@
                 </button>
             {/if}
             {#if ondelete}
-                <button class="btn btn-soft btn-sm btn-error" onclick={ondelete}>
+                <button {disabled} class="btn btn-soft btn-sm btn-error" onclick={ondelete}>
                     <Trash2 class="w-4 h-4"/>
                     Delete
                 </button>
             {/if}
             {#if onrun}
-                <button class="btn btn-sm btn-success" onclick={onrun}>
+                <button {disabled} class="btn btn-sm btn-success" onclick={onrun}>
                     <Play class="w-4 h-4"/>
                     Run now
                 </button>
