@@ -1,3 +1,7 @@
+import { db } from '$lib/db';
+import { storages } from '$lib/db/schema';
+import { getRepositoryStats } from '$lib/storages/restic';
+import { eq, or } from 'drizzle-orm';
 import fs from 'fs/promises';
 import { err, ok, type ResultAsync } from 'neverthrow';
 import path from 'path';
@@ -42,4 +46,58 @@ export async function checkPathForCreate(rawPath: string | null): Promise<Result
         isEmpty: files.length === 0,
         path: resolvedPath,
     });
+}
+
+
+/**
+ * Check if all active or errored repositories are accessible and update their status accordingly.
+ */
+export async function checkAllActiveRepositories() {
+    const storagesList = await db
+        .select()
+        .from(storages)
+        .where(or(eq(storages.status, 'active'), eq(storages.status, 'error')))
+        .execute();
+
+    for (const storage of storagesList) {
+        await checkRepository(storage);
+    }
+}
+
+
+/**
+ * Check if a repository is accessible and update the storage status accordingly.
+ * @param storage The storage object to check.
+ * @returns A promise that resolves to a boolean indicating if the repository is accessible.
+ */
+export async function checkRepository(storage: typeof storages.$inferSelect) {
+    const checkResult = await getRepositoryStats(storage.url, storage.password!, storage.env);
+
+    // If the repository is not accessible, update the storage status to error
+    if (checkResult.isErr()) {
+        await db
+            .update(storages)
+            .set({
+                status: 'error',
+                error: checkResult.error.message,
+            })
+            .where(eq(storages.id, storage.id))
+            .execute();
+
+        return false;
+    }
+
+    // If there was an error but now the repository is accessible, update the storage status to ok
+    if (storage.status === 'error') {
+        await db
+            .update(storages)
+            .set({
+                status: 'active',
+                error: null,
+            })
+            .where(eq(storages.id, storage.id))
+            .execute();
+    }
+
+    return true;
 }
