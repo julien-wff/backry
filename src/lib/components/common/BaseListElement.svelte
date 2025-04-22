@@ -7,6 +7,7 @@
     import Power from '@lucide/svelte/icons/power';
     import Trash2 from '@lucide/svelte/icons/trash-2';
     import Play from '@lucide/svelte/icons/play';
+    import EllipsisVertical from '@lucide/svelte/icons/ellipsis-vertical';
     import type { Snippet } from 'svelte';
 
     interface Props {
@@ -42,12 +43,7 @@
                     </button>
                 </a>
             {/if}
-            {#if onduplicate}
-                <button {disabled} class="btn btn-soft btn-sm btn-primary" onclick={onduplicate}>
-                    <CopyPlus class="w-4 h-4"/>
-                    Duplicate and edit
-                </button>
-            {/if}
+
             {#if onstatuschange && (status === 'active' || status === 'inactive')}
                 <button {disabled} class="btn btn-sm btn-warning" onclick={onstatuschange}>
                     {#if status === 'active'}
@@ -59,17 +55,34 @@
                     {/if}
                 </button>
             {/if}
-            {#if ondelete}
-                <button {disabled} class="btn btn-soft btn-sm btn-error" onclick={ondelete}>
-                    <Trash2 class="w-4 h-4"/>
-                    Delete
-                </button>
-            {/if}
+
             {#if onrun}
                 <button {disabled} class="btn btn-sm btn-success" onclick={onrun}>
                     <Play class="w-4 h-4"/>
                     Run now
                 </button>
+            {/if}
+
+            {#if onduplicate || ondelete}
+                <div class="dropdown dropdown-end">
+                    <div class="btn btn-square btn-sm btn-soft" role="button" tabindex="0">
+                        <EllipsisVertical class="w-4 h-4"/>
+                    </div>
+                    <div class="menu dropdown-content gap-2 bg-base-200 rounded-box z-1 w-48 p-2 shadow-sm">
+                        {#if onduplicate}
+                            <button {disabled} class="btn btn-soft btn-sm btn-primary" onclick={onduplicate}>
+                                <CopyPlus class="w-4 h-4"/>
+                                Duplicate and edit
+                            </button>
+                        {/if}
+                        {#if ondelete}
+                            <button {disabled} class="btn btn-soft btn-sm btn-error" onclick={ondelete}>
+                                <Trash2 class="w-4 h-4"/>
+                                Delete
+                            </button>
+                        {/if}
+                    </div>
+                </div>
             {/if}
         </div>
     </div>
