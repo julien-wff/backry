@@ -2,6 +2,7 @@
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
     import NewPageHeader from '$lib/components/new-elements/NewPageHeader.svelte';
     import type { JobsCreateRequest } from '$lib/types/api';
+    import { slugify } from '$lib/utils/format';
     import Timer from '@lucide/svelte/icons/timer';
     import Trash2 from '@lucide/svelte/icons/trash-2';
     import type { PageData } from './$types';
@@ -17,6 +18,7 @@
     let isLoading = $state(false);
 
     let jobName = $state('');
+    let slug = $state('');
     let storageBackend = $state<number>(-1);
     let cron = $state('');
     let databases = $state<Array<{ id: number }>>([]);
@@ -34,6 +36,16 @@
         databases = databases.filter((_, i) => index != i);
     }
 
+    let oldJobName = $state('');
+    $effect(() => updateSlug(jobName));
+
+    function updateSlug(_: string) {
+        if (slugify(oldJobName) === slug) {
+            slug = slugify(jobName);
+        }
+        oldJobName = jobName;
+    }
+
     async function handleFormSubmit() {
         isLoading = true;
         error = null;
@@ -45,6 +57,7 @@
             },
             body: JSON.stringify({
                 name: jobName,
+                slug,
                 storageId: storageBackend,
                 cron,
                 databases,
@@ -78,6 +91,10 @@
 
     <InputContainer for="job-name" label="Name">
         <input bind:value={jobName} class="input w-full" id="job-name" required>
+    </InputContainer>
+
+    <InputContainer for="slug" label="Slug">
+        <input bind:value={slug} class="input w-full" id="slug" pattern="^[a-z0-9\-]+$" required>
     </InputContainer>
 
     <InputContainer for="backend" label="Storage backend">

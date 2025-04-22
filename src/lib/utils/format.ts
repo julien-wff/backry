@@ -38,3 +38,17 @@ export const formatSize = (size: number) => {
     }
     return `${size.toFixed(i === 0 ? 0 : 2)} ${sizes[i]}`;
 };
+
+/**
+ * Transform a string into a slug.
+ * Replaces spaces with dashes and removes special characters.
+ * Only a-z 0-9 and dashes are kept.
+ * @param text The string to slugify
+ * @returns The slugified string
+ */
+export const slugify = (text: string) =>
+    text
+        .trim()
+        .toLowerCase()
+        .replace(/[^0-9a-z-]/g, '-')
+        .replace(/-+/g, '-');

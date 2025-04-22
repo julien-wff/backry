@@ -47,6 +47,7 @@ export async function createJob(req: JobsCreateRequest) {
         .insert(jobs)
         .values({
             name: req.name,
+            slug: req.slug,
             storageId: req.storageId,
             cron: req.cron,
         })

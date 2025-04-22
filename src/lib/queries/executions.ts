@@ -17,11 +17,12 @@ export const executionsListFull = async () => db.query.executions.findMany({
     },
 });
 
-export const createExecution = async (jobDatabaseId: number) =>
+export const createExecution = async (jobDatabaseId: number, fileName: string) =>
     db
         .insert(executions)
         .values({
-            jobDatabaseId: jobDatabaseId,
+            jobDatabaseId,
+            fileName,
         })
         .returning()
         .get();

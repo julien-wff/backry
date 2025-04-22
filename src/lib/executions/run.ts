@@ -8,14 +8,15 @@ export async function startBackup(job: Awaited<ReturnType<typeof getJob>>) {
     const engine = new PostgresEngine();
     const databaseInfo = job!.jobsDatabases[0].database;
 
-    const execution = await createExecution(job!.jobsDatabases[0].id);
+    const fileName = `${job!.slug}_${databaseInfo.slug}.${engine.dumpFileExtension}`;
+    const execution = await createExecution(job!.jobsDatabases[0].id, fileName);
 
     const res = await backupFromCommand(
         job!.storage.url,
         job!.storage.password!,
         job!.storage.env,
         engine.getDumpCommand(databaseInfo.connectionString!),
-        `dump.${engine.dumpFileExtension}`,
+        fileName,
         [
             `jobId:${job!.id}`,
             `jobName:${job!.name}`,

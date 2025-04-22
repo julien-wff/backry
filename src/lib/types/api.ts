@@ -47,6 +47,7 @@ export type StoragesCreateRepositoryResponse = {
 /** `POST /api/jobs` */
 export interface JobsCreateRequest {
     name: string;
+    slug: string;
     storageId: number;
     cron: string;
     databases: Array<{

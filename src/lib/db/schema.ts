@@ -9,6 +9,7 @@ export const STORAGE_TYPES = [ 'local', 'custom' ] as const;
 export const databases = sqliteTable('databases', {
     id: integer('id').primaryKey({ autoIncrement: true }),
     name: text('name').notNull(),
+    slug: text('slug').notNull(),
     engine: text('engine', { enum: SCHEMA_DATABASE_ENGINES }).notNull(),
     status: text('status', { enum: ELEMENT_STATUS }).notNull().default('active'),
     error: text('error'),
@@ -46,6 +47,7 @@ export const storagesRelations = relations(storages, ({ many }) => ({
 export const jobs = sqliteTable('jobs', {
     id: integer('id').primaryKey({ autoIncrement: true }),
     name: text('name').notNull(),
+    slug: text('slug').notNull(),
     status: text('status', { enum: ELEMENT_STATUS }).notNull().default('active'),
     createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`),
     updatedAt: text('updated_at').default(sql`(CURRENT_TIMESTAMP)`).$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
@@ -86,6 +88,7 @@ export const jobDatabasesRelations = relations(jobDatabases, ({ one, many }) => 
 export const executions = sqliteTable('executions', {
     id: integer('id').primaryKey({ autoIncrement: true }),
     jobDatabaseId: integer('job_database_id').notNull().references(() => jobDatabases.id),
+    fileName: text('file_name').notNull(),
     error: text('error'),
     startedAt: text('started_at').default(sql`(CURRENT_TIMESTAMP)`),
     updatedAt: text('updated_at').default(sql`(CURRENT_TIMESTAMP)`).$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
