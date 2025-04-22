@@ -13,7 +13,12 @@ export interface CheckPathError {
     path?: string;
 }
 
-export async function checkPath(rawPath: string | null): Promise<ResultAsync<CheckPathResult, CheckPathError>> {
+/**
+ * Get information about a local path to check if it's accessible and empty.
+ * @param rawPath The path to check, can be relative or absolute.
+ * @returns A promise that resolves to a ResultAsync containing the path information or an error.
+ */
+export async function checkPathForCreate(rawPath: string | null): Promise<ResultAsync<CheckPathResult, CheckPathError>> {
     if (!rawPath) {
         return err({ error: 'path is required' });
     }

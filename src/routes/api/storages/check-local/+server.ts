@@ -1,4 +1,4 @@
-import { checkPath } from '$lib/storages/checks';
+import { checkPathForCreate } from '$lib/storages/checks';
 import { getRepositoryStats } from '$lib/storages/restic';
 import type { StoragesCheckLocalRequest, StoragesCheckLocalResponse } from '$lib/types/api';
 import type { ResticError } from '$lib/types/restic';
@@ -9,7 +9,7 @@ import type { RequestHandler } from './$types';
 export const POST: RequestHandler = async ({ request }) => {
     const body = await request.json() as StoragesCheckLocalRequest;
 
-    const checkPathResult = await checkPath(body.url);
+    const checkPathResult = await checkPathForCreate(body.url);
     if (checkPathResult.isErr()) {
         return json({
             error: checkPathResult.error.error,
