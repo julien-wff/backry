@@ -1,15 +1,15 @@
-import { DATABASE_ENGINES } from '$lib/engines';
 import { relations, sql } from 'drizzle-orm';
 import { integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
 export const ELEMENT_STATUS = [ 'active', 'inactive', 'error' ] as const;
+export const SCHEMA_DATABASE_ENGINES = [ 'postgresql' ] as const; // From ../engines/index.ts (cannot import, drizzle doesn't support $lib)
 export const EXECUTION_STATUS = [ 'running', 'success', 'error' ] as const;
 export const STORAGE_TYPES = [ 'local', 'custom' ] as const;
 
 export const databases = sqliteTable('databases', {
     id: integer('id').primaryKey({ autoIncrement: true }),
     name: text('name').notNull(),
-    engine: text('engine', { enum: DATABASE_ENGINES }).notNull(),
+    engine: text('engine', { enum: SCHEMA_DATABASE_ENGINES }).notNull(),
     status: text('status', { enum: ELEMENT_STATUS }).notNull().default('active'),
     error: text('error'),
     createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`),
