@@ -1,8 +1,9 @@
+import type { databases } from '$lib/db/schema';
 import type { ResultAsync } from 'neverthrow';
 
 export abstract class BaseEngine {
     public abstract dumpFileExtension: string;
-    
+
     /**
      * Get the version of the engine.
      */
@@ -15,4 +16,11 @@ export abstract class BaseEngine {
      * @returns Full command to run the dump.
      */
     public abstract getDumpCommand(connectionString: string, additionalArgs?: string[]): string[];
+
+    /**
+     * Check the connection to the database.
+     * @param db The database object to check.
+     * @returns Empty ok or error message.
+     */
+    public abstract checkConnection(db: typeof databases.$inferSelect): Promise<ResultAsync<void, string>>;
 }

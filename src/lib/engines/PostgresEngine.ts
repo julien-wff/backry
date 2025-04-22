@@ -1,5 +1,7 @@
+import type { databases } from '$lib/db/schema';
 import type { BaseEngine } from '$lib/engines/BaseEngine';
 import { runCommandSync } from '$lib/utils/cmd';
+import { SQL } from 'bun';
 import { err, ok, type ResultAsync } from 'neverthrow';
 
 export class PostgresEngine implements BaseEngine {
@@ -19,4 +21,20 @@ export class PostgresEngine implements BaseEngine {
     getDumpCommand(connectionString: string, additionalArgs: string[] = []): string[] {
         return [ this.pgDump, ...additionalArgs, connectionString ];
     }
+
+    async checkConnection(db: typeof databases.$inferSelect): Promise<ResultAsync<void, string>> {
+        const con = new SQL({
+            url: db.connectionString!,
+            connectionTimeout: 5,
+        });
+
+        try {
+            await con.connect();
+            await con.close();
+            return ok();
+        } catch (e) {
+            return err(e instanceof Error ? e.message : 'Unknown error');
+        }
+    }
 }
+
