@@ -3,6 +3,9 @@ import type { ResultAsync } from 'neverthrow';
 
 export abstract class BaseEngine {
     public abstract dumpFileExtension: string;
+    public abstract displayName: string;
+    public abstract icon: string;
+    public abstract connectionStringPlaceholder: string;
 
     /**
      * Get the version of the engine.

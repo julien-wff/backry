@@ -6,6 +6,9 @@ import { err, ok, type ResultAsync } from 'neverthrow';
 
 export class PostgresEngine implements BaseEngine {
     public readonly dumpFileExtension = 'sql';
+    public readonly displayName = 'PostgreSQL';
+    public readonly icon = 'postgres.svg';
+    public readonly connectionStringPlaceholder = 'postgres://user:password@host:port/dbname';
 
     private readonly pgDump = process.env.PG_DUMP_CMD ?? 'pg_dump';
 
