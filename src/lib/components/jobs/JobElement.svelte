@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { goto } from '$app/navigation';
     import BaseListElement from '$lib/components/common/BaseListElement.svelte';
     import CloudUpload from '@lucide/svelte/icons/cloud-upload';
     import Clock from '@lucide/svelte/icons/clock';
@@ -16,6 +17,10 @@
         const res = await fetch(`/api/jobs/${job.id}/run`, {
             method: 'POST',
         });
+
+        if (res.ok) {
+            await goto('/executions');
+        }
     }
 </script>
 
