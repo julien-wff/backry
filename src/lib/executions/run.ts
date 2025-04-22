@@ -19,9 +19,7 @@ export async function startBackup(job: Awaited<ReturnType<typeof getJob>>) {
         fileName,
         [
             `jobId:${job!.id}`,
-            `jobName:${job!.name}`,
             `dbId:${databaseInfo.id}`,
-            `dbName:${databaseInfo.name}`,
         ],
     );
 
