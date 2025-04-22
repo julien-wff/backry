@@ -7,6 +7,9 @@ import { eq } from 'drizzle-orm';
  */
 export const databasesList = () => db.select().from(databases);
 
+export const createDatabase = (values: typeof databases.$inferInsert) =>
+    db.insert(databases).values(values).returning().get();
+
 /**
  * Fetches a list of all active databases ID and name.
  */

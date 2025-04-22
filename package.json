@@ -35,6 +35,8 @@
 		"cron": "^4.3.0",
 		"dayjs": "^1.11.13",
 		"drizzle-orm": "^0.40.1",
-		"neverthrow": "^8.2.0"
+		"neverthrow": "^8.2.0",
+		"zod": "^3.24.3",
+		"zod-validation-error": "^3.4.0"
 	}
 }
