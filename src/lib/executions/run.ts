@@ -14,7 +14,7 @@ export async function startBackup(job: Awaited<ReturnType<typeof getJob>>) {
         job!.storage.url,
         job!.storage.password!,
         job!.storage.env,
-        engine.getDumpCommand(databaseInfo.connection_string!),
+        engine.getDumpCommand(databaseInfo.connectionString!),
         `dump.${engine.dumpFileExtension}`,
         [
             `jobId:${job!.id}`,
@@ -31,12 +31,12 @@ export async function startBackup(job: Awaited<ReturnType<typeof getJob>>) {
 
     await updateExecution(execution.id, {
         // @ts-expect-error only accepts string, sql is not supported in type definition (but is for drizzle)
-        finished_at: sql`(CURRENT_TIMESTAMP)`,
+        finishedAt: sql`(CURRENT_TIMESTAMP)`,
         error: res.isErr() ? res.error.message : noSummaryErrorMessage,
-        dump_size: backupSummary?.total_bytes_processed,
-        dump_space_added: backupSummary?.data_added,
+        dumpSize: backupSummary?.total_bytes_processed,
+        dumpSpaceAdded: backupSummary?.data_added,
         duration: backupSummary?.total_duration,
-        snapshot_id: backupSummary?.snapshot_id,
+        snapshotId: backupSummary?.snapshot_id,
     });
 
     return res;

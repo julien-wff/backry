@@ -47,7 +47,7 @@ export async function createJob(req: JobsCreateRequest) {
         .insert(jobs)
         .values({
             name: req.name,
-            storage_id: req.storage_id,
+            storageId: req.storageId,
             cron: req.cron,
         })
         .returning()
@@ -58,8 +58,8 @@ export async function createJob(req: JobsCreateRequest) {
             db
                 .insert(jobDatabases)
                 .values({
-                    job_id: job.id,
-                    database_id: database.id,
+                    jobId: job.id,
+                    databaseId: database.id,
                 })
                 .execute(),
         ),

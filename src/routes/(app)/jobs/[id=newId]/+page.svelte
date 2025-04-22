@@ -45,7 +45,7 @@
             },
             body: JSON.stringify({
                 name: jobName,
-                storage_id: storageBackend,
+                storageId: storageBackend,
                 cron,
                 databases,
             } as JobsCreateRequest),

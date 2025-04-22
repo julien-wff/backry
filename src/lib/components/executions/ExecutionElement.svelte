@@ -16,7 +16,7 @@
     let status = $derived(((): typeof EXECUTION_STATUS[number] => {
         if (execution.error) {
             return 'error';
-        } else if (execution.finished_at) {
+        } else if (execution.finishedAt) {
             return 'success';
         } else {
             return 'running';
@@ -30,7 +30,7 @@
                  title="{execution.jobDatabase.job.name} - {execution.jobDatabase.database.name}">
     <div class="flex items-center gap-1">
         <Clock class="w-4 h-4"/>
-        Started: {execution.started_at}
+        Started: {execution.startedAt}
     </div>
 
     {#if execution.duration}
@@ -40,17 +40,17 @@
         </div>
     {/if}
 
-    {#if execution.dump_size}
+    {#if execution.dumpSize}
         <div class="flex items-center gap-1">
             <FileChartPie class="w-4 h-4"/>
-            Dump size: {formatSize(execution.dump_size)}
+            Dump size: {formatSize(execution.dumpSize)}
         </div>
     {/if}
 
-    {#if execution.dump_space_added}
+    {#if execution.dumpSpaceAdded}
         <div class="flex items-center gap-1">
             <HardDriveDownload class="w-4 h-4"/>
-            Space added: {formatSize(execution.dump_space_added)}
+            Space added: {formatSize(execution.dumpSpaceAdded)}
         </div>
     {/if}
 </BaseListElement>

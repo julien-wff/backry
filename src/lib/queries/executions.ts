@@ -21,7 +21,7 @@ export const createExecution = async (jobDatabaseId: number) =>
     db
         .insert(executions)
         .values({
-            job_database_id: jobDatabaseId,
+            jobDatabaseId: jobDatabaseId,
         })
         .returning()
         .get();
