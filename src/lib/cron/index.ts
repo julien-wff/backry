@@ -20,7 +20,15 @@ export const addOrUpdateCronJob = (id: CronId, cron: string, callback: () => any
         cron,
         callback,
         null,
-        true,
+        true, // start
+        null,
+        null,
+        null,
+        null,
+        null,
+        true, // waitForCompletion (wait for the last execution to finish before starting a new one)
+        null,
+        id, // name
     );
     cronJobs.set(id, job);
 };
