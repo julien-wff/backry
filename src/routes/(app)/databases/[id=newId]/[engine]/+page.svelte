@@ -1,5 +1,6 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
+    import Head from '$lib/components/common/Head.svelte';
     import { customEnhance } from '$lib/utils/actions.js';
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
     import NewPageHeader from '$lib/components/new-elements/NewPageHeader.svelte';
@@ -22,6 +23,8 @@
         oldDbName = dbName;
     }
 </script>
+
+<Head title="Add database - {data.engineName}"/>
 
 <NewPageHeader backText="Back to engines" currentStep={2} icon={Database} totalSteps={2}>
     Add database - {data.engineName}
