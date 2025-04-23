@@ -1,4 +1,5 @@
-import { DATABASE_ENGINES, engines } from '$lib/engines';
+import { DATABASE_ENGINES } from '$lib/db/schema';
+import { engines } from '$lib/engines';
 import { createDatabase } from '$lib/queries/databases';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';

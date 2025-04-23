@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { DATABASE_ENGINES } from '$lib/engines';
+    import type { DATABASE_ENGINES } from '$lib/db/schema';
 
     interface Props {
         engine: typeof DATABASE_ENGINES[number];
