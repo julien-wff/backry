@@ -1,24 +1,20 @@
-import { cronJobs } from '$lib/cron';
+import { addOrUpdateCronJob } from '$lib/cron';
 import { checkAllActiveDatabases } from '$lib/engines/checks';
 import { setUnfinishedExecutionsToError } from '$lib/queries/executions';
 import { checkAllActiveRepositories } from '$lib/storages/checks';
 import type { ServerInit } from '@sveltejs/kit';
-import { CronJob } from 'cron';
 
 export const init: ServerInit = async () => {
-    cronJobs.set('system:check-storages', new CronJob(
+    addOrUpdateCronJob('system:check-storages',
         '* * * * *',
         () => checkAllActiveRepositories(),
-        null,
-        true,
-    ));
+    );
 
-    cronJobs.set('system:check-dbs', new CronJob(
+    addOrUpdateCronJob(
+        'system:check-dbs',
         '* * * * *',
         () => checkAllActiveDatabases(),
-        null,
-        true,
-    ));
+    );
 
     await setUnfinishedExecutionsToError();
 };
