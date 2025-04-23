@@ -23,12 +23,16 @@ function formatResticError(shellOutput: ShellOutput) {
     }
 }
 
-async function resticCommandToResult<T>(res: Result<ShellOutput, ShellOutput>): Promise<ResultAsync<T[], ResticError>> {
+async function resticCommandToResult<T>(res: Result<ShellOutput, ShellOutput>, json = true): Promise<ResultAsync<T[], ResticError>> {
     if (res.isErr()) {
         return err(formatResticError(res.error));
     }
 
     const output = res.value.text().trim().split('\n').filter((line) => line.length > 0);
+    if (!json) {
+        return ok(output as T[]);
+    }
+
     try {
         return ok(output.map(o => JSON.parse(o)) as T[]);
     } catch {
@@ -104,13 +108,14 @@ export async function deleteSnapshot(url: string,
                                      password: string,
                                      env: Record<string, string>,
                                      snapshotId: string) {
+    // forget with --prune does not yet support JSON output as of restic v0.18.0
+    // https://restic.readthedocs.io/en/v0.18.0/075_scripting.html#forget
     const res = await runCommandSync(
         'restic',
         [
             '-r', url,
             'forget',
             '--prune',
-            '--json',
             snapshotId,
         ],
         {
@@ -118,5 +123,5 @@ export async function deleteSnapshot(url: string,
         },
     );
 
-    return resticCommandToResult<ResticBackupStatus>(res);
+    return resticCommandToResult<string>(res, false);
 }
