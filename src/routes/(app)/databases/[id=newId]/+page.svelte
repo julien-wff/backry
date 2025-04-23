@@ -15,7 +15,7 @@
     Add database - engine
 </NewPageHeader>
 
-<NewElementsContainer gridClass="grid-cols-1">
+<NewElementsContainer gridClass="grid-cols-2">
     {#each data.engines as engine (engine.id)}
         <NewElementCard href={engine.id} icon="/icons/{engine.icon}">
             {engine.displayName}
