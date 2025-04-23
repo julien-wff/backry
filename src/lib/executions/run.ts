@@ -1,24 +1,30 @@
 import { engines } from '$lib/engines';
 import { createExecution, updateExecution } from '$lib/queries/executions';
-import type { getJob } from '$lib/queries/jobs';
+import { getJob } from '$lib/queries/jobs';
 import { backupFromCommand } from '$lib/storages/restic';
 import { sql } from 'drizzle-orm';
+import { err, ok, type ResultAsync } from 'neverthrow';
 
-export async function startBackup(job: Awaited<ReturnType<typeof getJob>>) {
-    const engine = new engines[job!.jobsDatabases[0].database.engine]();
-    const databaseInfo = job!.jobsDatabases[0].database;
+export async function startBackup(jobId: number): Promise<ResultAsync<void, string>> {
+    const job = await getJob(jobId);
+    if (!job) {
+        return err(`Job #${jobId} not found`);
+    }
 
-    const fileName = `${job!.slug}_${databaseInfo.slug}.${engine.dumpFileExtension}`;
-    const execution = await createExecution(job!.jobsDatabases[0].id, fileName);
+    const engine = new engines[job.jobsDatabases[0].database.engine]();
+    const databaseInfo = job.jobsDatabases[0].database;
+
+    const fileName = `${job.slug}_${databaseInfo.slug}.${engine.dumpFileExtension}`;
+    const execution = await createExecution(job.jobsDatabases[0].id, fileName);
 
     const res = await backupFromCommand(
-        job!.storage.url,
-        job!.storage.password!,
-        job!.storage.env,
+        job.storage.url,
+        job.storage.password!,
+        job.storage.env,
         engine.getDumpCommand(databaseInfo.connectionString!),
         fileName,
         [
-            `jobId:${job!.id}`,
+            `jobId:${job.id}`,
             `dbId:${databaseInfo.id}`,
         ],
     );
@@ -38,5 +44,9 @@ export async function startBackup(job: Awaited<ReturnType<typeof getJob>>) {
         snapshotId: backupSummary?.snapshot_id,
     });
 
-    return res;
+    if (res.isErr()) {
+        return err(res.error.message);
+    }
+
+    return ok();
 }
