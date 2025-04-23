@@ -1,4 +1,4 @@
-import { addOrUpdateCronJob } from '$lib/cron';
+import { addOrUpdateCronJob } from '$lib/shared/cron';
 import { checkAllActiveDatabases } from '$lib/engines/checks';
 import { startBackup } from '$lib/executions/run';
 import { setUnfinishedExecutionsToError } from '$lib/queries/executions';
