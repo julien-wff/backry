@@ -13,7 +13,7 @@ export const DELETE: RequestHandler = async ({ params }) => {
         return json({ error: 'Execution not found' }, { status: 404 });
     }
 
-    if (!execution.finishedAt) {
+    if (!execution.error && !execution.finishedAt) {
         return json({ error: 'Execution is not finished' }, { status: 400 });
     }
 
