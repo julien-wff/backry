@@ -1,11 +1,11 @@
-import { PostgresEngine } from '$lib/engines/PostgresEngine';
+import { engines } from '$lib/engines';
 import { createExecution, updateExecution } from '$lib/queries/executions';
 import type { getJob } from '$lib/queries/jobs';
 import { backupFromCommand } from '$lib/storages/restic';
 import { sql } from 'drizzle-orm';
 
 export async function startBackup(job: Awaited<ReturnType<typeof getJob>>) {
-    const engine = new PostgresEngine();
+    const engine = new engines[job!.jobsDatabases[0].database.engine]();
     const databaseInfo = job!.jobsDatabases[0].database;
 
     const fileName = `${job!.slug}_${databaseInfo.slug}.${engine.dumpFileExtension}`;
