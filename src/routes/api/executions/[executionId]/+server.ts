@@ -20,7 +20,10 @@ export const DELETE: RequestHandler = async ({ params }) => {
     // Delete from restic if completed
     const storage = execution.jobDatabase.job.storage;
     if (execution.snapshotId) {
-        await deleteSnapshot(storage.url, storage.password!, storage.env, execution.snapshotId);
+        const res = await deleteSnapshot(storage.url, storage.password!, storage.env, execution.snapshotId);
+        if (res.isErr()) {
+            return json({ error: res.error.message }, { status: 500 });
+        }
     }
 
     const res = await deleteExecution(executionId);
