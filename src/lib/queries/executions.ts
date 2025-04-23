@@ -1,6 +1,6 @@
 import { db } from '$lib/db';
 import { executions } from '$lib/db/schema';
-import { desc, eq } from 'drizzle-orm';
+import { desc, eq, isNull } from 'drizzle-orm';
 
 export const executionsListFull = async () => db.query.executions.findMany({
     orderBy: [ desc(executions.startedAt) ],
@@ -59,3 +59,16 @@ export const updateExecution = async (id: number, payload: Partial<typeof execut
         .where(eq(executions.id, id))
         .returning()
         .get();
+
+/**
+ * Set all unfinished executions to error.
+ * Used on startup to set all executions that are still running to error.
+ */
+export const setUnfinishedExecutionsToError = async () => db
+    .update(executions)
+    .set({
+        error: 'Job timed out',
+    })
+    .where(isNull(executions.finishedAt))
+    .returning()
+    .get();

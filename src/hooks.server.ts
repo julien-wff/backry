@@ -1,5 +1,6 @@
 import { cronJobs } from '$lib/cron';
 import { checkAllActiveDatabases } from '$lib/engines/checks';
+import { setUnfinishedExecutionsToError } from '$lib/queries/executions';
 import { checkAllActiveRepositories } from '$lib/storages/checks';
 import type { ServerInit } from '@sveltejs/kit';
 import { CronJob } from 'cron';
@@ -18,4 +19,6 @@ export const init: ServerInit = async () => {
         null,
         true,
     ));
+
+    await setUnfinishedExecutionsToError();
 };
