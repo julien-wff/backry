@@ -1,6 +1,7 @@
 import { db } from '$lib/db';
 import { jobDatabases, jobs } from '$lib/db/schema';
 import type { JobsCreateRequest } from '$lib/types/api';
+import { eq, or } from 'drizzle-orm';
 
 /**
  * Get all jobs with info about the storage and the databases to back up
@@ -18,6 +19,19 @@ export const jobsListFull = async () => db
             storage: true,
         },
     });
+
+
+/**
+ * Get all active and errored jobs to create CRON jobs.
+ * Errors are included so they can be retried.
+ */
+export const getJobsToExecute = async () => db
+    .query
+    .jobs
+    .findMany({
+        where: or(eq(jobs.status, 'active'), eq(jobs.status, 'error')),
+    });
+
 
 /**
  * Get a job with info about the storage and the databases to back up
