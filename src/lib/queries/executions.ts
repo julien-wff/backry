@@ -1,8 +1,9 @@
 import { db } from '$lib/db';
 import { executions } from '$lib/db/schema';
-import { eq } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 
 export const executionsListFull = async () => db.query.executions.findMany({
+    orderBy: [ desc(executions.startedAt) ],
     with: {
         jobDatabase: {
             with: {
