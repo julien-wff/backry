@@ -1,5 +1,5 @@
 import type { ResticBackupStatus, ResticBackupSummary, ResticError, ResticInit, ResticStats } from '$lib/types/restic';
-import { runCommandSync } from '$lib/utils/cmd';
+import { runCommandStream, runCommandSync, type StreamCommandOptions } from '$lib/utils/cmd';
 import { type ShellOutput } from 'bun';
 import { err, ok, Result, type ResultAsync } from 'neverthrow';
 
@@ -76,16 +76,21 @@ export async function initRepository(path: string, password: string, env: Record
     return resticCommandToResult<ResticInit>(res);
 }
 
+type BackupFromCommandExtras = Pick<
+    StreamCommandOptions<ResticBackupSummary | ResticBackupStatus, string>,
+    'onStdout' | 'onStderr'
+>;
 
 export async function backupFromCommand(url: string,
                                         password: string,
                                         env: Record<string, string>,
                                         command: string[],
                                         fileName: string,
-                                        tags: string[]) {
+                                        tags: string[],
+                                        extras: BackupFromCommandExtras = {}) {
     tags = [ 'backry', ...tags.map((tag) => tag.replace(/,/g, '_')) ];
 
-    const res = await runCommandSync(
+    return runCommandStream(
         'restic',
         [
             '-r', url,
@@ -97,10 +102,10 @@ export async function backupFromCommand(url: string,
         ],
         {
             env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env },
+            json: true,
+            ...extras,
         },
     );
-
-    return resticCommandToResult<ResticBackupStatus | ResticBackupSummary>(res);
 }
 
 
