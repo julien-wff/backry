@@ -1,4 +1,4 @@
-import type { getExecution } from '$lib/queries/executions';
+import type { executions } from '$lib/db/schema';
 import { EventEmitter as BaseEventEmitter } from 'node:events';
 
 export class EventEmitter<TEvents extends Record<string, any>> {
@@ -30,8 +30,12 @@ export class EventEmitter<TEvents extends Record<string, any>> {
     }
 }
 
+export type ExecutionUpdateEventPayload =
+    Partial<typeof executions.$inferSelect>
+    & Pick<typeof executions.$inferSelect, 'id'>;
+
 export interface ExecutionEvents {
-    update: [ Awaited<ReturnType<typeof getExecution>> ];
+    update: [ ExecutionUpdateEventPayload ];
 }
 
 export const executionEmitter = new EventEmitter<ExecutionEvents>();

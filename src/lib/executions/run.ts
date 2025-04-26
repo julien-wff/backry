@@ -22,6 +22,8 @@ export async function startBackup(jobId: number): Promise<ResultAsync<void, stri
         return err(`Execution #${executionId} not found`);
     }
 
+    const startTime = Date.now();
+
     const res = await backupFromCommand(
         job.storage.url,
         job.storage.password!,
@@ -33,13 +35,10 @@ export async function startBackup(jobId: number): Promise<ResultAsync<void, stri
             `dbId:${databaseInfo.id}`,
         ],
         {
-            onStdout: e => executionEmitter.emit('update', {
-                ...execution,
+            onStdout: e => e.message_type === 'status' && executionEmitter.emit('update', {
                 id: execution.id,
-                fileName: execution.fileName,
-                jobDatabaseId: job.jobsDatabases[0].id,
-                duration: e.message_type === 'summary' ? e.total_duration : null,
-                dumpSize: e.message_type === 'summary' ? e.total_bytes_processed : e.bytes_done ?? null,
+                duration: (Date.now() - startTime) / 1000,
+                dumpSize: e.bytes_done ?? null,
             }),
         },
     );
@@ -49,7 +48,7 @@ export async function startBackup(jobId: number): Promise<ResultAsync<void, stri
         : null;
     const noSummaryErrorMessage = !backupSummary ? 'No result found in command output' : null;
 
-    await updateExecution(execution.id, {
+    const updatedExecution = await updateExecution(execution.id, {
         // @ts-expect-error only accepts string, sql is not supported in type definition (but is for drizzle)
         finishedAt: sql`(CURRENT_TIMESTAMP)`,
         error: res.isErr() ? JSON.stringify(res.error) : noSummaryErrorMessage,
@@ -58,6 +57,8 @@ export async function startBackup(jobId: number): Promise<ResultAsync<void, stri
         duration: backupSummary?.total_duration,
         snapshotId: backupSummary?.snapshot_id,
     });
+
+    executionEmitter.emit('update', updatedExecution);
 
     if (res.isErr()) {
         return err(JSON.stringify(res.error));
