@@ -1,3 +1,4 @@
+import type { ExecutionUpdateEventPayload } from '$lib/shared/events';
 import { err, ok, ResultAsync } from 'neverthrow';
 
 /**
@@ -46,3 +47,27 @@ export async function fetchApi<B extends object, R extends object, E = string>(
 
     return ok(response as R);
 }
+
+
+export function subscribeApi<T extends ExecutionUpdateEventPayload>(endpoint: '/api/executions/subscribe', onChunk: (chunk: T) => void): () => void;
+export function subscribeApi<T>(endpoint: string, onChunk: (chunk: T) => void): () => void {
+    const eventSource = new EventSource(endpoint);
+
+    eventSource.onmessage = (event) => {
+        try {
+            const data = JSON.parse(event.data) as T;
+            onChunk(data);
+        } catch (error) {
+            console.error('Error parsing SSE data:', error);
+        }
+    };
+
+    eventSource.onerror = (error) => {
+        console.error('EventSource failed:', error);
+    };
+
+    return () => {
+        eventSource.close();
+    };
+}
+
