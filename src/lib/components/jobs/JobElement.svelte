@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { goto } from '$app/navigation';
+    import { goto, invalidateAll } from '$app/navigation';
     import BaseListElement from '$lib/components/common/BaseListElement.svelte';
     import CloudUpload from '@lucide/svelte/icons/cloud-upload';
     import Clock from '@lucide/svelte/icons/clock';
@@ -12,21 +12,39 @@
 
     let { job }: Props = $props();
     let status = $state(job.status);
+    let loading = $state(false);
 
     async function handleRunJob() {
+        loading = true;
         const res = await fetch(`/api/jobs/${job.id}/run`, {
             method: 'POST',
         });
 
         if (res.ok) {
             await goto('/executions');
+        } else {
+            loading = false;
         }
+    }
+
+    async function deleteJob() {
+        loading = true;
+        const res = await fetch(`/api/jobs/${job.id}`, {
+            method: 'DELETE',
+        });
+
+        if (res.ok) {
+            await invalidateAll();
+        }
+
+        loading = false;
     }
 </script>
 
 
-<BaseListElement editHref={`/storages/${job.id}`}
-                 ondelete={() => console.log('Delete')}
+<BaseListElement disabled={loading}
+                 editHref={`/storages/${job.id}`}
+                 ondelete={deleteJob}
                  onduplicate={() => console.log('Duplicate')}
                  onrun={handleRunJob}
                  onstatuschange={() => console.log('Status change')}

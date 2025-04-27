@@ -80,3 +80,14 @@ export async function createJob(req: JobsCreateRequest) {
         ),
     );
 }
+
+/**
+ * Delete a job and its databases to back up
+ * @param id Job ID
+ * @returns Deleted job, or null if not found
+ */
+export const deleteJob = async (id: number) => db
+    .delete(jobs)
+    .where(eq(jobs.id, id))
+    .returning()
+    .get();
