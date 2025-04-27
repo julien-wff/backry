@@ -1,4 +1,3 @@
-import type { databases } from '$lib/db/schema';
 import { type BaseEngine } from '$lib/engines/BaseEngine';
 import { runCommandSync } from '$lib/utils/cmd';
 import { Database } from 'bun:sqlite';
@@ -21,9 +20,9 @@ export class SQLiteEngine implements BaseEngine {
         return ok(res.value.text().trim());
     }
 
-    async checkConnection(db: typeof databases.$inferSelect): Promise<ResultAsync<void, string>> {
+    async checkConnection(connectionString: string): Promise<ResultAsync<void, string>> {
         try {
-            const con = new Database(db.connectionString!, { readonly: true, create: false });
+            const con = new Database(connectionString, { readonly: true, create: false });
             con.close();
         } catch (e) {
             if (e instanceof Error) {

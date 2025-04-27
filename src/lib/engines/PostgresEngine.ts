@@ -1,4 +1,3 @@
-import type { databases } from '$lib/db/schema';
 import type { BaseEngine } from '$lib/engines/BaseEngine';
 import { runCommandSync } from '$lib/utils/cmd';
 import { SQL } from 'bun';
@@ -25,9 +24,9 @@ export class PostgresEngine implements BaseEngine {
         return [ this.pgDump, ...additionalArgs, connectionString ];
     }
 
-    async checkConnection(db: typeof databases.$inferSelect): Promise<ResultAsync<void, string>> {
+    async checkConnection(connectionString: string): Promise<ResultAsync<void, string>> {
         const con = new SQL({
-            url: db.connectionString!,
+            url: connectionString,
             connectionTimeout: 5,
         });
 

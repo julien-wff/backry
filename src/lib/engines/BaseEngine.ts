@@ -1,4 +1,3 @@
-import type { databases } from '$lib/db/schema';
 import type { ResultAsync } from 'neverthrow';
 
 export abstract class BaseEngine {
@@ -22,8 +21,8 @@ export abstract class BaseEngine {
 
     /**
      * Check the connection to the database.
-     * @param db The database object to check.
+     * @param connectionString Full connection string to the database.
      * @returns Empty ok or error message.
      */
-    public abstract checkConnection(db: typeof databases.$inferSelect): Promise<ResultAsync<void, string>>;
+    public abstract checkConnection(connectionString: string): Promise<ResultAsync<void, string>>;
 }

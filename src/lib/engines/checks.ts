@@ -26,7 +26,7 @@ export async function checkAllActiveDatabases() {
  */
 export async function checkDatabase(database: typeof databases.$inferSelect) {
     const engine = new engines[database.engine]();
-    const checkResult = await engine.checkConnection(database);
+    const checkResult = await engine.checkConnection(database.connectionString!);
 
     // If the repository is not accessible, update the storage status to error
     if (checkResult.isErr()) {
