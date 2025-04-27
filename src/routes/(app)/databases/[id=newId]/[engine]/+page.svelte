@@ -1,16 +1,20 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
     import Head from '$lib/components/common/Head.svelte';
+    import type { DATABASE_ENGINES } from '$lib/db/schema';
     import type { DatabasesCheckRequest, DatabasesCheckResponse } from '$lib/types/api';
     import { customEnhance } from '$lib/utils/actions.js';
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
     import NewPageHeader from '$lib/components/new-elements/NewPageHeader.svelte';
     import { slugify } from '$lib/utils/format';
     import Database from '@lucide/svelte/icons/database';
+    import OctogonAlert from '@lucide/svelte/icons/octagon-alert';
     import type { PageProps } from './$types';
 
     let { data }: PageProps = $props();
     let error = $state<{ current: null | string }>({ current: null });
+
+    let selectedEngine = $state<typeof DATABASE_ENGINES[number] | null>(null);
 
     let dbName = $state('');
     let oldDbName = $state('');
@@ -30,13 +34,18 @@
     let databaseConnectionStatus = $state<boolean | null>(null);
 
     async function testDbConnection() {
+        if (!selectedEngine) {
+            error.current = 'Please select a database engine';
+            return;
+        }
+
         error.current = null;
         isConnectionTesting = true;
 
         const res = await fetch('/api/databases/check', {
             method: 'POST',
             body: JSON.stringify({
-                engine: data.engine,
+                engine: selectedEngine,
                 url: connectionString,
             } satisfies DatabasesCheckRequest),
             headers: {
@@ -76,8 +85,35 @@
     </h2>
 
     {#if error.current}
-        <p class="text-error whitespace-break-spaces">{error.current}</p>
+        <div role="alert" class="alert alert-error alert-soft">
+            <OctogonAlert class="w-4 h-4"/>
+            <span class="whitespace-break-spaces">{error.current}</span>
+        </div>
     {/if}
+
+    <InputContainer label="Engine">
+        <div class="flex gap-2">
+            {#each data.engineList as engine (engine.id)}
+                <div class="w-32 gap-2 px-4 py-2 flex flex-col items-center bg-base-300 justify-center rounded-lg cursor-pointer border-primary"
+                     class:border-2={selectedEngine === engine.id}
+                     role="button"
+                     tabindex="0"
+                     onclick={() => {
+                         selectedEngine = engine.id;
+                     }}
+                     onkeydown={(e) => {
+                         if (e.key === 'Enter' || e.key === ' ') {
+                             selectedEngine = engine.id;
+                         }
+                     }}>
+                    <img alt="{engine.displayName} logo" class="w-8 h-8" src="/icons/{engine.icon}"/>
+                    {engine.displayName}
+                </div>
+            {/each}
+        </div>
+
+        <input name="engine" required type="hidden" value={selectedEngine}/>
+    </InputContainer>
 
     <InputContainer for="db-name" label="Name">
         <input bind:value={dbName} class="input w-full" id="db-name" minlength="2" name="name" required>

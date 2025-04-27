@@ -13,12 +13,22 @@ export const load: PageServerLoad = async ({ params }) => {
         return redirect(307, '/databases');
     }
 
+    const engineList = Object.entries(engines).map(([ key, value ]) => {
+        const engine = new value();
+        return {
+            id: key as typeof DATABASE_ENGINES[number],
+            displayName: engine.displayName,
+            icon: engine.icon,
+        };
+    });
+
     const engineInstance = new engines[engine]();
 
     return {
         engine,
         engineName: engineInstance.displayName,
         connectionStringPlaceholder: engineInstance.connectionStringPlaceholder,
+        engineList,
     };
 };
 
