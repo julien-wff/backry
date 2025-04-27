@@ -1,6 +1,7 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
     import Head from '$lib/components/common/Head.svelte';
+    import type { DatabasesCheckRequest, DatabasesCheckResponse } from '$lib/types/api';
     import { customEnhance } from '$lib/utils/actions.js';
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
     import NewPageHeader from '$lib/components/new-elements/NewPageHeader.svelte';
@@ -9,18 +10,54 @@
     import type { PageProps } from './$types';
 
     let { data }: PageProps = $props();
-    let error = $state({ current: null });
+    let error = $state<{ current: null | string }>({ current: null });
 
     let dbName = $state('');
     let oldDbName = $state('');
     let slug = $state('');
     $effect(() => updateSlug(dbName));
 
+    let connectionString = $state('');
+
     function updateSlug(_: string) {
         if (slugify(oldDbName) === slug) {
             slug = slugify(dbName);
         }
         oldDbName = dbName;
+    }
+
+    let isConnectionTesting = $state(false);
+    let databaseConnectionStatus = $state<boolean | null>(null);
+
+    async function testDbConnection() {
+        error.current = null;
+        isConnectionTesting = true;
+
+        const res = await fetch('/api/databases/check', {
+            method: 'POST',
+            body: JSON.stringify({
+                engine: data.engine,
+                url: connectionString,
+            } satisfies DatabasesCheckRequest),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        isConnectionTesting = false;
+
+        if (res.ok) {
+            const { error: responseError }: DatabasesCheckResponse = await res.json();
+            if (responseError) {
+                error.current = responseError;
+                databaseConnectionStatus = false;
+            } else {
+                error.current = null;
+                databaseConnectionStatus = true;
+            }
+        } else {
+            error.current = 'Failed to test connection';
+        }
     }
 </script>
 
@@ -52,11 +89,34 @@
     </InputContainer>
 
     <InputContainer for="connection-string" label="Connection string">
-        <input class="input w-full" id="connection-string" minlength="2" name="connectionString"
-               placeholder={data.connectionStringPlaceholder} required>
+        <input bind:value={connectionString}
+               class="input w-full"
+               id="connection-string"
+               minlength="2"
+               name="connectionString"
+               placeholder={data.connectionStringPlaceholder}
+               required>
     </InputContainer>
 
-    <button class="btn btn-primary" type="submit">
-        Save
-    </button>
+    <div class="flex gap-2">
+        <button class="btn flex-1"
+                class:btn-error={databaseConnectionStatus === false}
+                class:btn-info={databaseConnectionStatus === null}
+                class:btn-success={databaseConnectionStatus === true}
+                disabled={isConnectionTesting}
+                onclick={testDbConnection}
+                type="button">
+            Test connection
+            {#if databaseConnectionStatus === false}
+                (fail)
+            {:else if databaseConnectionStatus === true}
+                (success)
+            {/if}
+        </button>
+
+        <button class="btn btn-primary flex-1" disabled={!databaseConnectionStatus} type="submit">
+            Save
+        </button>
+    </div>
+
 </form>

@@ -1,4 +1,16 @@
+import type { DATABASE_ENGINES } from '$lib/db/schema';
 import type { ResticError, ResticInit } from '$lib/types/restic';
+
+/** `POST /api/databases/check` */
+export interface DatabasesCheckRequest {
+    url: string;
+    engine: typeof DATABASE_ENGINES[number];
+}
+
+/** `POST /api/databases/check` */
+export interface DatabasesCheckResponse {
+    error: string | null;
+}
 
 /** `POST /api/storages` */
 export interface StoragesCreateRequest {
