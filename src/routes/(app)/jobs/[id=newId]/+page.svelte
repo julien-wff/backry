@@ -1,4 +1,5 @@
 <script lang="ts">
+    import ElementForm from '$lib/components/common/ElementForm.svelte';
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
     import NewPageHeader from '$lib/components/new-elements/NewPageHeader.svelte';
     import type { JobsCreateRequest } from '$lib/types/api';
@@ -48,7 +49,6 @@
 
     async function handleFormSubmit() {
         isLoading = true;
-        error = null;
 
         const res = await fetch(`/api/jobs`, {
             method: 'POST',
@@ -80,15 +80,9 @@
 </NewPageHeader>
 
 
-<form class="rounded-box bg-base-200 p-4 flex flex-col gap-4 max-w-xl w-full mx-auto" onsubmit={handleFormSubmit}>
-    <h2 class="font-bold text-lg">
-        Add new job pool
-    </h2>
-
-    {#if error}
-        <p class="text-error">Error: {error}</p>
-    {/if}
-
+<ElementForm bind:error={error}
+             onsubmit={handleFormSubmit}
+             title="Add new job pool">
     <InputContainer for="job-name" label="Name">
         <input bind:value={jobName} class="input w-full" id="job-name" required>
     </InputContainer>
@@ -138,4 +132,4 @@
     </InputContainer>
 
     <button class="btn btn-primary" disabled={isLoading || databases.length === 0}>Save</button>
-</form>
+</ElementForm>

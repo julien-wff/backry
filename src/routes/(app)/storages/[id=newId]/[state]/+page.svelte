@@ -1,5 +1,6 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
+    import ElementForm from '$lib/components/common/ElementForm.svelte';
     import Head from '$lib/components/common/Head.svelte';
     import EnvVarInput from '$lib/components/forms/EnvVarInput.svelte';
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
@@ -23,9 +24,7 @@
         return acc;
     }, {} as Record<string, string>));
 
-    async function handleFormSubmit(ev: SubmitEvent) {
-        ev.preventDefault();
-        error = null;
+    async function handleFormSubmit() {
         isLoading = true;
 
         if (!arePreChecksValid) {
@@ -135,15 +134,9 @@
 </NewPageHeader>
 
 
-<form class="rounded-box bg-base-200 p-4 flex flex-col gap-4 max-w-xl w-full mx-auto" onsubmit={handleFormSubmit}>
-    <h2 class="font-bold text-lg">
-        Add {isExistingRepository ? 'existing' : 'and initialize'} Restic repository
-    </h2>
-
-    {#if error}
-        <p class="text-error">Error: {error}</p>
-    {/if}
-
+<ElementForm bind:error={error}
+             onsubmit={handleFormSubmit}
+             title="Add {isExistingRepository ? 'existing' : 'and initialize'} Restic repository">
     <InputContainer for="repo-name" label="Name">
         <input bind:value={repoName} class="input w-full" id="repo-name" required>
     </InputContainer>
@@ -167,4 +160,4 @@
             Create repository and save
         </button>
     {/if}
-</form>
+</ElementForm>
