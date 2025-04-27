@@ -21,6 +21,7 @@
     </h2>
 
     <ToolVersion {...data.bun} name="Bun"/>
+    <ToolVersion {...data.svelteKit} name="SvelteKit"/>
     <ToolVersion {...data.restic} name="Restic"/>
     <ToolVersion {...data.postgresql} name="PGDump"/>
     <ToolVersion {...data.sqlite} name="SQLite"/>

@@ -2,9 +2,9 @@ import type { DATABASE_ENGINES } from '$lib/db/schema';
 import { checkAllEngines } from '$lib/engines';
 import { getResticVersion } from '$lib/storages/restic';
 import type { PageServerLoad } from './$types';
+import { VERSION as svelteKitVersion } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({}) => {
-    const bunVersion = Bun.version_with_sha;
     const [ resticVersion, enginesVersions ] = await Promise.all([
         getResticVersion(),
         checkAllEngines(),
@@ -12,7 +12,11 @@ export const load: PageServerLoad = async ({}) => {
 
     return {
         bun: {
-            version: bunVersion,
+            version: Bun.version_with_sha,
+            error: null,
+        },
+        svelteKit: {
+            version: svelteKitVersion,
             error: null,
         },
         restic: {
