@@ -4,7 +4,6 @@ import { integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 export const ELEMENT_STATUS = [ 'active', 'inactive', 'error' ] as const;
 export const DATABASE_ENGINES = [ 'postgresql', 'sqlite' ] as const;
 export const EXECUTION_STATUS = [ 'running', 'success', 'error' ] as const;
-export const STORAGE_TYPES = [ 'local', 'custom' ] as const;
 
 export const databases = sqliteTable('databases', {
     id: integer('id').primaryKey({ autoIncrement: true }),
@@ -30,7 +29,6 @@ export const databasesRelations = relations(databases, ({ many }) => ({
 export const storages = sqliteTable('storages', {
     id: integer('id').primaryKey({ autoIncrement: true }),
     name: text('name').notNull(),
-    type: text('type', { enum: STORAGE_TYPES }).notNull(),
     status: text('status', { enum: ELEMENT_STATUS }).notNull().default('active'),
     error: text('error'),
     createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`),

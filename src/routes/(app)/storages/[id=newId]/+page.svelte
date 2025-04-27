@@ -10,7 +10,7 @@
 
 <Head title="New storage backend"/>
 
-<NewPageHeader currentStep={1} icon={CloudUpload} totalSteps={3}>
+<NewPageHeader currentStep={1} icon={CloudUpload} totalSteps={2}>
     Add storage backend - repository status
 </NewPageHeader>
 

@@ -1,10 +1,8 @@
 import type { ResticError, ResticInit } from '$lib/types/restic';
-import type { STORAGE_TYPES } from '$lib/db/schema';
 
 /** `POST /api/storages` */
 export interface StoragesCreateRequest {
     name: string;
-    type: typeof STORAGE_TYPES[number];
     url: string;
     password: string;
     env: Record<string, string>;
