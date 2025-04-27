@@ -14,6 +14,7 @@
 
 
 <BaseListElement editHref={`/databases/${database.id}`}
+                 error={database.error}
                  ondelete={() => console.log('Delete')}
                  onduplicate={() => console.log('Duplicate')}
                  onstatuschange={() => console.log('Status change')}

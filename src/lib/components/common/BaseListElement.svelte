@@ -20,16 +20,34 @@
         ondelete?: () => void;
         onrun?: () => void;
         disabled?: boolean;
+        error?: string | null;
     }
 
-    let { status, title, children, editHref, onduplicate, onstatuschange, ondelete, onrun, disabled }: Props = $props();
+    let {
+        status,
+        title,
+        children,
+        editHref,
+        onduplicate,
+        onstatuschange,
+        ondelete,
+        onrun,
+        disabled,
+        error,
+    }: Props = $props();
 </script>
 
 <div class="bg-base-100 p-2 flex flex-col gap-2 rounded-box shadow-base-100">
     <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
             {#if status}
-                <StatusIndicator {status}/>
+                {#if error}
+                    <div class="tooltip tooltip-error flex" data-tip={error}>
+                        <StatusIndicator {status}/>
+                    </div>
+                {:else}
+                    <StatusIndicator {status}/>
+                {/if}
             {/if}
             {title}
         </div>
@@ -44,14 +62,14 @@
                 </a>
             {/if}
 
-            {#if onstatuschange && (status === 'active' || status === 'inactive')}
+            {#if onstatuschange}
                 <button {disabled} class="btn btn-sm btn-warning" onclick={onstatuschange}>
-                    {#if status === 'active'}
-                        <PowerOff class="w-4 h-4"/>
-                        Disable
-                    {:else}
+                    {#if status === 'inactive'}
                         <Power class="w-4 h-4"/>
                         Enable
+                    {:else}
+                        <PowerOff class="w-4 h-4"/>
+                        Disable
                     {/if}
                 </button>
             {/if}

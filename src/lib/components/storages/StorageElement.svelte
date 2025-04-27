@@ -13,6 +13,7 @@
 
 
 <BaseListElement editHref={`/storages/${storage.id}`}
+                 error={storage.error}
                  ondelete={() => console.log('Delete')}
                  onduplicate={() => console.log('Duplicate')}
                  onstatuschange={() => console.log('Status change')}

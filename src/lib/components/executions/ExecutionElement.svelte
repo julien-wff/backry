@@ -37,6 +37,7 @@
 
 
 <BaseListElement disabled={loading}
+                 error={execution.error}
                  ondelete={handleDelete}
                  status={status}
                  title="{execution.jobDatabase.job.name} - {execution.jobDatabase.database.name}">
