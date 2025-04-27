@@ -64,8 +64,10 @@
             } as JobsCreateRequest),
         });
 
-        if (!res.ok) {
-            error = 'Unknown error';
+        const body = await res.json();
+
+        if (body.error) {
+            error = body.error;
             isLoading = false;
             return;
         }
