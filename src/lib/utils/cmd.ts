@@ -1,4 +1,4 @@
-import { $, type ShellOutput } from 'bun';
+import { $ } from 'bun';
 import { err, ok, type ResultAsync } from 'neverthrow';
 
 interface CommandOptions {
@@ -6,7 +6,7 @@ interface CommandOptions {
     env?: Record<string, string>;
 }
 
-export async function runCommandSync(command: string, args: string[] = [], options?: CommandOptions): Promise<ResultAsync<ShellOutput, ShellOutput>> {
+export async function runCommandSync(command: string, args: string[] = [], options?: CommandOptions): Promise<ResultAsync<$.ShellOutput, $.ShellOutput>> {
     const cmd = $`${command} ${{ raw: args.map($.escape).join(' ') }}`
         .env(options?.env)
         .nothrow()

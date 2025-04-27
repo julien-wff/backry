@@ -1,6 +1,6 @@
 import type { ResticBackupStatus, ResticBackupSummary, ResticError, ResticInit, ResticStats } from '$lib/types/restic';
 import { runCommandStream, runCommandSync, type StreamCommandOptions } from '$lib/utils/cmd';
-import { type ShellOutput } from 'bun';
+import { type $ } from 'bun';
 import { err, ok, Result, type ResultAsync } from 'neverthrow';
 
 export const RESTIC_DEFAULT_ENV = {
@@ -10,7 +10,7 @@ export const RESTIC_DEFAULT_ENV = {
     'LOCALAPPDATA': process.env.LOCALAPPDATA ?? '',
 };
 
-function formatResticError(shellOutput: ShellOutput) {
+function formatResticError(shellOutput: $.ShellOutput) {
     const error = shellOutput.stderr.toString().trim();
     try {
         return JSON.parse(error) as ResticError;
@@ -23,7 +23,7 @@ function formatResticError(shellOutput: ShellOutput) {
     }
 }
 
-async function resticCommandToResult<T>(res: Result<ShellOutput, ShellOutput>, json = true): Promise<ResultAsync<T[], ResticError>> {
+async function resticCommandToResult<T>(res: Result<$.ShellOutput, $.ShellOutput>, json = true): Promise<ResultAsync<T[], ResticError>> {
     if (res.isErr()) {
         return err(formatResticError(res.error));
     }
