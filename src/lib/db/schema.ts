@@ -44,7 +44,7 @@ export const jobs = sqliteTable('jobs', {
     status: text('status', { enum: ELEMENT_STATUS }).notNull().default('active'),
     createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`),
     updatedAt: text('updated_at').default(sql`(CURRENT_TIMESTAMP)`).$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
-    storageId: integer('storage_id').notNull().references(() => storages.id),
+    storageId: integer('storage_id').notNull().references(() => storages.id, { onDelete: 'cascade' }),
     cron: text('cron').notNull(),
 });
 
@@ -58,8 +58,8 @@ export const jobsRelations = relations(jobs, ({ one, many }) => ({
 
 export const jobDatabases = sqliteTable('job_databases', {
     id: integer('id').primaryKey({ autoIncrement: true }),
-    jobId: integer('job_id').notNull().references(() => jobs.id),
-    databaseId: integer('database_id').notNull().references(() => databases.id),
+    jobId: integer('job_id').notNull().references(() => jobs.id, { onDelete: 'cascade' }),
+    databaseId: integer('database_id').notNull().references(() => databases.id, { onDelete: 'cascade' }),
     createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`),
     updatedAt: text('updated_at').default(sql`(CURRENT_TIMESTAMP)`).$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
     status: text('status', { enum: ELEMENT_STATUS }).notNull().default('active'),
@@ -80,7 +80,7 @@ export const jobDatabasesRelations = relations(jobDatabases, ({ one, many }) => 
 
 export const executions = sqliteTable('executions', {
     id: integer('id').primaryKey({ autoIncrement: true }),
-    jobDatabaseId: integer('job_database_id').notNull().references(() => jobDatabases.id),
+    jobDatabaseId: integer('job_database_id').notNull().references(() => jobDatabases.id, { onDelete: 'cascade' }),
     fileName: text('file_name').notNull(),
     error: text('error'),
     startedAt: text('started_at').default(sql`(CURRENT_TIMESTAMP)`),
