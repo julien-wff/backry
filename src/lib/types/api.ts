@@ -10,21 +10,18 @@ export interface StoragesCreateRequest {
     env: Record<string, string>;
 }
 
-/** `POST /api/storages/check-local` */
-export interface StoragesCheckLocalRequest {
+/** `POST /api/storages/check` */
+export interface StoragesCheckRequest {
     url: string;
     checkRepository?: boolean;
     password?: string;
     env?: Record<string, string>;
 }
 
-export type StoragesCheckLocalResponse = {
-    error: string;
-    path: string | null;
-} | {
-    error: null;
-    path: string;
-    isEmpty: boolean;
+export interface StoragesCheckResponse {
+    error: string | null;
+    newLocalUrl: string | null;
+    isLocalFolderEmptyEmpty: boolean | null;
     resticError: ResticError | null;
 }
 

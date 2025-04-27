@@ -1,11 +1,12 @@
 <script lang="ts">
+    import { goto } from '$app/navigation';
     import Head from '$lib/components/common/Head.svelte';
     import EnvVarInput from '$lib/components/forms/EnvVarInput.svelte';
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
     import NewPageHeader from '$lib/components/new-elements/NewPageHeader.svelte';
     import CloudUpload from '@lucide/svelte/icons/cloud-upload';
     import { page } from '$app/state';
-    import type { StoragesCheckLocalRequest, StoragesCheckLocalResponse, StoragesCreateRequest } from '$lib/types/api';
+    import type { StoragesCheckRequest, StoragesCheckResponse, StoragesCreateRequest } from '$lib/types/api';
 
     let isExistingRepository = $state(page.params['state'] === 'existing');
     let error = $state<string | null>(null);
@@ -13,7 +14,7 @@
     let arePreChecksValid = $state(false);
 
     let repoName = $state('');
-    let filePath = $state('');
+    let repoUrl = $state('');
     let password = $state('');
 
     let envVars = $state<{ key: string; value: string }[]>([]);
@@ -28,7 +29,7 @@
         isLoading = true;
 
         if (!arePreChecksValid) {
-            await checkPath();
+            await checkURL();
         } else {
             await createRepository();
         }
@@ -36,24 +37,24 @@
         isLoading = false;
     }
 
-    async function checkPath() {
-        const res = await fetch('/api/storages/check-local', {
+    async function checkURL() {
+        const res = await fetch('/api/storages/check', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
             },
             body: JSON.stringify({
-                url: filePath,
+                url: repoUrl,
                 password,
                 env: envRecords,
                 checkRepository: isExistingRepository,
-            } as StoragesCheckLocalRequest),
+            } as StoragesCheckRequest),
         });
-        const data = await res.json() as StoragesCheckLocalResponse;
+        const data = await res.json() as StoragesCheckResponse;
 
-        if (data.path) {
-            filePath = data.path;
+        if (data.newLocalUrl) {
+            repoUrl = data.newLocalUrl;
         }
 
         if (data.error !== null) {
@@ -70,8 +71,8 @@
             return;
         }
 
-        if (!isExistingRepository && !data.isEmpty) {
-            error = 'Folder must be empty to create initialize a repository';
+        if (!isExistingRepository && data.isLocalFolderEmptyEmpty === false) {
+            error = 'Folder must be empty to initialize a new repository';
             return;
         }
 
@@ -87,17 +88,19 @@
             },
             body: JSON.stringify({
                 name: repoName,
-                url: `local:${filePath}`,
+                url: repoUrl,
                 password,
                 env: envRecords,
-            } as StoragesCheckLocalRequest),
+            } as StoragesCheckRequest),
         });
         const data = await res.json();
 
         if (data.error) {
-            error = data.error;
+            error = data.error.message || data.error;
             return;
         }
+
+        await saveRepositoryToDb();
     }
 
     async function saveRepositoryToDb() {
@@ -109,7 +112,7 @@
             },
             body: JSON.stringify({
                 name: repoName,
-                url: `local:${filePath}`,
+                url: repoUrl,
                 type: 'local',
                 password,
                 env: envRecords,
@@ -121,19 +124,21 @@
             error = data.error || 'Failed to save repository';
             return;
         }
+
+        await goto('/storages');
     }
 </script>
 
 <Head title="New storage backend"/>
 
 <NewPageHeader backText="Back to connection type" currentStep={3} icon={CloudUpload} totalSteps={3}>
-    Add storage backend - local
+    Add {isExistingRepository ? 'existing' : 'new'} storage backend
 </NewPageHeader>
 
 
 <form class="rounded-box bg-base-200 p-4 flex flex-col gap-4 max-w-xl w-full mx-auto" onsubmit={handleFormSubmit}>
     <h2 class="font-bold text-lg">
-        Add {isExistingRepository ? 'existing' : 'and initialize'} local Restic repository
+        Add {isExistingRepository ? 'existing' : 'and initialize'} Restic repository
     </h2>
 
     {#if error}
@@ -144,8 +149,8 @@
         <input bind:value={repoName} class="input w-full" id="repo-name" required>
     </InputContainer>
 
-    <InputContainer for="repo-path" label="Repository path">
-        <input bind:value={filePath} class="input w-full" id="repo-path" placeholder="/data/repo-path" required>
+    <InputContainer for="repo-path" label="Repository URL">
+        <input bind:value={repoUrl} class="input w-full" id="repo-path" placeholder="local:/data/repo-path" required>
     </InputContainer>
 
     <InputContainer for="repo-password" label="Repository password">
@@ -155,11 +160,11 @@
     <EnvVarInput bind:envVars/>
 
     <button class="btn btn-primary" disabled={arePreChecksValid || isLoading} type="submit">
-        {isExistingRepository ? 'Check and save' : 'Check path'}
+        {isExistingRepository ? 'Check and save' : 'Check URL'}
     </button>
 
     {#if arePreChecksValid}
-        <button class="btn btn-primary" type="submit">
+        <button class="btn btn-primary" type="submit" disabled={isLoading}>
             Create repository and save
         </button>
     {/if}
