@@ -14,12 +14,7 @@ export const databases = sqliteTable('databases', {
     error: text('error'),
     createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`),
     updatedAt: text('updated_at').default(sql`(CURRENT_TIMESTAMP)`).$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
-    connectionString: text('connection_string'),
-    host: text('host'),
-    port: integer('port'),
-    database: text('database'),
-    username: text('username'),
-    password: text('password'),
+    connectionString: text('connection_string').notNull(),
 });
 
 export const databasesRelations = relations(databases, ({ many }) => ({

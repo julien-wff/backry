@@ -23,6 +23,6 @@
     <EngineIndicator engine={database.engine}/>
     <div class="flex items-center gap-1">
         <EthernetPort class="w-4 h-4"/>
-        Host: {database.host}
+        {database.connectionString}
     </div>
 </BaseListElement>

@@ -28,7 +28,7 @@ export async function startBackup(jobId: number): Promise<ResultAsync<void, stri
         job.storage.url,
         job.storage.password!,
         job.storage.env,
-        engine.getDumpCommand(databaseInfo.connectionString!),
+        engine.getDumpCommand(databaseInfo.connectionString),
         fileName,
         [
             `jobId:${job.id}`,
