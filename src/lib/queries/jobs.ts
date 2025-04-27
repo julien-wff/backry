@@ -79,6 +79,8 @@ export async function createJob(req: JobsCreateRequest) {
                 .execute(),
         ),
     );
+
+    return job;
 }
 
 /**
