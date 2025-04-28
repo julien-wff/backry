@@ -43,7 +43,7 @@
 
 
 <BaseListElement disabled={loading}
-                 editHref={`/storages/${job.id}`}
+                 editHref={`/jobs/${job.id}`}
                  ondelete={deleteJob}
                  onduplicate={() => console.log('Duplicate')}
                  onrun={handleRunJob}
