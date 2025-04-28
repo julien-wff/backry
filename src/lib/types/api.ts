@@ -59,5 +59,6 @@ export interface JobsCreateRequest {
     cron: string;
     databases: Array<{
         id: number;
+        enabled: boolean;
     }>;
 }

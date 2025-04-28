@@ -75,6 +75,7 @@ export async function createJob(req: JobsCreateRequest) {
                 .values({
                     jobId: job.id,
                     databaseId: database.id,
+                    status: database.enabled ? 'active' : 'inactive',
                 })
                 .execute(),
         ),
