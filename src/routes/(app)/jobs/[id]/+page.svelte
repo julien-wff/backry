@@ -18,11 +18,14 @@
     let error = $state<string | null>();
     let isLoading = $state(false);
 
-    let jobName = $state('');
-    let slug = $state('');
-    let storageBackend = $state<number>(-1);
-    let cron = $state('');
-    let selectedDatabases = $state<Array<{ id: number, enabled: boolean }>>([]);
+    let jobName = $state(data.job?.name ?? '');
+    let slug = $state(data.job?.slug ?? '');
+    let storageBackend = $state<number>(data.job?.storageId ?? -1);
+    let cron = $state(data.job?.cron ?? '');
+    let selectedDatabases = $state(data.job?.jobsDatabases.map(jd => ({
+        id: jd.databaseId,
+        enabled: jd.status === 'active',
+    })) ?? []);
 
     let oldJobName = $state('');
     $effect(() => updateSlug(jobName));

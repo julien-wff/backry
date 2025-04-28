@@ -1,8 +1,24 @@
 import { activeDatabasesListShort } from '$lib/queries/databases';
+import { getJob } from '$lib/queries/jobs';
 import { activeStoragesListShort } from '$lib/queries/storages';
+import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
+import { parseIdOrNewParam } from '$lib/utils/params';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ params }) => {
+    const { id, isNew } = parseIdOrNewParam(params.id);
+    if (id === null && !isNew) {
+        return error(400, 'Invalid job ID');
+    }
+
+    let job: Awaited<ReturnType<typeof getJob>> | null = null;
+    if (id !== null) {
+        job = await getJob(id);
+        if (!job) {
+            return error(404, 'Job not found');
+        }
+    }
+
     const [ databases, storages ] = await Promise.all([
         activeDatabasesListShort(),
         activeStoragesListShort(),
@@ -11,5 +27,6 @@ export const load: PageServerLoad = async () => {
     return {
         databases,
         storages,
+        job,
     };
 };
