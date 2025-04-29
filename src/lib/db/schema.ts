@@ -1,5 +1,5 @@
 import { relations, sql } from 'drizzle-orm';
-import { integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { integer, real, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
 export const ELEMENT_STATUS = [ 'active', 'inactive', 'error' ] as const;
 export const DATABASE_ENGINES = [ 'postgresql', 'sqlite' ] as const;
@@ -56,15 +56,21 @@ export const jobsRelations = relations(jobs, ({ one, many }) => ({
     jobsDatabases: many(jobDatabases),
 }));
 
-export const jobDatabases = sqliteTable('job_databases', {
-    id: integer('id').primaryKey({ autoIncrement: true }),
-    jobId: integer('job_id').notNull().references(() => jobs.id, { onDelete: 'cascade' }),
-    databaseId: integer('database_id').notNull().references(() => databases.id, { onDelete: 'cascade' }),
-    createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`),
-    updatedAt: text('updated_at').default(sql`(CURRENT_TIMESTAMP)`).$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
-    status: text('status', { enum: ELEMENT_STATUS }).notNull().default('active'),
-    error: text('error'),
-});
+export const jobDatabases = sqliteTable(
+    'job_databases',
+    {
+        id: integer('id').primaryKey({ autoIncrement: true }),
+        jobId: integer('job_id').notNull().references(() => jobs.id, { onDelete: 'cascade' }),
+        databaseId: integer('database_id').notNull().references(() => databases.id, { onDelete: 'cascade' }),
+        createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`),
+        updatedAt: text('updated_at').default(sql`(CURRENT_TIMESTAMP)`).$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
+        status: text('status', { enum: ELEMENT_STATUS }).notNull().default('active'),
+        error: text('error'),
+    },
+    t => [
+        uniqueIndex('job_db_unique_idx').on(t.jobId, t.databaseId),
+    ],
+);
 
 export const jobDatabasesRelations = relations(jobDatabases, ({ one, many }) => ({
     job: one(jobs, {

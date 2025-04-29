@@ -5,15 +5,18 @@
     import NewPageHeader from '$lib/components/new-elements/NewPageHeader.svelte';
     import type { JobsCreateRequest } from '$lib/types/api';
     import { slugify } from '$lib/utils/format';
+    import { parseIdOrNewParam } from '$lib/utils/params';
     import Timer from '@lucide/svelte/icons/timer';
     import type { PageData } from './$types';
     import { goto } from '$app/navigation';
+    import { page } from '$app/state';
 
     interface Props {
         data: PageData;
     }
 
     let { data }: Props = $props();
+    const { id, isNew } = parseIdOrNewParam(page.params.id);
 
     let error = $state<string | null>();
     let isLoading = $state(false);
@@ -40,8 +43,8 @@
     async function handleFormSubmit() {
         isLoading = true;
 
-        const res = await fetch(`/api/jobs`, {
-            method: 'POST',
+        const res = await fetch(isNew ? `/api/jobs` : `/api/jobs/${id}`, {
+            method: isNew ? 'POST' : 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },

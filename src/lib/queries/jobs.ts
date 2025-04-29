@@ -1,7 +1,7 @@
 import { db } from '$lib/db';
 import { jobDatabases, jobs } from '$lib/db/schema';
 import type { JobsCreateRequest } from '$lib/types/api';
-import { eq, or } from 'drizzle-orm';
+import { eq, or, and, notInArray } from 'drizzle-orm';
 
 /**
  * Get all jobs with info about the storage and the databases to back up
@@ -94,3 +94,56 @@ export const deleteJob = async (id: number) => db
     .where(eq(jobs.id, id))
     .returning()
     .get();
+
+/**
+ * Update a job and its databases to back up
+ * @param id Job ID
+ * @param job Job data
+ */
+export const updateJob = async (id: number, job: JobsCreateRequest) => {
+    const updatedJob = db
+        .update(jobs)
+        .set({
+            name: job.name,
+            slug: job.slug,
+            storageId: job.storageId,
+            cron: job.cron,
+        })
+        .where(eq(jobs.id, id))
+        .returning()
+        .get();
+
+    if (!updatedJob) {
+        return null;
+    }
+
+    const providedDatabaseIds = job.databases.map(db => db.id);
+
+    await db
+        .delete(jobDatabases)
+        .where(and(
+            eq(jobDatabases.jobId, id),
+            notInArray(jobDatabases.databaseId, providedDatabaseIds),
+        ))
+        .execute();
+
+    await Promise.all(
+        job.databases.map((database) => {
+            const newStatus = database.enabled ? 'active' : 'inactive';
+            return db
+                .insert(jobDatabases)
+                .values({
+                    jobId: updatedJob.id,
+                    databaseId: database.id,
+                    status: newStatus,
+                })
+                .onConflictDoUpdate({
+                    target: [ jobDatabases.jobId, jobDatabases.databaseId ],
+                    set: { status: newStatus },
+                })
+                .execute();
+        }),
+    );
+
+    return updatedJob;
+};
