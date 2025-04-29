@@ -62,6 +62,7 @@ export const jobDatabases = sqliteTable(
         id: integer('id').primaryKey({ autoIncrement: true }),
         jobId: integer('job_id').notNull().references(() => jobs.id, { onDelete: 'cascade' }),
         databaseId: integer('database_id').notNull().references(() => databases.id, { onDelete: 'cascade' }),
+        position: integer('position').notNull(),
         createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`),
         updatedAt: text('updated_at').default(sql`(CURRENT_TIMESTAMP)`).$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
         status: text('status', { enum: ELEMENT_STATUS }).notNull().default('active'),

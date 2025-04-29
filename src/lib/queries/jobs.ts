@@ -15,6 +15,7 @@ export const jobsListFull = async () => db
                 with: {
                     database: true,
                 },
+                orderBy: (jobDatabases, { asc }) => asc(jobDatabases.position),
             },
             storage: true,
         },
@@ -47,6 +48,7 @@ export const getJob = async (id: number) => db
                 with: {
                     database: true,
                 },
+                orderBy: (jobDatabases, { asc }) => asc(jobDatabases.position),
             },
             storage: true,
         },
@@ -69,13 +71,14 @@ export async function createJob(req: JobsCreateRequest) {
         .get();
 
     await Promise.all(
-        req.databases.map((database) =>
+        req.databases.map((database, index) =>
             db
                 .insert(jobDatabases)
                 .values({
                     jobId: job.id,
                     databaseId: database.id,
                     status: database.enabled ? 'active' : 'inactive',
+                    position: index,
                 })
                 .execute(),
         ),
@@ -128,7 +131,7 @@ export const updateJob = async (id: number, job: JobsCreateRequest) => {
         .execute();
 
     await Promise.all(
-        job.databases.map((database) => {
+        job.databases.map((database, index) => {
             const newStatus = database.enabled ? 'active' : 'inactive';
             return db
                 .insert(jobDatabases)
@@ -136,10 +139,14 @@ export const updateJob = async (id: number, job: JobsCreateRequest) => {
                     jobId: updatedJob.id,
                     databaseId: database.id,
                     status: newStatus,
+                    position: index,
                 })
                 .onConflictDoUpdate({
                     target: [ jobDatabases.jobId, jobDatabases.databaseId ],
-                    set: { status: newStatus },
+                    set: {
+                        status: newStatus,
+                        position: index,
+                    },
                 })
                 .execute();
         }),
