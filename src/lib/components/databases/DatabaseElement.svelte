@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { invalidateAll } from '$app/navigation';
     import BaseListElement from '$lib/components/common/BaseListElement.svelte';
     import EngineIndicator from '$lib/components/common/EngineIndicator.svelte';
     import { EthernetPort } from '$lib/components/icons';
@@ -10,12 +11,27 @@
 
     let { database }: Props = $props();
     let status = $state(database.status);
+    let loading = $state(false);
+
+    async function deleteDatabase() {
+        loading = true;
+        const res = await fetch(`/api/databases/${database.id}`, {
+            method: 'DELETE',
+        });
+
+        if (res.ok) {
+            await invalidateAll();
+        }
+
+        loading = false;
+    }
 </script>
 
 
-<BaseListElement editHref={`/databases/${database.id}`}
+<BaseListElement disabled={loading}
+                 editHref={`/databases/${database.id}`}
                  error={database.error}
-                 ondelete={() => console.log('Delete')}
+                 ondelete={deleteDatabase}
                  status={status}
                  title={database.name}>
     <EngineIndicator engine={database.engine}/>

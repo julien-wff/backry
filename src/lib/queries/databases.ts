@@ -21,3 +21,11 @@ export const activeDatabasesListShort = () =>
         })
         .from(databases)
         .where(eq(databases.status, 'active'));
+
+/**
+ * Deletes a database by ID.
+ * @param id - The ID of the database to delete.
+ * @returns The deleted database record.
+ */
+export const deleteDatabase = (id: number) =>
+    db.delete(databases).where(eq(databases.id, id)).returning().get();
