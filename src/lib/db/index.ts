@@ -8,6 +8,7 @@ if (!env.DATABASE_URL) {
 }
 
 const sqlite = new Database(env.DATABASE_URL);
+sqlite.exec('PRAGMA foreign_keys = ON;');
 
 export const db = drizzle({
     client: sqlite,
