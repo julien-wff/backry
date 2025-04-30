@@ -37,6 +37,20 @@
 
         loading = false;
     }
+
+    async function changeJobStatus() {
+        loading = true;
+        const res = await fetch(`/api/jobs/${job.id}`, {
+            method: 'PATCH',
+            body: JSON.stringify({ status: status === 'inactive' ? 'active' : 'inactive' }),
+        });
+
+        if (res.ok) {
+            status = status === 'inactive' ? 'active' : 'inactive';
+        }
+
+        loading = false;
+    }
 </script>
 
 
@@ -44,7 +58,7 @@
                  editHref={`/jobs/${job.id}`}
                  ondelete={deleteJob}
                  onrun={handleRunJob}
-                 onstatuschange={() => console.log('Status change')}
+                 onstatuschange={changeJobStatus}
                  status={status}
                  title={job.name}>
     <div class="flex items-center gap-1">

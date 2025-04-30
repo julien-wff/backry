@@ -154,3 +154,11 @@ export const updateJob = async (id: number, job: JobsCreateRequest) => {
 
     return updatedJob;
 };
+
+
+export const updateJobStatus = async (id: number, status: 'active' | 'inactive') => db
+    .update(jobs)
+    .set({ status })
+    .where(eq(jobs.id, id))
+    .returning()
+    .get();
