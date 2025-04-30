@@ -1,6 +1,16 @@
-<script>
+<script lang="ts">
     import { CloudUpload, Database, LayoutDashboard, RefreshCw, Settings, Timer } from '$lib/components/icons';
     import NavbarElement from '$lib/components/navbar/NavbarElement.svelte';
+
+    interface Props {
+        errors: {
+            databases: boolean;
+            storages: boolean;
+            executions: boolean;
+        };
+    }
+
+    const { errors }: Props = $props();
 </script>
 
 <aside class="flex flex-col gap-8 p-2 shadow-md bg-base-100 rounded-r-box">
@@ -11,10 +21,10 @@
 
     <nav class="flex flex-col flex-1 gap-4">
         <NavbarElement href="/dashboard" icon={LayoutDashboard} label="Dashboard"/>
-        <NavbarElement href="/databases" icon={Database} label="Databases"/>
-        <NavbarElement href="/storages" icon={CloudUpload} label="Storage"/>
+        <NavbarElement hasError={errors.databases} href="/databases" icon={Database} label="Databases"/>
+        <NavbarElement hasError={errors.storages} href="/storages" icon={CloudUpload} label="Storage"/>
         <NavbarElement href="/jobs" icon={Timer} label="Backup jobs"/>
-        <NavbarElement href="/executions" icon={RefreshCw} label="Executions"/>
+        <NavbarElement hasError={errors.executions} href="/executions" icon={RefreshCw} label="Executions"/>
         <!--        <NavbarElement href="/restore" icon={History} label="Restore"/>-->
 
         <div class="flex flex-col justify-end flex-1">
