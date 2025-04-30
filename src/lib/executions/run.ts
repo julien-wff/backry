@@ -6,17 +6,44 @@ import { backupFromCommand } from '$lib/storages/restic';
 import { sql } from 'drizzle-orm';
 import { err, ok, type ResultAsync } from 'neverthrow';
 
+/**
+ * Start a backup job, by running each database backup in the job one after the other.
+ * @param jobId The job ID to start the backup for.
+ * @returns If error, the error message. If success, void.
+ */
 export async function startBackup(jobId: number): Promise<ResultAsync<void, string>> {
     const job = await getJob(jobId);
     if (!job) {
         return err(`Job #${jobId} not found`);
     }
 
-    const engine = new engines[job.jobsDatabases[0].database.engine]();
-    const databaseInfo = job.jobsDatabases[0].database;
+    for (let i = 0; i < job.jobsDatabases.length; i++) {
+        await jobDatabaseBackup(job, i);
+        // 1s delay between each database backup
+        await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+
+    return ok();
+}
+
+
+/**
+ * Run a backup for a specific database in a job.
+ * @param job The job to run the backup for.
+ * @param jobIndex The index of the database in the job to run the backup for.
+ * @returns If error, the error message. If success, void.
+ */
+async function jobDatabaseBackup(job: NonNullable<Awaited<ReturnType<typeof getJob>>>, jobIndex: number): Promise<ResultAsync<void, string>> {
+    const jobDatabase = job.jobsDatabases[jobIndex];
+    if (!jobDatabase) {
+        return err(`Cannot get database ${jobIndex} for job #${job.id}`);
+    }
+
+    const engine = new engines[jobDatabase.database.engine]();
+    const databaseInfo = jobDatabase.database;
     const fileName = `${job.slug}_${databaseInfo.slug}.${engine.dumpFileExtension}`;
 
-    const { id: executionId } = await createExecution(job.jobsDatabases[0].id, fileName);
+    const { id: executionId } = await createExecution(jobDatabase.id, fileName);
     const execution = await getExecution(executionId);
     if (!execution) {
         return err(`Execution #${executionId} not found`);
