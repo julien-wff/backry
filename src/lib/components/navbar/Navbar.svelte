@@ -1,12 +1,6 @@
 <script>
+    import { CloudUpload, Database, History, LayoutDashboard, RefreshCw, Settings, Timer } from '$lib/components/icons';
     import NavbarElement from '$lib/components/navbar/NavbarElement.svelte';
-    import CloudUpload from '@lucide/svelte/icons/cloud-upload';
-    import Database from '@lucide/svelte/icons/database';
-    import History from '@lucide/svelte/icons/history';
-    import LayoutDashboard from '@lucide/svelte/icons/layout-dashboard';
-    import RefreshCw from '@lucide/svelte/icons/refresh-cw';
-    import Settings from '@lucide/svelte/icons/settings';
-    import Timer from '@lucide/svelte/icons/timer';
 </script>
 
 <aside class="flex flex-col gap-8 p-2 shadow-md bg-base-100 rounded-r-box">

@@ -1,6 +1,5 @@
 <script lang="ts">
-    import type { Icon as IconType } from '@lucide/svelte';
-    import ChevronLeft from '@lucide/svelte/icons/chevron-left';
+    import { ChevronLeft, type IconType } from '$lib/components/icons';
     import type { Snippet } from 'svelte';
 
     interface Props {

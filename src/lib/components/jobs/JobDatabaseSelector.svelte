@@ -1,10 +1,6 @@
 <script lang="ts">
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
-    import ArrowDown from '@lucide/svelte/icons/arrow-down';
-    import ArrowUp from '@lucide/svelte/icons/arrow-up';
-    import PowerOff from '@lucide/svelte/icons/power-off';
-    import Power from '@lucide/svelte/icons/power';
-    import Trash2 from '@lucide/svelte/icons/trash-2';
+    import { ArrowDown, ArrowUp, Power, PowerOff, Trash2 } from '$lib/components/icons';
 
     interface Props {
         selection: Array<{ id: number, enabled: boolean }>;

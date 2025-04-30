@@ -1,7 +1,7 @@
 import { db } from '$lib/db';
 import { jobDatabases, jobs } from '$lib/db/schema';
 import type { JobsCreateRequest } from '$lib/types/api';
-import { eq, or, and, notInArray } from 'drizzle-orm';
+import { and, eq, notInArray, or } from 'drizzle-orm';
 
 /**
  * Get all jobs with info about the storage and the databases to back up

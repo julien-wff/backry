@@ -1,13 +1,7 @@
 <script lang="ts">
     import StatusIndicator from '$lib/components/common/StatusIndicator.svelte';
-    import { type EXECUTION_STATUS, type ELEMENT_STATUS } from '$lib/db/schema';
-    import CopyPlus from '@lucide/svelte/icons/copy-plus';
-    import Pencil from '@lucide/svelte/icons/pencil';
-    import PowerOff from '@lucide/svelte/icons/power-off';
-    import Power from '@lucide/svelte/icons/power';
-    import Trash2 from '@lucide/svelte/icons/trash-2';
-    import Play from '@lucide/svelte/icons/play';
-    import EllipsisVertical from '@lucide/svelte/icons/ellipsis-vertical';
+    import { CopyPlus, EllipsisVertical, Pencil, Play, Power, PowerOff, Trash2 } from '$lib/components/icons';
+    import { type ELEMENT_STATUS, type EXECUTION_STATUS } from '$lib/db/schema';
     import type { Snippet } from 'svelte';
 
     interface Props {

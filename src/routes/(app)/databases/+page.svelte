@@ -1,8 +1,8 @@
 <script lang="ts">
     import Head from '$lib/components/common/Head.svelte';
     import DatabaseElement from '$lib/components/databases/DatabaseElement.svelte';
+    import { Database } from '$lib/components/icons';
     import TableHeader from '$lib/components/table/TableHeader.svelte';
-    import Database from '@lucide/svelte/icons/database';
     import type { PageData } from './$types';
 
     interface Props {

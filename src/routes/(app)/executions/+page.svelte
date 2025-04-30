@@ -2,10 +2,10 @@
     import { invalidateAll } from '$app/navigation';
     import Head from '$lib/components/common/Head.svelte';
     import ExecutionElement from '$lib/components/executions/ExecutionElement.svelte';
+    import { RefreshCw } from '$lib/components/icons';
     import TableHeader from '$lib/components/table/TableHeader.svelte';
     import type { ExecutionUpdateEventPayload } from '$lib/shared/events';
     import { subscribeApi } from '$lib/utils/api';
-    import RefreshCw from '@lucide/svelte/icons/refresh-cw';
     import { onMount } from 'svelte';
     import type { PageData } from './$types';
 

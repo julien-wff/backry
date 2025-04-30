@@ -1,8 +1,8 @@
 <script lang="ts">
     import Head from '$lib/components/common/Head.svelte';
+    import { CloudUpload } from '$lib/components/icons';
     import StorageElement from '$lib/components/storages/StorageElement.svelte';
     import TableHeader from '$lib/components/table/TableHeader.svelte';
-    import CloudUpload from '@lucide/svelte/icons/cloud-upload';
     import type { PageData } from './$types';
 
     interface Props {

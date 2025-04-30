@@ -1,14 +1,11 @@
 <script lang="ts">
     import { invalidateAll } from '$app/navigation';
     import BaseListElement from '$lib/components/common/BaseListElement.svelte';
+    import { Clock, FileChartPie, HardDriveDownload, Timer } from '$lib/components/icons';
     import type { EXECUTION_STATUS } from '$lib/db/schema';
     import type { executionsListFull } from '$lib/queries/executions';
     import { fetchApi } from '$lib/utils/api';
     import { formatDuration, formatSize } from '$lib/utils/format.js';
-    import Clock from '@lucide/svelte/icons/clock';
-    import Timer from '@lucide/svelte/icons/timer';
-    import FileChartPie from '@lucide/svelte/icons/file-chart-pie';
-    import HardDriveDownload from '@lucide/svelte/icons/hard-drive-download';
 
     interface Props {
         execution: Awaited<ReturnType<typeof executionsListFull>>[number];

@@ -1,6 +1,6 @@
+import { DATABASE_ENGINES } from '$lib/db/schema';
 import type { BaseEngine } from '$lib/engines/BaseEngine';
 import { PostgresEngine } from '$lib/engines/PostgresEngine';
-import { DATABASE_ENGINES } from '$lib/db/schema';
 import { SQLiteEngine } from '$lib/engines/SQLiteEngine';
 
 export const engines = {

@@ -1,7 +1,6 @@
 <script lang="ts">
     import { page } from '$app/state';
-    import type { Icon as IconType } from '@lucide/svelte';
-    import Plus from '@lucide/svelte/icons/plus';
+    import { type IconType, Plus } from '$lib/components/icons';
     import type { Snippet } from 'svelte';
 
     interface Props {

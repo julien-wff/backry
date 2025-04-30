@@ -1,12 +1,12 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
+    import { page } from '$app/state';
     import ElementForm from '$lib/components/common/ElementForm.svelte';
     import Head from '$lib/components/common/Head.svelte';
     import EnvVarInput from '$lib/components/forms/EnvVarInput.svelte';
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
+    import { CloudUpload } from '$lib/components/icons';
     import NewPageHeader from '$lib/components/new-elements/NewPageHeader.svelte';
-    import CloudUpload from '@lucide/svelte/icons/cloud-upload';
-    import { page } from '$app/state';
     import type { StoragesCheckRequest, StoragesCheckResponse, StoragesCreateRequest } from '$lib/types/api';
 
     let isExistingRepository = $state(page.params['state'] === 'existing');

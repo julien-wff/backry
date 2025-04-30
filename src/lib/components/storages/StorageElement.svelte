@@ -1,7 +1,7 @@
 <script lang="ts">
     import BaseListElement from '$lib/components/common/BaseListElement.svelte';
+    import { Link } from '$lib/components/icons';
     import { type storages } from '$lib/db/schema';
-    import Link from '@lucide/svelte/icons/link';
 
     interface Props {
         storage: typeof storages.$inferSelect;

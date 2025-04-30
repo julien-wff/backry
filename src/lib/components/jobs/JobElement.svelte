@@ -1,9 +1,7 @@
 <script lang="ts">
     import { goto, invalidateAll } from '$app/navigation';
     import BaseListElement from '$lib/components/common/BaseListElement.svelte';
-    import CloudUpload from '@lucide/svelte/icons/cloud-upload';
-    import Clock from '@lucide/svelte/icons/clock';
-    import DataBase from '@lucide/svelte/icons/database';
+    import { Clock, CloudUpload, Database } from '$lib/components/icons';
     import type { jobsListFull } from '$lib/queries/jobs';
 
     interface Props {
@@ -61,7 +59,7 @@
     </div>
 
     <div class="flex items-center gap-1">
-        <DataBase class="w-4 h-4"/>
+        <Database class="w-4 h-4"/>
         Databases: {job.jobsDatabases.map((db) => db.database.name).join(', ')}
     </div>
 </BaseListElement>

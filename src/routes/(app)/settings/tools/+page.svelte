@@ -1,8 +1,8 @@
 <script lang="ts">
     import Head from '$lib/components/common/Head.svelte';
+    import { Settings } from '$lib/components/icons';
     import NewPageHeader from '$lib/components/new-elements/NewPageHeader.svelte';
     import ToolVersion from '$lib/components/settings/ToolVersion.svelte';
-    import Settings from '@lucide/svelte/icons/settings';
     import type { PageProps } from './$types';
 
     let { data }: PageProps = $props();

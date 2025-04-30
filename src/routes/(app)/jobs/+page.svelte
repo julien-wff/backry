@@ -1,8 +1,8 @@
 <script lang="ts">
     import Head from '$lib/components/common/Head.svelte';
+    import { Timer } from '$lib/components/icons';
     import JobElement from '$lib/components/jobs/JobElement.svelte';
     import TableHeader from '$lib/components/table/TableHeader.svelte';
-    import Timer from '@lucide/svelte/icons/timer';
     import type { PageData } from './$types';
 
     interface Props {

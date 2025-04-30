@@ -1,5 +1,5 @@
 <script lang="ts">
-    import OctagonAlert from '@lucide/svelte/icons/octagon-alert';
+    import { OctagonAlert } from '$lib/components/icons';
     import type { Snippet } from 'svelte';
 
     interface Props {

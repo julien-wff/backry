@@ -1,8 +1,8 @@
 import type { DATABASE_ENGINES } from '$lib/db/schema';
 import { checkAllEngines } from '$lib/engines';
 import { getResticVersion } from '$lib/storages/restic';
-import type { PageServerLoad } from './$types';
 import { VERSION as svelteKitVersion } from '@sveltejs/kit';
+import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({}) => {
     const [ resticVersion, enginesVersions ] = await Promise.all([

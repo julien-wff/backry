@@ -1,8 +1,8 @@
 <script lang="ts">
     import BaseListElement from '$lib/components/common/BaseListElement.svelte';
     import EngineIndicator from '$lib/components/common/EngineIndicator.svelte';
+    import { EthernetPort } from '$lib/components/icons';
     import type { databases } from '$lib/db/schema';
-    import EthernetPort from '@lucide/svelte/icons/ethernet-port';
 
     interface Props {
         database: typeof databases.$inferSelect;

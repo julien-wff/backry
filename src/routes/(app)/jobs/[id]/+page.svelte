@@ -1,15 +1,15 @@
 <script lang="ts">
+    import { goto } from '$app/navigation';
+    import { page } from '$app/state';
     import ElementForm from '$lib/components/common/ElementForm.svelte';
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
+    import { Timer } from '$lib/components/icons';
     import JobDatabaseSelector from '$lib/components/jobs/JobDatabaseSelector.svelte';
     import NewPageHeader from '$lib/components/new-elements/NewPageHeader.svelte';
     import type { JobsCreateRequest } from '$lib/types/api';
     import { slugify } from '$lib/utils/format';
     import { parseIdOrNewParam } from '$lib/utils/params';
-    import Timer from '@lucide/svelte/icons/timer';
     import type { PageData } from './$types';
-    import { goto } from '$app/navigation';
-    import { page } from '$app/state';
 
     interface Props {
         data: PageData;

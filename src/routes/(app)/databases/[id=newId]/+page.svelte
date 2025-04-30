@@ -1,14 +1,13 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
     import Head from '$lib/components/common/Head.svelte';
+    import InputContainer from '$lib/components/forms/InputContainer.svelte';
+    import { Database, OctagonAlert } from '$lib/components/icons';
+    import NewPageHeader from '$lib/components/new-elements/NewPageHeader.svelte';
     import type { DATABASE_ENGINES } from '$lib/db/schema';
     import type { DatabasesCheckRequest, DatabasesCheckResponse } from '$lib/types/api';
     import { customEnhance } from '$lib/utils/actions.js';
-    import InputContainer from '$lib/components/forms/InputContainer.svelte';
-    import NewPageHeader from '$lib/components/new-elements/NewPageHeader.svelte';
     import { slugify } from '$lib/utils/format';
-    import Database from '@lucide/svelte/icons/database';
-    import OctagonAlert from '@lucide/svelte/icons/octagon-alert';
     import type { PageProps } from './$types';
 
     let { data }: PageProps = $props();

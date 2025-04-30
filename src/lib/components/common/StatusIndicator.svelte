@@ -1,9 +1,6 @@
 <script lang="ts">
-    import { type EXECUTION_STATUS, type ELEMENT_STATUS } from '$lib/db/schema';
-    import CheckCircle from '@lucide/svelte/icons/check-circle';
-    import CircleX from '@lucide/svelte/icons/circle-x';
-    import CirclePlay from '@lucide/svelte/icons/circle-play';
-    import OctagonAlert from '@lucide/svelte/icons/octagon-alert';
+    import { CheckCircle, CirclePlay, CircleX, OctagonAlert } from '$lib/components/icons';
+    import { type ELEMENT_STATUS, type EXECUTION_STATUS } from '$lib/db/schema';
 
     interface Props {
         status: typeof ELEMENT_STATUS[number] | typeof EXECUTION_STATUS[number];
