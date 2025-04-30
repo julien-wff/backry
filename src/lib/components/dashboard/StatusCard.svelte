@@ -24,7 +24,7 @@
 
     {#snippet status(text: string, value: number | undefined, statusClass: string)}
         {#if value}
-            <div class="flex items-center justify-between gap-2 bg-base-200 p-2 rounded-box">
+            <div class="flex items-center justify-between gap-2 bg-base-200 py-2 px-3 rounded-box">
                 <span>
                     {value} {text}
                 </span>
