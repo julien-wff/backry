@@ -6,9 +6,9 @@ export const load: LayoutServerLoad = async () => {
 
     return {
         errors: {
-            databases: errors.databases > 0,
-            storages: errors.storages > 0,
-            executions: errors.executions > 0,
+            databases: errors.databases,
+            storages: errors.storages,
+            executions: errors.executions,
         },
     };
 };

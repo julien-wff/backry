@@ -4,9 +4,9 @@
 
     interface Props {
         errors: {
-            databases: boolean;
-            storages: boolean;
-            executions: boolean;
+            databases: number;
+            storages: number;
+            executions: number;
         };
     }
 
@@ -21,10 +21,10 @@
 
     <nav class="flex flex-col flex-1 gap-4">
         <NavbarElement href="/dashboard" icon={LayoutDashboard} label="Dashboard"/>
-        <NavbarElement hasError={errors.databases} href="/databases" icon={Database} label="Databases"/>
-        <NavbarElement hasError={errors.storages} href="/storages" icon={CloudUpload} label="Storage"/>
+        <NavbarElement hasError={errors.databases > 0} href="/databases" icon={Database} label="Databases"/>
+        <NavbarElement hasError={errors.storages > 0} href="/storages" icon={CloudUpload} label="Storage"/>
         <NavbarElement href="/jobs" icon={Timer} label="Backup jobs"/>
-        <NavbarElement hasError={errors.executions} href="/executions" icon={RefreshCw} label="Executions"/>
+        <NavbarElement hasError={errors.executions > 0} href="/executions" icon={RefreshCw} label="Executions"/>
         <!--        <NavbarElement href="/restore" icon={History} label="Restore"/>-->
 
         <div class="flex flex-col justify-end flex-1">
