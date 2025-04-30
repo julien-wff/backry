@@ -7,8 +7,37 @@ import { eq } from 'drizzle-orm';
  */
 export const databasesList = () => db.select().from(databases);
 
+/**
+ * Fetches a database by ID.
+ * @param id The ID of the database to fetch.
+ * @returns The database record or null if not found.
+ */
+export const getDatabase = (id: number) =>
+    db.query.databases.findFirst({
+        where: eq(databases.id, id),
+    });
+
+/**
+ * Creates a new database record.
+ * @param values Database information to insert.
+ * @returns The created database record.
+ */
 export const createDatabase = (values: typeof databases.$inferInsert) =>
     db.insert(databases).values(values).returning().get();
+
+/**
+ * Updates an existing database record by ID.
+ * @param id The ID of the database to update.
+ * @param values The new values to update the database with.
+ * @returns The updated database record, or null if not found.
+ */
+export const updateDatabase = (id: number, values: typeof databases.$inferInsert) =>
+    db
+        .update(databases)
+        .set(values)
+        .where(eq(databases.id, id))
+        .returning()
+        .get();
 
 /**
  * Fetches a list of all active databases ID and name.

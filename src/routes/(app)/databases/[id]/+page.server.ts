@@ -1,12 +1,26 @@
 import { DATABASE_ENGINES } from '$lib/db/schema';
 import { engines } from '$lib/engines';
-import { createDatabase } from '$lib/queries/databases';
-import { fail, redirect } from '@sveltejs/kit';
+import { createDatabase, getDatabase, updateDatabase } from '$lib/queries/databases';
+import { parseIdOrNewParam } from '$lib/utils/params';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { z } from 'zod';
 import { fromError } from 'zod-validation-error';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ params }) => {
+    const { id, isNew } = parseIdOrNewParam(params.id);
+    if (id === null && !isNew) {
+        return error(400, 'Invalid database ID');
+    }
+
+    let database: Awaited<ReturnType<typeof getDatabase>> | null = null;
+    if (id !== null) {
+        database = await getDatabase(id);
+        if (!database) {
+            return error(404, 'Job not found');
+        }
+    }
+
     const engineList = Object.entries(engines).map(([ key, value ]) => {
         const engine = new value();
         return {
@@ -19,6 +33,7 @@ export const load: PageServerLoad = async ({ params }) => {
 
     return {
         engineList,
+        database,
     };
 };
 
@@ -38,7 +53,20 @@ export const actions = {
             return fail(401, { error: fromError(error).details });
         }
 
-        createDatabase(data);
+        const { id, isNew } = parseIdOrNewParam(params.id);
+        if (id === null && !isNew) {
+            return fail(400, { error: 'Invalid database ID' });
+        }
+
+        if (isNew) {
+            createDatabase(data);
+        } else if (id !== null) {
+            const db = updateDatabase(id, data);
+            if (!db) {
+                return fail(404, { error: 'Database not found' });
+            }
+        }
+
         return redirect(307, '/databases');
     },
 } satisfies Actions;

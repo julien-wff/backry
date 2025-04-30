@@ -13,14 +13,14 @@
     let { data }: PageProps = $props();
     let error = $state<{ current: null | string }>({ current: null });
 
-    let selectedEngine = $state<typeof DATABASE_ENGINES[number] | null>(null);
+    let selectedEngine = $state<typeof DATABASE_ENGINES[number] | null>(data.database?.engine ?? null);
 
-    let dbName = $state('');
+    let dbName = $state(data.database?.name ?? '');
     let oldDbName = $state('');
-    let slug = $state('');
+    let slug = $state(data.database?.slug ?? '');
     $effect(() => updateSlug(dbName));
 
-    let connectionString = $state('');
+    let connectionString = $state(data.database?.connectionString ?? '');
     let connectionStringPlaceholder = $derived(
         data.engineList.find((engine) => engine.id === selectedEngine)?.connectionStringPlaceholder ?? '',
     );
