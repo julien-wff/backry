@@ -1,5 +1,5 @@
 <script lang="ts">
-    import OctogonAlert from '@lucide/svelte/icons/octagon-alert';
+    import OctagonAlert from '@lucide/svelte/icons/octagon-alert';
     import type { Snippet } from 'svelte';
 
     interface Props {
@@ -27,7 +27,7 @@
 
     {#if error}
         <div role="alert" class="alert alert-error alert-soft">
-            <OctogonAlert class="w-4 h-4"/>
+            <OctagonAlert class="w-4 h-4"/>
             <span class="whitespace-break-spaces">{error}</span>
         </div>
     {/if}

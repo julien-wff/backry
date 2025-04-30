@@ -8,7 +8,7 @@
     import NewPageHeader from '$lib/components/new-elements/NewPageHeader.svelte';
     import { slugify } from '$lib/utils/format';
     import Database from '@lucide/svelte/icons/database';
-    import OctogonAlert from '@lucide/svelte/icons/octagon-alert';
+    import OctagonAlert from '@lucide/svelte/icons/octagon-alert';
     import type { PageProps } from './$types';
 
     let { data }: PageProps = $props();
@@ -89,7 +89,7 @@
 
     {#if error.current}
         <div role="alert" class="alert alert-error alert-soft">
-            <OctogonAlert class="w-4 h-4"/>
+            <OctagonAlert class="w-4 h-4"/>
             <span class="whitespace-break-spaces">{error.current}</span>
         </div>
     {/if}

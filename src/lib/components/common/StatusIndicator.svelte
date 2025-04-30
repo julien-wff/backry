@@ -3,7 +3,7 @@
     import CheckCircle from '@lucide/svelte/icons/check-circle';
     import CircleX from '@lucide/svelte/icons/circle-x';
     import CirclePlay from '@lucide/svelte/icons/circle-play';
-    import OctogonAlert from '@lucide/svelte/icons/octagon-alert';
+    import OctagonAlert from '@lucide/svelte/icons/octagon-alert';
 
     interface Props {
         status: typeof ELEMENT_STATUS[number] | typeof EXECUTION_STATUS[number];
@@ -25,7 +25,7 @@
         <CircleX class="w-4 h-4"/>
         Inactive
     {:else if status === 'error'}
-        <OctogonAlert class="w-4 h-4"/>
+        <OctagonAlert class="w-4 h-4"/>
         Error
     {:else if status === 'running'}
         <CirclePlay class="w-4 h-4"/>
