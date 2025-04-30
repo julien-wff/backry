@@ -29,3 +29,15 @@ export const activeStoragesListShort = () =>
         })
         .from(storages)
         .where(eq(storages.status, 'active'));
+
+/**
+ * Deletes a storage by ID.
+ * @param id Storage ID.
+ * @return Deleted storage or null if not found.
+ */
+export const deleteStorage = (id: number) =>
+    db
+        .delete(storages)
+        .where(eq(storages.id, id))
+        .returning()
+        .get();

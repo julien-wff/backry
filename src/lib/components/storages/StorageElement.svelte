@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { invalidateAll } from '$app/navigation';
     import BaseListElement from '$lib/components/common/BaseListElement.svelte';
     import { Link } from '$lib/components/icons';
     import { type storages } from '$lib/db/schema';
@@ -9,12 +10,27 @@
 
     let { storage }: Props = $props();
     let status = $state(storage.status);
+    let loading = $state(false);
+
+    async function deleteStorage() {
+        loading = true;
+        const res = await fetch(`/api/storages/${storage.id}`, {
+            method: 'DELETE',
+        });
+
+        if (res.ok) {
+            await invalidateAll();
+        }
+
+        loading = false;
+    }
 </script>
 
 
-<BaseListElement editHref={`/storages/${storage.id}`}
+<BaseListElement disabled={loading}
+                 editHref={`/storages/${storage.id}`}
                  error={storage.error}
-                 ondelete={() => console.log('Delete')}
+                 ondelete={deleteStorage}
                  status={status}
                  title={storage.name}>
     <div class="flex items-center gap-1">
