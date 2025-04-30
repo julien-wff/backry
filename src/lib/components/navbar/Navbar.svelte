@@ -1,5 +1,5 @@
 <script>
-    import { CloudUpload, Database, History, LayoutDashboard, RefreshCw, Settings, Timer } from '$lib/components/icons';
+    import { CloudUpload, Database, LayoutDashboard, RefreshCw, Settings, Timer } from '$lib/components/icons';
     import NavbarElement from '$lib/components/navbar/NavbarElement.svelte';
 </script>
 
@@ -15,7 +15,7 @@
         <NavbarElement href="/storages" icon={CloudUpload} label="Storage"/>
         <NavbarElement href="/jobs" icon={Timer} label="Backup jobs"/>
         <NavbarElement href="/executions" icon={RefreshCw} label="Executions"/>
-        <NavbarElement href="/restore" icon={History} label="Restore"/>
+        <!--        <NavbarElement href="/restore" icon={History} label="Restore"/>-->
 
         <div class="flex flex-col justify-end flex-1">
             <NavbarElement href="/settings" icon={Settings} label="Settings"/>
