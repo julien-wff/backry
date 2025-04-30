@@ -15,8 +15,6 @@
 <BaseListElement editHref={`/storages/${storage.id}`}
                  error={storage.error}
                  ondelete={() => console.log('Delete')}
-                 onduplicate={() => console.log('Duplicate')}
-                 onstatuschange={() => console.log('Status change')}
                  status={status}
                  title={storage.name}>
     <div class="flex items-center gap-1">
