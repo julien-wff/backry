@@ -17,7 +17,7 @@ export const load: PageServerLoad = async ({ params }) => {
     if (id !== null) {
         database = await getDatabase(id);
         if (!database) {
-            return error(404, 'Job not found');
+            return error(404, 'Database not found');
         }
     }
 
