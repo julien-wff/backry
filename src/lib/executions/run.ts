@@ -39,6 +39,10 @@ async function jobDatabaseBackup(job: NonNullable<Awaited<ReturnType<typeof getJ
         return err(`Cannot get database ${jobIndex} for job #${job.id}`);
     }
 
+    if (jobDatabase.status === 'inactive') {
+        return ok();
+    }
+
     const engine = ENGINES_METHODS[jobDatabase.database.engine];
     const databaseInfo = jobDatabase.database;
     const fileName = `${job.slug}_${databaseInfo.slug}.${engine.dumpFileExtension}`;
