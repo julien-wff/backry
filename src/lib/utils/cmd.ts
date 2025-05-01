@@ -80,7 +80,6 @@ export async function runCommandStream<O, E>(command: string, args: string[] = [
     const subprocess = Bun.spawn([ command, ...args ], {
         cwd: options?.cwd,
         env: options?.env,
-        shell: true,
         stdout: 'pipe',
         stderr: 'pipe',
     });
