@@ -141,26 +141,28 @@
 <ElementForm bind:error={error}
              onsubmit={handleFormSubmit}
              title="Add {isExistingRepository ? 'existing' : 'and initialize'} Restic repository">
-    <InputContainer label="Repository">
-        <div class="flex gap-2">
-            <button class="flex-1 gap-2 px-4 py-2 flex flex-col items-center bg-base-300 justify-center rounded-lg cursor-pointer border-2 text-center"
-                    class:border-primary={!isExistingRepository}
-                    class:border-transparent={isExistingRepository}
-                    onclick={() => (isExistingRepository = false)}
-                    type="button">
-                <PackageOpen size={24}/>
-                New repository
-            </button>
-            <button class="flex-1 gap-2 px-4 py-2 flex flex-col items-center bg-base-300 justify-center rounded-lg cursor-pointer border-2 text-center"
-                    class:border-primary={isExistingRepository}
-                    class:border-transparent={!isExistingRepository}
-                    onclick={() => (isExistingRepository = true)}
-                    type="button">
-                <ArchiveRestore size={24}/>
-                Existing repository
-            </button>
-        </div>
-    </InputContainer>
+    {#if !data.storage}
+        <InputContainer label="Repository">
+            <div class="flex gap-2">
+                <button class="flex-1 gap-2 px-4 py-2 flex flex-col items-center bg-base-300 justify-center rounded-lg cursor-pointer border-2 text-center"
+                        class:border-primary={!isExistingRepository}
+                        class:border-transparent={isExistingRepository}
+                        onclick={() => (isExistingRepository = false)}
+                        type="button">
+                    <PackageOpen size={24}/>
+                    New repository
+                </button>
+                <button class="flex-1 gap-2 px-4 py-2 flex flex-col items-center bg-base-300 justify-center rounded-lg cursor-pointer border-2 text-center"
+                        class:border-primary={isExistingRepository}
+                        class:border-transparent={!isExistingRepository}
+                        onclick={() => (isExistingRepository = true)}
+                        type="button">
+                    <ArchiveRestore size={24}/>
+                    Existing repository
+                </button>
+            </div>
+        </InputContainer>
+    {/if}
 
     <InputContainer for="repo-name" label="Name">
         <input bind:value={repoName} class="input w-full" id="repo-name" required>
