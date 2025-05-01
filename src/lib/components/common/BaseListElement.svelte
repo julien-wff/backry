@@ -15,6 +15,7 @@
         onrun?: () => void;
         disabled?: boolean;
         error?: string | null;
+        secondaryBtns?: Snippet;
     }
 
     let {
@@ -28,6 +29,7 @@
         onrun,
         disabled,
         error,
+        secondaryBtns,
     }: Props = $props();
 </script>
 
@@ -75,7 +77,7 @@
                 </button>
             {/if}
 
-            {#if onduplicate || ondelete}
+            {#if onduplicate || ondelete || secondaryBtns}
                 <div class="dropdown dropdown-end">
                     <div class="btn btn-square btn-sm btn-soft" role="button" tabindex="0">
                         <EllipsisVertical class="w-4 h-4"/>
@@ -93,6 +95,7 @@
                                 Delete
                             </button>
                         {/if}
+                        {@render secondaryBtns?.()}
                     </div>
                 </div>
             {/if}

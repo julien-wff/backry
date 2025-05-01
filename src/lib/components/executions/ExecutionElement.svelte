@@ -1,7 +1,7 @@
 <script lang="ts">
     import { invalidateAll } from '$app/navigation';
     import BaseListElement from '$lib/components/common/BaseListElement.svelte';
-    import { Clock, FileChartPie, HardDriveDownload, Timer } from '$lib/components/icons';
+    import { Clock, FileChartPie, FileDown, HardDriveDownload, Timer } from '$lib/components/icons';
     import type { EXECUTION_STATUS } from '$lib/db/schema';
     import type { executionsListFull } from '$lib/queries/executions';
     import { fetchApi } from '$lib/utils/api';
@@ -33,9 +33,27 @@
 </script>
 
 
+{#snippet secondaryBtns()}
+    {#if !execution.error && execution.dumpSize && execution.dumpSize < 10e6}
+        <a download href="/api/executions/{execution.id}/download" class="btn btn-sm btn-success btn-soft">
+            <FileDown class="w-4 h-4"/>
+            Download
+        </a>
+    {:else if !execution.error && execution.dumpSize}
+        <div class="tooltip tooltip-error" data-tip="Cannot download dumps larger than 10MB">
+            <button class="btn btn-sm btn-success btn-soft w-full" disabled>
+                <FileDown class="w-4 h-4"/>
+                Download
+            </button>
+        </div>
+    {/if}
+{/snippet}
+
+
 <BaseListElement disabled={loading}
                  error={execution.error}
                  ondelete={handleDelete}
+                 {secondaryBtns}
                  status={status}
                  title="{execution.jobDatabase.job.name} - {execution.jobDatabase.database.name}">
     <div class="flex items-center gap-1">

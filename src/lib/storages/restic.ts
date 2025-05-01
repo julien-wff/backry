@@ -130,3 +130,25 @@ export async function deleteSnapshot(url: string,
 
     return resticCommandToResult<string>(res, false);
 }
+
+
+export async function readFileContent(url: string,
+                                      password: string,
+                                      env: Record<string, string>,
+                                      snapshotId: string,
+                                      fileName: string) {
+    const res = await runCommandSync(
+        'restic',
+        [
+            '-r', url,
+            'dump',
+            snapshotId,
+            fileName,
+        ],
+        {
+            env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env },
+        },
+    );
+
+    return resticCommandToResult<string>(res, false);
+}
