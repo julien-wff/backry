@@ -5,6 +5,7 @@
     import { Database, OctagonAlert } from '$lib/components/icons';
     import NewPageHeader from '$lib/components/new-elements/NewPageHeader.svelte';
     import type { DATABASE_ENGINES } from '$lib/db/schema';
+    import { ENGINE_META_ENTRIES, ENGINES_META } from '$lib/engines/enginesMeta';
     import type { DatabasesCheckRequest, DatabasesCheckResponse } from '$lib/types/api';
     import { customEnhance } from '$lib/utils/actions.js';
     import { slugify } from '$lib/utils/format';
@@ -22,7 +23,7 @@
 
     let connectionString = $state(data.database?.connectionString ?? '');
     let connectionStringPlaceholder = $derived(
-        data.engineList.find((engine) => engine.id === selectedEngine)?.connectionStringPlaceholder ?? '',
+        (selectedEngine && ENGINES_META[selectedEngine].connectionStringPlaceholder) || '',
     );
 
     function updateSlug(_: string) {
@@ -95,21 +96,21 @@
 
     <InputContainer label="Engine">
         <div class="flex gap-2">
-            {#each data.engineList as engine (engine.id)}
+            {#each ENGINE_META_ENTRIES as [engineId, engine] (engineId)}
                 <div class="w-32 gap-2 px-4 py-2 flex flex-col items-center bg-base-300 justify-center rounded-lg cursor-pointer border-2"
-                     class:border-primary={selectedEngine === engine.id}
-                     class:border-transparent={selectedEngine !== engine.id}
+                     class:border-primary={selectedEngine === engineId}
+                     class:border-transparent={selectedEngine !== engineId}
                      role="button"
                      tabindex="0"
                      onclick={() => {
-                         selectedEngine = engine.id;
+                         selectedEngine = engineId;
                      }}
                      onkeydown={(e) => {
                          if (e.key === 'Enter' || e.key === ' ') {
-                             selectedEngine = engine.id;
+                             selectedEngine = engineId;
                          }
                      }}>
-                    <img alt="{engine.displayName} logo" class="w-8 h-8" src="/icons/{engine.icon}"/>
+                    <img alt="{engine.displayName} logo" class="w-8 h-8" src={engine.icon}/>
                     {engine.displayName}
                 </div>
             {/each}

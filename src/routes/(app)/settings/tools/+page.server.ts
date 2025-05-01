@@ -1,5 +1,4 @@
-import type { DATABASE_ENGINES } from '$lib/db/schema';
-import { checkAllEngines } from '$lib/engines';
+import { getAllEnginesVersionsOrError } from '$lib/engines/checks';
 import { getResticVersion } from '$lib/storages/restic';
 import { VERSION as svelteKitVersion } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
@@ -7,7 +6,7 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({}) => {
     const [ resticVersion, enginesVersions ] = await Promise.all([
         getResticVersion(),
-        checkAllEngines(),
+        getAllEnginesVersionsOrError(),
     ]);
 
     return {
@@ -23,12 +22,6 @@ export const load: PageServerLoad = async ({}) => {
             version: resticVersion.isOk() ? resticVersion.value : null,
             error: resticVersion.isErr() ? resticVersion.error : null,
         },
-        ...enginesVersions.reduce((obj, { id, version }) => ({
-            ...obj,
-            [id]: {
-                version: version.isOk() ? version.value : null,
-                error: version.isErr() ? version.error : null,
-            },
-        }), {} as Record<typeof DATABASE_ENGINES[number], { version: string | null; error: string | null }>),
+        ...enginesVersions,
     };
 };

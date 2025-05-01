@@ -1,4 +1,4 @@
-import { engines } from '$lib/engines';
+import { ENGINES_METHODS } from '$lib/engines/enginesMethods';
 import { createExecution, getExecution, updateExecution } from '$lib/queries/executions';
 import { getJob } from '$lib/queries/jobs';
 import { executionEmitter } from '$lib/shared/events';
@@ -39,7 +39,7 @@ async function jobDatabaseBackup(job: NonNullable<Awaited<ReturnType<typeof getJ
         return err(`Cannot get database ${jobIndex} for job #${job.id}`);
     }
 
-    const engine = new engines[jobDatabase.database.engine]();
+    const engine = ENGINES_METHODS[jobDatabase.database.engine];
     const databaseInfo = jobDatabase.database;
     const fileName = `${job.slug}_${databaseInfo.slug}.${engine.dumpFileExtension}`;
 

@@ -1,5 +1,4 @@
 import { DATABASE_ENGINES } from '$lib/db/schema';
-import { engines } from '$lib/engines';
 import { createDatabase, getDatabase, updateDatabase } from '$lib/queries/databases';
 import { parseIdOrNewParam } from '$lib/utils/params';
 import { error, fail, redirect } from '@sveltejs/kit';
@@ -21,18 +20,7 @@ export const load: PageServerLoad = async ({ params }) => {
         }
     }
 
-    const engineList = Object.entries(engines).map(([ key, value ]) => {
-        const engine = new value();
-        return {
-            id: key as typeof DATABASE_ENGINES[number],
-            displayName: engine.displayName,
-            icon: engine.icon,
-            connectionStringPlaceholder: engine.connectionStringPlaceholder,
-        };
-    });
-
     return {
-        engineList,
         database,
     };
 };

@@ -1,24 +1,20 @@
-import { type BaseEngine } from '$lib/engines/BaseEngine';
+import type { EngineMethods } from '$lib/types/engine';
 import { runCommandSync } from '$lib/utils/cmd';
 import { Database } from 'bun:sqlite';
 import { err, ok, type ResultAsync } from 'neverthrow';
 
-export class SQLiteEngine implements BaseEngine {
-    readonly connectionStringPlaceholder = 'sqlite://path/to/database.db';
-    readonly displayName = 'SQLite';
-    readonly dumpFileExtension = 'sql';
-    readonly icon = 'sqlite.svg';
-
-    private readonly sqlite3 = process.env.SQLITE3_CMD ?? 'sqlite3';
+export const sqliteMethods = {
+    command: process.env.BACKRY_SQLITE3_CMD ?? 'sqlite3',
+    dumpFileExtension: 'sql',
 
     async getVersion(): Promise<ResultAsync<string, string>> {
-        const res = await runCommandSync(this.sqlite3, [ '--version' ]);
+        const res = await runCommandSync(this.command, [ '--version' ]);
         if (res.isErr()) {
             return err(res.error.stderr.toString().trim());
         }
 
         return ok(res.value.text().trim());
-    }
+    },
 
     async checkConnection(connectionString: string): Promise<ResultAsync<void, string>> {
         try {
@@ -32,9 +28,9 @@ export class SQLiteEngine implements BaseEngine {
         }
 
         return ok();
-    }
+    },
 
     getDumpCommand(connectionString: string, additionalArgs?: string[]): string[] {
-        return [ this.sqlite3, ...additionalArgs ?? [], '-readonly', connectionString, '.dump' ];
-    }
-}
+        return [ this.command, ...additionalArgs ?? [], '-readonly', connectionString, '.dump' ];
+    },
+} satisfies EngineMethods;

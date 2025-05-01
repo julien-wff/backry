@@ -1,6 +1,7 @@
 import { db } from '$lib/db';
-import { databases } from '$lib/db/schema';
-import { engines } from '$lib/engines/index';
+import { DATABASE_ENGINES, databases } from '$lib/db/schema';
+import { ENGINE_META_ENTRIES } from '$lib/engines/enginesMeta';
+import { ENGINES_METHODS } from '$lib/engines/enginesMethods';
 import { eq, or } from 'drizzle-orm';
 
 /**
@@ -25,7 +26,7 @@ export async function checkAllActiveDatabases() {
  * @returns A promise that resolves to a boolean indicating if the database is accessible.
  */
 export async function checkDatabase(database: typeof databases.$inferSelect) {
-    const engine = new engines[database.engine]();
+    const engine = ENGINES_METHODS[database.engine];
     const checkResult = await engine.checkConnection(database.connectionString);
 
     // If the repository is not accessible, update the storage status to error
@@ -55,4 +56,20 @@ export async function checkDatabase(database: typeof databases.$inferSelect) {
     }
 
     return true;
+}
+
+
+export async function getAllEnginesVersionsOrError() {
+    const result = {} as Record<typeof DATABASE_ENGINES[number], { version: string | null; error: string | null }>;
+
+    for (const [ engineId ] of ENGINE_META_ENTRIES) {
+        const version = await ENGINES_METHODS[engineId].getVersion();
+        if (version.isOk()) {
+            result[engineId] = { version: version.value, error: null };
+        } else {
+            result[engineId] = { version: null, error: version.error };
+        }
+    }
+
+    return result;
 }

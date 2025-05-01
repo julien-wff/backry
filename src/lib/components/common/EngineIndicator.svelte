@@ -1,19 +1,16 @@
 <script lang="ts">
     import type { DATABASE_ENGINES } from '$lib/db/schema';
+    import { ENGINES_META } from '$lib/engines/enginesMeta';
 
     interface Props {
         engine: typeof DATABASE_ENGINES[number];
     }
 
-    let { engine }: Props = $props();
+    let { engine: engineId }: Props = $props();
+    const engine = ENGINES_META[engineId];
 </script>
 
 <div class="flex items-center gap-1">
-    {#if engine === 'postgresql'}
-        <img src="/icons/postgres.svg" alt="Postgres 16" class="w-4 h-4"/>
-        PostgreSQL
-    {:else if engine === 'sqlite'}
-        <img src="/icons/sqlite.svg" alt="SQLite 3" class="w-4 h-4"/>
-        SQLite
-    {/if}
+    <img alt={engine.displayName} class="w-4 h-4" src={engine.icon}/>
+    {engine.displayName}
 </div>
