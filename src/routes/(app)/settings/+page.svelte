@@ -1,9 +1,9 @@
 <script lang="ts">
     import Head from '$lib/components/common/Head.svelte';
     import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
+    import FullScreenSelectorCard from '$lib/components/common/selector/FullScreenSelectorCard.svelte';
+    import FullScreenSelectorContainer from '$lib/components/common/selector/FullScreenSelectorContainer.svelte';
     import { Settings, Wrench } from '$lib/components/icons';
-    import NewElementCard from '$lib/components/new-elements/NewElementCard.svelte';
-    import NewElementsContainer from '$lib/components/new-elements/NewElementsContainer.svelte';
 </script>
 
 <Head title="Settings"/>
@@ -12,8 +12,8 @@
     Settings
 </PageContentHeader>
 
-<NewElementsContainer gridClass="grid-cols-1">
-    <NewElementCard href="tools" icon={Wrench}>
+<FullScreenSelectorContainer gridClass="grid-cols-1">
+    <FullScreenSelectorCard href="tools" icon={Wrench}>
         Tools info
-    </NewElementCard>
-</NewElementsContainer>
+    </FullScreenSelectorCard>
+</FullScreenSelectorContainer>
