@@ -131,16 +131,16 @@
     }
 </script>
 
-<Head title="New storage backend"/>
+<Head title="{data.storage ? `Edit ${data.storage.name}` : 'New'} storage backend"/>
 
 <NewPageHeader icon={CloudUpload}>
-    Add {isExistingRepository ? 'existing' : 'new'} storage backend
+    {data.storage ? 'Edit' : 'Add'} {isExistingRepository ? 'existing' : 'new'} storage backend
 </NewPageHeader>
 
 
 <ElementForm bind:error={error}
              onsubmit={handleFormSubmit}
-             title="Add {isExistingRepository ? 'existing' : 'and initialize'} Restic repository">
+             title="{data.storage ? 'Edit' : 'Add'} {isExistingRepository ? 'existing' : 'and initialize'} Restic repository">
     {#if !data.storage}
         <InputContainer label="Repository">
             <div class="flex gap-2">

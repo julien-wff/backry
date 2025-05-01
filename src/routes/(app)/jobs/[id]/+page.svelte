@@ -2,6 +2,7 @@
     import { goto } from '$app/navigation';
     import { page } from '$app/state';
     import ElementForm from '$lib/components/common/ElementForm.svelte';
+    import Head from '$lib/components/common/Head.svelte';
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
     import { Timer } from '$lib/components/icons';
     import JobDatabaseSelector from '$lib/components/jobs/JobDatabaseSelector.svelte';
@@ -70,14 +71,15 @@
 </script>
 
 
-<NewPageHeader icon={Timer}>
-    Add job pool
-</NewPageHeader>
+<Head title="{data.job ? `Edit ${data.job.name}` : 'Add'} job pool"/>
 
+<NewPageHeader icon={Timer}>
+    {data.job ? 'Edit' : 'Add'} job pool
+</NewPageHeader>
 
 <ElementForm bind:error={error}
              onsubmit={handleFormSubmit}
-             title="Add new job pool">
+             title="{data.job ? 'Edit' : 'Add'} job pool">
     <InputContainer for="job-name" label="Name">
         <input bind:value={jobName} class="input w-full" id="job-name" required>
     </InputContainer>

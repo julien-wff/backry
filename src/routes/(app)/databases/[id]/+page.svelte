@@ -72,10 +72,10 @@
     }
 </script>
 
-<Head title="Add database"/>
+<Head title="{data.database ? `Edit ${data.database.name}` : 'Add'} database"/>
 
 <NewPageHeader icon={Database}>
-    Add database
+    {data.database ? 'Edit' : 'Add'} database
 </NewPageHeader>
 
 <form class="rounded-box bg-base-200 p-4 flex flex-col gap-4 max-w-xl w-full mx-auto"
@@ -83,7 +83,7 @@
       use:customEnhance={{ enhance, error }}>
 
     <h2 class="font-bold text-lg">
-        Add new database connection
+        {data.database ? 'Edit' : 'Add new'} database connection
     </h2>
 
     {#if error.current}
