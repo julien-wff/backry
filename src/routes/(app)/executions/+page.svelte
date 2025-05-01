@@ -1,9 +1,9 @@
 <script lang="ts">
     import { invalidateAll } from '$app/navigation';
     import Head from '$lib/components/common/Head.svelte';
+    import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
     import ExecutionElement from '$lib/components/executions/ExecutionElement.svelte';
     import { RefreshCw } from '$lib/components/icons';
-    import TableHeader from '$lib/components/table/TableHeader.svelte';
     import type { ExecutionUpdateEventPayload } from '$lib/shared/events';
     import { subscribeApi } from '$lib/utils/api';
     import { onMount } from 'svelte';
@@ -35,7 +35,9 @@
 
 <Head title="Executions"/>
 
-<TableHeader icon={RefreshCw} noNew>Executions</TableHeader>
+<PageContentHeader icon={RefreshCw}>
+    Executions
+</PageContentHeader>
 
 <div class="grid grid-cols-1 gap-4">
     {#each executions as execution (execution.id)}

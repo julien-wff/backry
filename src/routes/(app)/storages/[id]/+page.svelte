@@ -1,11 +1,11 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
-    import ElementForm from '$lib/components/common/ElementForm.svelte';
     import Head from '$lib/components/common/Head.svelte';
+    import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
+    import ElementForm from '$lib/components/forms/ElementForm.svelte';
     import EnvVarInput from '$lib/components/forms/EnvVarInput.svelte';
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
     import { ArchiveRestore, CloudUpload, PackageOpen } from '$lib/components/icons';
-    import NewPageHeader from '$lib/components/new-elements/NewPageHeader.svelte';
     import type { StoragesCheckRequest, StoragesCheckResponse, StoragesCreateRequest } from '$lib/types/api';
     import type { PageProps } from './$types';
 
@@ -133,9 +133,9 @@
 
 <Head title="{data.storage ? `Edit ${data.storage.name}` : 'New'} storage backend"/>
 
-<NewPageHeader icon={CloudUpload}>
+<PageContentHeader buttonType="back" icon={CloudUpload}>
     {data.storage ? 'Edit' : 'Add'} {isExistingRepository ? 'existing' : 'new'} storage backend
-</NewPageHeader>
+</PageContentHeader>
 
 
 <ElementForm bind:error={error}

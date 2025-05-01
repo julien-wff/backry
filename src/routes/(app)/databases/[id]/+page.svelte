@@ -1,9 +1,9 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
     import Head from '$lib/components/common/Head.svelte';
+    import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
     import { Database, OctagonAlert } from '$lib/components/icons';
-    import NewPageHeader from '$lib/components/new-elements/NewPageHeader.svelte';
     import type { DATABASE_ENGINES } from '$lib/db/schema';
     import { ENGINE_META_ENTRIES, ENGINES_META } from '$lib/engines/enginesMeta';
     import type { DatabasesCheckRequest, DatabasesCheckResponse } from '$lib/types/api';
@@ -75,9 +75,9 @@
 
 <Head title="{data.database ? `Edit ${data.database.name}` : 'Add'} database"/>
 
-<NewPageHeader icon={Database}>
+<PageContentHeader buttonType="back" icon={Database}>
     {data.database ? 'Edit' : 'Add'} database
-</NewPageHeader>
+</PageContentHeader>
 
 <form class="rounded-box bg-base-200 p-4 flex flex-col gap-4 max-w-xl w-full mx-auto"
       method="POST"

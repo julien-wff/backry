@@ -1,8 +1,8 @@
 <script lang="ts">
     import Head from '$lib/components/common/Head.svelte';
+    import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
     import StatusCard from '$lib/components/dashboard/StatusCard.svelte';
     import { CloudUpload, Database, LayoutDashboard, RefreshCw } from '$lib/components/icons';
-    import TableHeader from '$lib/components/table/TableHeader.svelte';
     import type { PageProps } from './$types';
 
     let { data }: PageProps = $props();
@@ -10,9 +10,9 @@
 
 <Head title="Dashboard"/>
 
-<TableHeader icon={LayoutDashboard} noNew>
+<PageContentHeader icon={LayoutDashboard}>
     Dashboard
-</TableHeader>
+</PageContentHeader>
 
 <div class="grid grid-cols-3 gap-4">
     <StatusCard active={data.stats.databases.active}

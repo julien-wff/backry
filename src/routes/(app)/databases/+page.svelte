@@ -1,8 +1,8 @@
 <script lang="ts">
     import Head from '$lib/components/common/Head.svelte';
+    import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
     import DatabaseElement from '$lib/components/databases/DatabaseElement.svelte';
     import { Database } from '$lib/components/icons';
-    import TableHeader from '$lib/components/table/TableHeader.svelte';
     import type { PageData } from './$types';
 
     interface Props {
@@ -14,7 +14,9 @@
 
 <Head title="Databases"/>
 
-<TableHeader icon={Database}>Databases</TableHeader>
+<PageContentHeader buttonType="new" icon={Database}>
+    Databases
+</PageContentHeader>
 
 <div class="grid grid-cols-1 gap-4">
     {#each data.databases as database (database.id)}

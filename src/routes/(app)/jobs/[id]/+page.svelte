@@ -1,12 +1,12 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
     import { page } from '$app/state';
-    import ElementForm from '$lib/components/common/ElementForm.svelte';
     import Head from '$lib/components/common/Head.svelte';
+    import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
+    import ElementForm from '$lib/components/forms/ElementForm.svelte';
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
     import { Timer } from '$lib/components/icons';
     import JobDatabaseSelector from '$lib/components/jobs/JobDatabaseSelector.svelte';
-    import NewPageHeader from '$lib/components/new-elements/NewPageHeader.svelte';
     import type { JobsCreateRequest } from '$lib/types/api';
     import { slugify } from '$lib/utils/format';
     import { parseIdOrNewParam } from '$lib/utils/params';
@@ -73,9 +73,9 @@
 
 <Head title="{data.job ? `Edit ${data.job.name}` : 'Add'} job pool"/>
 
-<NewPageHeader icon={Timer}>
+<PageContentHeader buttonType="back" icon={Timer}>
     {data.job ? 'Edit' : 'Add'} job pool
-</NewPageHeader>
+</PageContentHeader>
 
 <ElementForm bind:error={error}
              onsubmit={handleFormSubmit}

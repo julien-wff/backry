@@ -1,7 +1,7 @@
 <script lang="ts">
     import Head from '$lib/components/common/Head.svelte';
+    import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
     import { Settings } from '$lib/components/icons';
-    import NewPageHeader from '$lib/components/new-elements/NewPageHeader.svelte';
     import ToolVersion from '$lib/components/settings/ToolVersion.svelte';
     import type { PageProps } from './$types';
 
@@ -10,9 +10,9 @@
 
 <Head title="Settings - Tools info"/>
 
-<NewPageHeader backText="Back to settings" icon={Settings}>
+<PageContentHeader buttonText="Back to settings" buttonType="back" icon={Settings}>
     Settings - Tools info
-</NewPageHeader>
+</PageContentHeader>
 
 
 <div class="rounded-box bg-base-200 p-4 flex flex-col gap-4 max-w-xl w-full mx-auto">

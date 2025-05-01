@@ -1,8 +1,8 @@
 <script lang="ts">
     import Head from '$lib/components/common/Head.svelte';
+    import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
     import { CloudUpload } from '$lib/components/icons';
     import StorageElement from '$lib/components/storages/StorageElement.svelte';
-    import TableHeader from '$lib/components/table/TableHeader.svelte';
     import type { PageData } from './$types';
 
     interface Props {
@@ -14,7 +14,9 @@
 
 <Head title="Storages"/>
 
-<TableHeader icon={CloudUpload}>Storages</TableHeader>
+<PageContentHeader buttonType="new" icon={CloudUpload}>
+    Storages
+</PageContentHeader>
 
 <div class="grid grid-cols-1 gap-4">
     {#each data.storages as storage (storage.id)}
