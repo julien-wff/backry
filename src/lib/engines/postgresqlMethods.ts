@@ -4,7 +4,7 @@ import { SQL } from 'bun';
 import { err, ok, type ResultAsync } from 'neverthrow';
 
 export const postgresMethods = {
-    command: process.env.PG_DUMP_CMD ?? 'pg_dump',
+    command: process.env.BACKRY_PGDUMP_CMD ?? 'pg_dump',
     dumpFileExtension: 'sql',
 
     async getVersion(): Promise<ResultAsync<string, string>> {
