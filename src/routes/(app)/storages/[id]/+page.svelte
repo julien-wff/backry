@@ -1,6 +1,5 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
-    import { page } from '$app/state';
     import ElementForm from '$lib/components/common/ElementForm.svelte';
     import Head from '$lib/components/common/Head.svelte';
     import EnvVarInput from '$lib/components/forms/EnvVarInput.svelte';
@@ -8,17 +7,22 @@
     import { ArchiveRestore, CloudUpload, PackageOpen } from '$lib/components/icons';
     import NewPageHeader from '$lib/components/new-elements/NewPageHeader.svelte';
     import type { StoragesCheckRequest, StoragesCheckResponse, StoragesCreateRequest } from '$lib/types/api';
+    import type { PageProps } from './$types';
 
-    let isExistingRepository = $state(page.params['id'] !== 'new');
+    let { data }: PageProps = $props();
+
+    let isExistingRepository = $state(!!data.storage);
     let error = $state<string | null>(null);
     let isLoading = $state(false);
     let arePreChecksValid = $state(false);
 
-    let repoName = $state('');
-    let repoUrl = $state('');
-    let password = $state('');
+    let repoName = $state(data.storage?.name ?? '');
+    let repoUrl = $state(data.storage?.url ?? '');
+    let password = $state(data.storage?.password ?? '');
 
-    let envVars = $state<{ key: string; value: string }[]>([]);
+    let envVars = $state<{ key: string; value: string }[]>(
+        Object.entries(data.storage?.env ?? {}).map(([ key, value ]) => ({ key, value })),
+    );
     let envRecords = $derived(envVars.reduce((acc, { key, value }) => {
         acc[key] = value;
         return acc;

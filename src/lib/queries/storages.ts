@@ -9,6 +9,18 @@ import { eq } from 'drizzle-orm';
 export const storagesList = () => db.select().from(storages);
 
 /**
+ * Fetches a storage by ID.
+ * @param id Storage ID.
+ * @return Storage or null if not found.
+ */
+export const getStorage = (id: number) =>
+    db
+        .select()
+        .from(storages)
+        .where(eq(storages.id, id))
+        .get();
+
+/**
  * Creates a new storage from an HTTP request.
  * @param storage Fields from request body.
  */
