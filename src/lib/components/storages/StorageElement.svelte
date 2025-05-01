@@ -27,12 +27,14 @@
 </script>
 
 
-<BaseListElement disabled={loading}
-                 editHref={`/storages/${storage.id}`}
-                 error={storage.error}
-                 ondelete={deleteStorage}
-                 status={status}
-                 title={storage.name}>
+<BaseListElement
+        deleteConfirmationMessage={`The storage "${storage.name}" will be deleted from Backry. The Restic repository will stay intact.`}
+        disabled={loading}
+        editHref={`/storages/${storage.id}`}
+        error={storage.error}
+        ondelete={deleteStorage}
+        status={status}
+        title={storage.name}>
     <div class="flex items-center gap-1">
         <Link class="w-4 h-4"/>
         <span>

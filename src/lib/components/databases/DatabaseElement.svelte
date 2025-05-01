@@ -28,7 +28,8 @@
 </script>
 
 
-<BaseListElement disabled={loading}
+<BaseListElement deleteConfirmationMessage={`The database "${database.name}" will be deleted from Backry.`}
+                 disabled={loading}
                  editHref={`/databases/${database.id}`}
                  error={database.error}
                  ondelete={deleteDatabase}

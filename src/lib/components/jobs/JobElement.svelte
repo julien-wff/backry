@@ -54,7 +54,8 @@
 </script>
 
 
-<BaseListElement disabled={loading}
+<BaseListElement deleteConfirmationMessage={`The job "${job.name}" will be deleted.`}
+                 disabled={loading}
                  editHref={`/jobs/${job.id}`}
                  ondelete={deleteJob}
                  onrun={handleRunJob}

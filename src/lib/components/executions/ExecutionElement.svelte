@@ -50,7 +50,8 @@
 {/snippet}
 
 
-<BaseListElement disabled={loading}
+<BaseListElement deleteConfirmationMessage="This execution and the backup stored in the repository will be deleted."
+                 disabled={loading}
                  error={execution.error}
                  ondelete={handleDelete}
                  {secondaryBtns}

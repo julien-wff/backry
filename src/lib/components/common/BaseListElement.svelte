@@ -1,4 +1,5 @@
 <script lang="ts">
+    import ConfirmDeleteModal from '$lib/components/common/ConfirmDeleteModal.svelte';
     import StatusIndicator from '$lib/components/common/StatusIndicator.svelte';
     import { CopyPlus, EllipsisVertical, Pencil, Play, Power, PowerOff, Trash2 } from '$lib/components/icons';
     import { type ELEMENT_STATUS, type EXECUTION_STATUS } from '$lib/db/schema';
@@ -7,6 +8,7 @@
     interface Props {
         status?: typeof ELEMENT_STATUS[number] | typeof EXECUTION_STATUS[number];
         title: string;
+        deleteConfirmationMessage?: string;
         children?: Snippet;
         editHref?: string;
         onduplicate?: () => void;
@@ -21,6 +23,7 @@
     let {
         status,
         title,
+        deleteConfirmationMessage,
         children,
         editHref,
         onduplicate,
@@ -31,6 +34,16 @@
         error,
         secondaryBtns,
     }: Props = $props();
+
+    let deleteDialog = $state<HTMLDialogElement>();
+
+    function handleDelete(ev: MouseEvent) {
+        if (ev.shiftKey) {
+            ondelete?.();
+        } else {
+            deleteDialog?.showModal();
+        }
+    }
 </script>
 
 <div class="bg-base-100 p-2 flex flex-col gap-2 rounded-box shadow-base-100">
@@ -90,7 +103,7 @@
                             </button>
                         {/if}
                         {#if ondelete}
-                            <button {disabled} class="btn btn-soft btn-sm btn-error" onclick={ondelete}>
+                            <button {disabled} class="btn btn-soft btn-sm btn-error" onclick={handleDelete}>
                                 <Trash2 class="w-4 h-4"/>
                                 Delete
                             </button>
@@ -108,3 +121,6 @@
         </div>
     {/if}
 </div>
+
+
+<ConfirmDeleteModal bind:dialog={deleteDialog} {deleteConfirmationMessage} {ondelete}/>
