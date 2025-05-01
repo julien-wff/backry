@@ -40,18 +40,6 @@ export const updateDatabase = (id: number, values: typeof databases.$inferInsert
         .get();
 
 /**
- * Fetches a list of all active databases ID and name.
- */
-export const activeDatabasesListShort = () =>
-    db
-        .select({
-            id: databases.id,
-            name: databases.name,
-        })
-        .from(databases)
-        .where(eq(databases.status, 'active'));
-
-/**
  * Deletes a database by ID.
  * @param id - The ID of the database to delete.
  * @returns The deleted database record.

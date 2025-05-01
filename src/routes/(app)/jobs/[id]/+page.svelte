@@ -91,7 +91,9 @@
     <InputContainer for="backend" label="Storage backend">
         <select bind:value={storageBackend} class="select w-full" id="backend" required>
             {#each data.storages as storage (storage.id)}
-                <option value={storage.id}>{storage.name}</option>
+                <option value={storage.id} disabled={storage.status !== 'active'}>
+                    {storage.name}
+                </option>
             {/each}
         </select>
     </InputContainer>

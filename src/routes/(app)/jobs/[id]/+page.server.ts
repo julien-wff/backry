@@ -1,6 +1,6 @@
-import { activeDatabasesListShort } from '$lib/queries/databases';
+import { databasesList } from '$lib/queries/databases';
 import { getJob } from '$lib/queries/jobs';
-import { activeStoragesListShort } from '$lib/queries/storages';
+import { storagesList } from '$lib/queries/storages';
 import { parseIdOrNewParam } from '$lib/utils/params';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
@@ -20,8 +20,8 @@ export const load: PageServerLoad = async ({ params }) => {
     }
 
     const [ databases, storages ] = await Promise.all([
-        activeDatabasesListShort(),
-        activeStoragesListShort(),
+        databasesList(),
+        storagesList(),
     ]);
 
     return {

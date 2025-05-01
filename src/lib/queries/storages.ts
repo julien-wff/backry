@@ -31,18 +31,6 @@ export const createStorage = (storage: StoragesCreateRequest) => db
     .get();
 
 /**
- * Fetches a list of all active storages ID and name.
- */
-export const activeStoragesListShort = () =>
-    db
-        .select({
-            id: storages.id,
-            name: storages.name,
-        })
-        .from(storages)
-        .where(eq(storages.status, 'active'));
-
-/**
  * Deletes a storage by ID.
  * @param id Storage ID.
  * @return Deleted storage or null if not found.

@@ -1,10 +1,11 @@
 <script lang="ts">
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
     import { ArrowDown, ArrowUp, Power, PowerOff, Trash2 } from '$lib/components/icons';
+    import type { databases } from '$lib/db/schema';
 
     interface Props {
         selection: Array<{ id: number, enabled: boolean }>;
-        availableDatabases: Array<{ id: number, name: string }>;
+        availableDatabases: Array<typeof databases.$inferSelect>;
     }
 
     let { selection = $bindable(), availableDatabases }: Props = $props();
@@ -76,7 +77,9 @@
 
             <select class="select select-sm w-full" bind:value={selection[i].id} id="database-{i}" required>
                 {#each localAvailableDbs as availableDb (availableDb.id)}
-                    <option value={availableDb.id}>{availableDb.name}</option>
+                    <option value={availableDb.id} disabled={availableDb.status !== 'active'}>
+                        {availableDb.name}
+                    </option>
                 {/each}
             </select>
         </fieldset>
