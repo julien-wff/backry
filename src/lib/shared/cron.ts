@@ -42,3 +42,22 @@ export const stopCronJob = (id: CronId) => {
     cronJobs.get(id)?.stop();
     return cronJobs.delete(id);
 };
+
+/**
+ * Get the next N jobs that are scheduled to run.
+ * @param count Number of jobs to return.
+ * @returns Array of objects containing the job ID and the next execution date.
+ */
+export function getNextJobs(count = 3) {
+    return Array.from(cronJobs.entries())
+        .filter(e => e[0].startsWith('job:'))
+        .map(([ jobId, cron ]) =>
+            cron.nextDates(3).map(date => ({
+                jobId: parseInt(jobId.split(':')[1]),
+                date: date.toJSDate(),
+            })),
+        )
+        .flat()
+        .sort((a, b) => a.date.getTime() - b.date.getTime())
+        .slice(0, count);
+}
