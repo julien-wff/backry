@@ -40,6 +40,15 @@ export const PUT: RequestHandler = async ({ params, request }) => {
         return json({ error: 'Job not found' }, { status: 404 });
     }
 
+    // Update cron job
+    if (updatedJob.status === 'inactive') {
+        stopCronJob(`job:${jobId}`);
+    } else {
+        addOrUpdateCronJob(`job:${jobId}`, updatedJob.cron, () => {
+            startBackup(jobId);
+        });
+    }
+
     return json(updatedJob);
 };
 
