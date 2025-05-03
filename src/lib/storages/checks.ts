@@ -67,11 +67,12 @@ export async function checkAllActiveRepositories() {
 
 /**
  * Check if a repository is accessible and update the storage status accordingly.
+ * If accessible, also update storage statistics.
  * @param storage The storage object to check.
  * @returns A promise that resolves to a boolean indicating if the repository is accessible.
  */
 export async function checkRepository(storage: typeof storages.$inferSelect) {
-    const checkResult = await getRepositoryStats(storage.url, storage.password!, storage.env);
+    const checkResult = await getRepositoryStats(storage.url, storage.password!, storage.env, true);
 
     // If the repository is not accessible, update the storage status to error
     if (checkResult.isErr()) {

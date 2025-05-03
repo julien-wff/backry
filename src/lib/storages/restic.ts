@@ -55,10 +55,17 @@ export async function getResticVersion(): Promise<ResultAsync<string, string>> {
 }
 
 
-export async function getRepositoryStats(path: string, password: string, env: Record<string, string>) {
+/**
+ * Get the raw statistics of a restic repository.
+ * @param path URL to the restic repository
+ * @param password Repository password
+ * @param env Additional environment variables to set
+ * @param onlyBackry If true, only include snapshots from backry
+ */
+export async function getRepositoryStats(path: string, password: string, env: Record<string, string>, onlyBackry = false) {
     const res = await runCommandSync(
         'restic',
-        [ 'stats', '-r', path, '--json', '--mode', 'raw-data' ],
+        [ 'stats', '-r', path, '--json', '--mode', 'raw-data', ...(onlyBackry ? [ '--tag', 'backry' ] : []) ],
         { env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env } },
     );
 
