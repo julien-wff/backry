@@ -41,7 +41,7 @@
                     title="{data.stats.storages.total} Storage backends"/>
         <StatusCard active={data.stats.jobs.active}
                     href="/jobs"
-                    icon={RefreshCw}
+                    icon={Timer}
                     inactive={data.stats.jobs.inactive}
                     title="{data.stats.jobs.total} Backup job pools"/>
     </div>
