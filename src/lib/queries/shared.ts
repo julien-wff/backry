@@ -1,7 +1,7 @@
 import { db } from '$lib/db';
 import { databases, executions, jobs, storages } from '$lib/db/schema';
 import type { getNextJobs } from '$lib/shared/cron';
-import { desc, eq, inArray, isNotNull } from 'drizzle-orm';
+import { avg, count, desc, eq, inArray, isNotNull, sum } from 'drizzle-orm';
 
 /**
  * Get the number of errors for databases, storages, executions.
@@ -23,10 +23,14 @@ export async function getErrorCountPerType() {
 
 
 export async function getDashboardStats(nextJobParams: ReturnType<typeof getNextJobs> = []) {
-    const [ dbStats, storageStats, jobsCount, latestExecutions, nextJobs ] = await Promise.all([
+    const [ dbStats, storageStats, jobsCount, latestExecutions, nextJobs, executionsCount, totalStorageSize, avgExecutionSize, avgBackupDuration ] = await Promise.all([
+        // Databases stats (active, error)
         db.select({ id: databases.id, status: databases.status }).from(databases),
+        // Storages stats (active, error)
         db.select({ id: storages.id, status: storages.status }).from(storages),
+        // Jobs stats (active, inactive)
         db.select({ id: jobs.id, status: jobs.status }).from(jobs),
+        // Latest executions
         db.query.executions.findMany({
             where: isNotNull(executions.finishedAt),
             orderBy: desc(executions.finishedAt),
@@ -52,6 +56,7 @@ export async function getDashboardStats(nextJobParams: ReturnType<typeof getNext
                 },
             },
         }),
+        // Next jobs
         db.query.jobs.findMany({
             where: inArray(jobs.id, nextJobParams.map(j => j.jobId)),
             columns: { id: true, name: true },
@@ -64,6 +69,14 @@ export async function getDashboardStats(nextJobParams: ReturnType<typeof getNext
                 },
             },
         }),
+        // Executions count
+        db.select({ count: count() }).from(executions),
+        // Total storage size
+        db.select({ size: sum(storages.diskSize) }).from(storages),
+        // Average dump size
+        db.select({ size: avg(executions.dumpSize) }).from(executions).where(isNotNull(executions.dumpSize)),
+        // Average backup duration
+        db.select({ duration: avg(executions.duration) }).from(executions).where(isNotNull(executions.duration)),
     ]);
 
     return {
@@ -87,5 +100,9 @@ export async function getDashboardStats(nextJobParams: ReturnType<typeof getNext
             ...nextJobs.find(j => j.id === jobId),
             nextDate,
         })),
+        executionsCount: executionsCount[0]?.count ?? 0,
+        totalStorageSize: parseInt(totalStorageSize[0]?.size ?? '0'),
+        averageDumpSize: parseInt(avgExecutionSize[0]?.size ?? '0'),
+        averageBackupDuration: parseFloat(avgBackupDuration[0]?.duration ?? '0'),
     };
 }
