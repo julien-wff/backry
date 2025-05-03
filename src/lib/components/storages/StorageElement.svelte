@@ -1,8 +1,9 @@
 <script lang="ts">
     import { invalidateAll } from '$app/navigation';
     import BaseListElement from '$lib/components/common/BaseListElement.svelte';
-    import { Link } from '$lib/components/icons';
+    import { HardDrive, Link } from '$lib/components/icons';
     import { type storages } from '$lib/db/schema';
+    import { formatSize } from '$lib/utils/format';
 
     interface Props {
         storage: typeof storages.$inferSelect;
@@ -35,6 +36,12 @@
         ondelete={deleteStorage}
         status={status}
         title={storage.name}>
+    <div class="flex items-center gap-1">
+        <HardDrive class="w-4 h-4"/>
+        <span>
+            Repo size: {formatSize(storage.diskSize ?? 0)}
+        </span>
+    </div>
     <div class="flex items-center gap-1">
         <Link class="w-4 h-4"/>
         <span>

@@ -58,7 +58,7 @@ export async function getResticVersion(): Promise<ResultAsync<string, string>> {
 export async function getRepositoryStats(path: string, password: string, env: Record<string, string>) {
     const res = await runCommandSync(
         'restic',
-        [ 'stats', '-r', path, '--json' ],
+        [ 'stats', '-r', path, '--json', '--mode', 'raw-data' ],
         { env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env } },
     );
 

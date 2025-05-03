@@ -87,13 +87,15 @@ export async function checkRepository(storage: typeof storages.$inferSelect) {
         return false;
     }
 
-    // If there was an error but now the repository is accessible, update the storage status to ok
-    if (storage.status === 'error') {
+    // If there was an error but now the repository is accessible, or if the size changed, update the storage status to ok
+    const { total_size: diskSize } = checkResult.value[0];
+    if (storage.status === 'error' || storage.diskSize !== diskSize) {
         await db
             .update(storages)
             .set({
                 status: 'active',
                 error: null,
+                diskSize,
             })
             .where(eq(storages.id, storage.id))
             .execute();

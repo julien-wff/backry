@@ -31,6 +31,7 @@ export const storages = sqliteTable('storages', {
     url: text('url').notNull(),
     password: text('password'),
     env: text('env', { mode: 'json' }).notNull().default({}).$type<Record<string, string>>(),
+    diskSize: integer('disk_size'),
 });
 
 export const storagesRelations = relations(storages, ({ many }) => ({
