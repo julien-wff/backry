@@ -4,6 +4,7 @@ import ArrowDown from '@lucide/svelte/icons/arrow-down';
 import ArrowUp from '@lucide/svelte/icons/arrow-up';
 import CheckCircle from '@lucide/svelte/icons/check-circle';
 import ChevronLeft from '@lucide/svelte/icons/chevron-left';
+import CircleHelp from '@lucide/svelte/icons/circle-help';
 import CirclePlay from '@lucide/svelte/icons/circle-play';
 import CircleX from '@lucide/svelte/icons/circle-x';
 import Clock from '@lucide/svelte/icons/clock';
@@ -39,6 +40,7 @@ export {
     ArrowUp,
     CheckCircle,
     ChevronLeft,
+    CircleHelp,
     CirclePlay,
     CircleX,
     Clock,
