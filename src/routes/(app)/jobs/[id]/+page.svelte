@@ -10,6 +10,7 @@
     import type { JobsCreateRequest } from '$lib/types/api';
     import { slugify } from '$lib/utils/format';
     import { parseIdOrNewParam } from '$lib/utils/params';
+    import { sendAt, validateCronExpression } from 'cron';
     import type { PageData } from './$types';
 
     interface Props {
@@ -40,6 +41,12 @@
         }
         oldJobName = jobName;
     }
+
+    const clientTimeZone = new Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const cronMessage = $derived(validateCronExpression(cron).valid
+        ? `Next: ${sendAt(cron).setZone(data.serverTimeZone, { keepLocalTime: true }).toJSDate().toLocaleString()} (${clientTimeZone})`
+        : 'Invalid expression',
+    );
 
     async function handleFormSubmit() {
         isLoading = true;
@@ -98,7 +105,7 @@
         </select>
     </InputContainer>
 
-    <InputContainer for="cron" label="Cron">
+    <InputContainer for="cron" label="Cron" subtitle={cronMessage}>
         <input bind:value={cron} class="input w-full" id="cron" placeholder="0 0 */2 * *" required>
     </InputContainer>
 

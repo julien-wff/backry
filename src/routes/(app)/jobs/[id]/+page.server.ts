@@ -3,7 +3,11 @@ import { getJob } from '$lib/queries/jobs';
 import { storagesList } from '$lib/queries/storages';
 import { parseIdOrNewParam } from '$lib/utils/params';
 import { error } from '@sveltejs/kit';
+import dayjs from 'dayjs';
+import tz from 'dayjs/plugin/timezone';
 import type { PageServerLoad } from './$types';
+
+dayjs.extend(tz);
 
 export const load: PageServerLoad = async ({ params }) => {
     const { id, isNew } = parseIdOrNewParam(params.id);
@@ -28,5 +32,6 @@ export const load: PageServerLoad = async ({ params }) => {
         databases,
         storages,
         job,
+        serverTimeZone: dayjs.tz.guess(),
     };
 };

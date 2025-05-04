@@ -5,9 +5,10 @@
         children: Snippet;
         label?: string;
         for?: string;
+        subtitle?: string;
     }
 
-    let { children, label, for: labelFor }: Props = $props();
+    let { children, label, for: labelFor, subtitle }: Props = $props();
 </script>
 
 
@@ -16,5 +17,10 @@
         <label for={labelFor}>{label}</label>
     {/if}
 
-    {@render children()}
+    <div class="flex flex-col">
+        {@render children()}
+        {#if subtitle}
+            <p class="text-sm text-base-content/50">{subtitle}</p>
+        {/if}
+    </div>
 </div>
