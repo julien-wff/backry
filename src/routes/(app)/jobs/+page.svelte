@@ -20,6 +20,6 @@
 
 <div class="grid grid-cols-1 gap-4">
     {#each data.jobs as job (job.id)}
-        <JobElement {job}/>
+        <JobElement {job} nextExecution={data.nextExecutions[job.id] ?? null}/>
     {/each}
 </div>

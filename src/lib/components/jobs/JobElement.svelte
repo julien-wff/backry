@@ -1,14 +1,15 @@
 <script lang="ts">
     import { goto, invalidateAll } from '$app/navigation';
     import BaseListElement from '$lib/components/common/BaseListElement.svelte';
-    import { Clock, CloudUpload, Database } from '$lib/components/icons';
+    import { Clock, CloudUpload, Database, RefreshCw } from '$lib/components/icons';
     import type { jobsListFull } from '$lib/queries/jobs';
 
     interface Props {
         job: Awaited<ReturnType<typeof jobsListFull>>[number];
+        nextExecution: Date | null;
     }
 
-    let { job }: Props = $props();
+    let { job, nextExecution }: Props = $props();
     let status = $state(job.status);
     let loading = $state(false);
 
@@ -76,4 +77,11 @@
         <Database class="w-4 h-4"/>
         Databases: {job.jobsDatabases.map((db) => db.database.name).join(', ')}
     </div>
+
+    {#if nextExecution}
+        <div class="flex flex-1 items-center justify-end gap-1">
+            <RefreshCw class="w-4 h-4"/>
+            Next execution: {nextExecution.toLocaleString()}
+        </div>
+    {/if}
 </BaseListElement>
