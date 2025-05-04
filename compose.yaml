@@ -1,0 +1,11 @@
+services:
+  backry:
+    image: cefadrom/backry:latest
+    restart: unless-stopped
+    hostname: backry
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - db:/app/db
+
+volumes:
+  db:
