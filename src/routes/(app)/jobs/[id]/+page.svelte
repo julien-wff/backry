@@ -78,6 +78,29 @@
 </script>
 
 
+{#snippet cronHelp()}
+    <div class="flex flex-col gap-2">
+        <p>
+            A cron expression is a string consisting of 5 or 6 fields separated by spaces. Each field represents a
+            unit of time.
+        </p>
+        <p>
+            Cron jobs runs on Backry's server or container timezone,
+            <span class="text-nowrap text-primary">{data.serverTimeZone}</span>.
+            <br/>
+            To change the timezone, see
+            <a href="https://github.com/julien-wff/backry" class="link link-primary">the documentation</a>.
+        </p>
+        <p>
+            To learn more about cron expressions, visit
+            <a href="https://crontab.guru/" target="_blank" rel="noopener noreferrer" class="link link-primary">
+                crontab.guru
+            </a>.
+        </p>
+    </div>
+{/snippet}
+
+
 <Head title="{data.job ? `Edit ${data.job.name}` : 'Add'} job pool"/>
 
 <PageContentHeader buttonType="back" icon={Timer}>
@@ -104,28 +127,6 @@
             {/each}
         </select>
     </InputContainer>
-
-    {#snippet cronHelp()}
-        <div class="flex flex-col gap-2">
-            <p>
-                A cron expression is a string consisting of 5 or 6 fields separated by spaces. Each field represents a
-                unit of time.
-            </p>
-            <p>
-                Cron jobs runs on Backry's server or container timezone,
-                <span class="text-nowrap text-primary">{data.serverTimeZone}</span>.
-                <br/>
-                To change the timezone, see
-                <a href="https://github.com/julien-wff/backry" class="link link-primary">the documentation</a>.
-            </p>
-            <p>
-                To learn more about cron expressions, visit
-                <a href="https://crontab.guru/" target="_blank" rel="noopener noreferrer" class="link link-primary">
-                    crontab.guru
-                </a>.
-            </p>
-        </div>
-    {/snippet}
 
     <InputContainer for="cron" helpContent={cronHelp} label="Cron" subtitle={cronMessage}>
         <input bind:value={cron} class="input w-full" id="cron" placeholder="0 0 */2 * *" required>
