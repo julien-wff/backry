@@ -8,3 +8,7 @@
 @theme {
     --font-inter: 'Inter', sans-serif;
 }
+
+:root {
+    background-color: var(--color-base-300);
+}
