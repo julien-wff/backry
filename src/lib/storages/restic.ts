@@ -4,6 +4,7 @@ import type {
     ResticError,
     ResticInit,
     ResticLock,
+    ResticSnapshot,
     ResticStats,
 } from '$lib/types/restic';
 import { runCommandStream, runCommandSync, type StreamCommandOptions } from '$lib/utils/cmd';
@@ -81,6 +82,25 @@ export async function getRepositoryStats(path: string, password: string, env: Re
     );
 
     return resticCommandToResult<ResticStats>(res);
+}
+
+
+/**
+ * Get the list of all snapshots in a restic repository.
+ * @param path URL to the restic repository
+ * @param password Repository password
+ * @param env Additional environment variables to set
+ * @param onlyBackry If true, only include snapshots from backry (with the `backry` tag)
+ * @return An array with a single element being the complete list of snapshots
+ */
+export async function getRepositorySnapshots(path: string, password: string, env: Record<string, string>, onlyBackry = false) {
+    const res = await runCommandSync(
+        'restic',
+        [ 'snapshots', '-r', path, '--json', '--no-lock', ...(onlyBackry ? [ '--tag', 'backry' ] : []) ],
+        { env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env } },
+    );
+
+    return resticCommandToResult<ResticSnapshot[]>(res);
 }
 
 

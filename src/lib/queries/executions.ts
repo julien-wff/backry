@@ -1,5 +1,5 @@
 import { db } from '$lib/db';
-import { executions } from '$lib/db/schema';
+import { executions, jobDatabases, jobs, storages } from '$lib/db/schema';
 import { desc, eq, isNull } from 'drizzle-orm';
 
 export const executionsListFull = async () => db.query.executions.findMany({
@@ -34,6 +34,26 @@ export const getExecution = async (id: number) =>
             },
         },
     });
+
+
+/**
+ * Get all restic snapshot IDs for a given storage ID from the list of executions.
+ * @param storageId Storage ID
+ * @return Array of snapshot IDs
+ */
+export const getSnapshotsIdsByStorageId = (storageId: number) =>
+    db
+        .select({ snapshotId: executions.snapshotId })
+        .from(executions)
+        .leftJoin(jobDatabases, eq(jobDatabases.id, executions.jobDatabaseId))
+        .leftJoin(jobs, eq(jobs.id, jobDatabases.jobId))
+        .leftJoin(storages, eq(storages.id, jobs.storageId))
+        .where(eq(storages.id, storageId))
+        .orderBy(desc(executions.startedAt))
+        .all()
+        .map(exec => exec.snapshotId)
+        .filter((snapshotId): snapshotId is string => snapshotId !== null);
+
 
 export const deleteExecution = async (id: number) =>
     db

@@ -5,6 +5,7 @@
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
     import { FolderHeart } from '$lib/components/icons';
     import LocksDisplay from '$lib/components/storages/LocksDisplay.svelte';
+    import StaleSnapshotsDisplay from '$lib/components/storages/StaleSnapshotsDisplay.svelte';
     import type { PageProps } from './$types';
 
     let { data }: PageProps = $props();
@@ -19,5 +20,9 @@
 <ElementForm title="Repository health">
     <InputContainer label="Locks">
         <LocksDisplay/>
+    </InputContainer>
+
+    <InputContainer label="Stale snapshots">
+        <StaleSnapshotsDisplay/>
     </InputContainer>
 </ElementForm>
