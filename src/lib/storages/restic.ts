@@ -16,7 +16,7 @@ function formatResticError(shellOutput: $.ShellOutput) {
     try {
         return JSON.parse(error) as ResticError;
     } catch {
-        logger.error('Failed to parse restic error', error);
+        logger.error(`Failed to parse restic error: ${error}`);
         return {
             message_type: 'unknown',
             code: -1,
@@ -27,7 +27,7 @@ function formatResticError(shellOutput: $.ShellOutput) {
 
 async function resticCommandToResult<T>(res: Result<$.ShellOutput, $.ShellOutput>, json = true): Promise<ResultAsync<T[], ResticError>> {
     if (res.isErr()) {
-        logger.error('Failed to run restic command', res.error.stderr.toString().trim());
+        logger.error(`Failed to run restic command: ${res.error.stderr.toString().trim()}`);
         return err(formatResticError(res.error));
     }
 
