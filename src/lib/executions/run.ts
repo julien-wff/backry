@@ -10,9 +10,10 @@ import { err, ok, type ResultAsync } from 'neverthrow';
 /**
  * Start a backup job, by running each database backup in the job one after the other.
  * @param jobId The job ID to start the backup for.
+ * @param forcedDatabases The list of database IDs to run the backup for. If null, all databases in the job will be backed up.
  * @returns If error, the error message. If success, void.
  */
-export async function startBackup(jobId: number): Promise<ResultAsync<void, string>> {
+export async function startBackup(jobId: number, forcedDatabases: number[] | null = null): Promise<ResultAsync<void, string>> {
     logger.info(`Starting backup for job #${jobId}`);
 
     const job = await getJob(jobId);
@@ -22,6 +23,11 @@ export async function startBackup(jobId: number): Promise<ResultAsync<void, stri
     }
 
     for (let i = 0; i < job.jobsDatabases.length; i++) {
+        if (forcedDatabases && !forcedDatabases.includes(job.jobsDatabases[i].database.id)) {
+            logger.debug(`Database #${i} is not in the forced list, skipping`);
+            continue;
+        }
+
         await jobDatabaseBackup(job, i);
         // 1s delay between each database backup
         await new Promise(resolve => setTimeout(resolve, 1000));

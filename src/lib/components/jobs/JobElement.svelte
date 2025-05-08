@@ -13,10 +13,32 @@
     let status = $state(job.status);
     let loading = $state(false);
 
+    let jobRunPopup = $state<HTMLDialogElement | null>(null);
+    let jobRunDatabases = $state<number[]>([]);
+
+    function handleRunJobDatabaseChange(ev: Event & { currentTarget: EventTarget & HTMLInputElement }) {
+        if (ev.currentTarget.checked) {
+            jobRunDatabases.push(Number(ev.currentTarget.value));
+        } else {
+            jobRunDatabases = jobRunDatabases.filter((dbId) => dbId !== Number(ev.currentTarget.value));
+        }
+    }
+
+    function handleRunJobPopup() {
+        jobRunDatabases = [];
+        jobRunPopup?.showModal();
+    }
+
     async function handleRunJob() {
         loading = true;
         const res = await fetch(`/api/jobs/${job.id}/run`, {
             method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                databases: jobRunDatabases,
+            }),
         });
 
         if (res.ok) {
@@ -59,7 +81,7 @@
                  disabled={loading}
                  editHref={`/jobs/${job.id}`}
                  ondelete={deleteJob}
-                 onrun={handleRunJob}
+                 onrun={handleRunJobPopup}
                  onstatuschange={changeJobStatus}
                  status={status}
                  title={job.name}>
@@ -85,3 +107,35 @@
         </div>
     {/if}
 </BaseListElement>
+
+
+<dialog bind:this={jobRunPopup} class="modal">
+    <div class="modal-box">
+        <h3 class="text-lg font-bold">Run {job.name} now</h3>
+
+        <div class="mt-4">Select databases to backup:</div>
+        <div class="mt-1 flex flex-col gap-1">
+            {#each job.jobsDatabases as db}
+                <label class="flex items-center gap-1 select-none">
+                    <input type="checkbox"
+                           class="checkbox checkbox-primary checkbox-xs"
+                           value="{db.database.id}"
+                           checked={jobRunDatabases.includes(db.database.id)}
+                           onchange={handleRunJobDatabaseChange}/>
+                    {db.database.name}
+                </label>
+            {/each}
+        </div>
+
+        <div class="modal-action">
+            <button class="btn" onclick={() => jobRunPopup?.close()}>Cancel</button>
+            <button class="btn btn-success" disabled={jobRunDatabases.length === 0} onclick={handleRunJob}>
+                Backup now
+            </button>
+        </div>
+    </div>
+
+    <form class="modal-backdrop" method="dialog">
+        <button>close</button>
+    </form>
+</dialog>
