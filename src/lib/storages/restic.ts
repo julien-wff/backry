@@ -147,10 +147,18 @@ export async function backupFromCommand(url: string,
 }
 
 
-export async function deleteSnapshot(url: string,
-                                     password: string,
-                                     env: Record<string, string>,
-                                     snapshotId: string) {
+/**
+ * Delete snapshots from a restic repository using `forget --prune`.
+ * @param url URL to the restic repository
+ * @param password Repository password
+ * @param env Additional environment variables to set
+ * @param snapshots List of snapshot IDs to delete
+ * @return Full CLI text output from restic
+ */
+export async function deleteSnapshots(url: string,
+                                      password: string,
+                                      env: Record<string, string>,
+                                      snapshots: string[]) {
     // forget with --prune does not yet support JSON output as of restic v0.18.0
     // https://restic.readthedocs.io/en/v0.18.0/075_scripting.html#forget
     const res = await runCommandSync(
@@ -159,7 +167,7 @@ export async function deleteSnapshot(url: string,
             '-r', url,
             'forget',
             '--prune',
-            snapshotId,
+            ...snapshots,
         ],
         {
             env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env },
