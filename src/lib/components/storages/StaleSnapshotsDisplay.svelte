@@ -41,6 +41,29 @@
         snapshots = fetchedSnapshots;
         loading = false;
     }
+
+    async function deleteSnapshots() {
+        deleteConfirmDialog?.close();
+        loading = true;
+
+        const res = await fetch(`/api/storages/${page.params['id']}/stale-snapshots`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ snapshots: snapshotsToDelete }),
+        });
+
+        if (!res.ok) {
+            const { error: reqError } = await res.json();
+            console.error('Error deleting snapshots:', reqError);
+            error = reqError || 'Failed to delete snapshots';
+            loading = false;
+            return;
+        }
+
+        await fetchStaleSnapshots();
+    }
 </script>
 
 {#if loading}
@@ -119,9 +142,7 @@
 
         <div class="modal-action">
             <button class="btn" onclick={() => deleteConfirmDialog?.close()}>Cancel</button>
-            <button class="btn btn-error">
-                Delete
-            </button>
+            <button class="btn btn-error" onclick={deleteSnapshots}>Delete</button>
         </div>
     </div>
 </dialog>
