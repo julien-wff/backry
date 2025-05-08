@@ -1,6 +1,6 @@
 <script lang="ts">
     import { page } from '$app/state';
-    import { OctagonAlert, ShieldCheck } from '$lib/components/icons.js';
+    import { LockKeyholeOpen, OctagonAlert, ShieldCheck } from '$lib/components/icons';
     import type { ResticLock } from '$lib/types/restic';
     import { onMount } from 'svelte';
 
@@ -31,6 +31,9 @@
     }
 
     async function handleUnlockAll() {
+        error = null;
+        loading = true;
+
         const res = await fetch(`/api/storages/${page.params['id']}/locks`, {
             method: 'DELETE',
         });
@@ -39,6 +42,7 @@
             const { error: reqError } = await res.json();
             console.error('Error unlocking all locks:', reqError);
             error = reqError || 'Failed to unlock all locks';
+            loading = false;
         } else {
             await fetchLocks();
         }
@@ -74,7 +78,8 @@
             {/each}
         </div>
 
-        <button class="btn btn-primary btn-sm btn-soft mt-1 w-full" onclick={handleUnlockAll} disabled={loading}>
+        <button class="btn btn-primary btn-sm btn-soft mt-1 w-full" onclick={handleUnlockAll}>
+            <LockKeyholeOpen class="w-4 h-4"/>
             Unlock all
         </button>
     {/if}

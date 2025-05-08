@@ -21,6 +21,7 @@ import HardDriveDownload from '@lucide/svelte/icons/hard-drive-download';
 import History from '@lucide/svelte/icons/history';
 import LayoutDashboard from '@lucide/svelte/icons/layout-dashboard';
 import Link from '@lucide/svelte/icons/link';
+import LockKeyholeOpen from '@lucide/svelte/icons/lock-keyhole-open';
 import OctagonAlert from '@lucide/svelte/icons/octagon-alert';
 import PackageOpen from '@lucide/svelte/icons/package-open';
 import Pencil from '@lucide/svelte/icons/pencil';
@@ -59,6 +60,7 @@ export {
     History,
     LayoutDashboard,
     Link,
+    LockKeyholeOpen,
     OctagonAlert,
     PackageOpen,
     Pencil,
