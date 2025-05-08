@@ -15,6 +15,7 @@ import EllipsisVertical from '@lucide/svelte/icons/ellipsis-vertical';
 import EthernetPort from '@lucide/svelte/icons/ethernet-port';
 import FileChartPie from '@lucide/svelte/icons/file-chart-pie';
 import FileDown from '@lucide/svelte/icons/file-down';
+import FolderHeart from '@lucide/svelte/icons/folder-heart';
 import HardDrive from '@lucide/svelte/icons/hard-drive';
 import HardDriveDownload from '@lucide/svelte/icons/hard-drive-download';
 import History from '@lucide/svelte/icons/history';
@@ -29,6 +30,7 @@ import Power from '@lucide/svelte/icons/power';
 import PowerOff from '@lucide/svelte/icons/power-off';
 import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 import Settings from '@lucide/svelte/icons/settings';
+import ShieldCheck from '@lucide/svelte/icons/shield-check';
 import Timer from '@lucide/svelte/icons/timer';
 import Trash2 from '@lucide/svelte/icons/trash-2';
 import Wrench from '@lucide/svelte/icons/wrench';
@@ -51,6 +53,7 @@ export {
     EthernetPort,
     FileChartPie,
     FileDown,
+    FolderHeart,
     HardDrive,
     HardDriveDownload,
     History,
@@ -65,6 +68,7 @@ export {
     PowerOff,
     RefreshCw,
     Settings,
+    ShieldCheck,
     Timer,
     Trash2,
     Wrench,

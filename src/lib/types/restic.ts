@@ -51,3 +51,11 @@ export interface ResticBackupSummary {
     backup_end: string,
     snapshot_id: string,
 }
+
+export interface ResticLock {
+    time: string,
+    exclusive: boolean,
+    hostname: string,
+    username: string,
+    pid: number,
+}

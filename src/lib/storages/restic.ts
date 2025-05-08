@@ -1,4 +1,11 @@
-import type { ResticBackupStatus, ResticBackupSummary, ResticError, ResticInit, ResticStats } from '$lib/types/restic';
+import type {
+    ResticBackupStatus,
+    ResticBackupSummary,
+    ResticError,
+    ResticInit,
+    ResticLock,
+    ResticStats,
+} from '$lib/types/restic';
 import { runCommandStream, runCommandSync, type StreamCommandOptions } from '$lib/utils/cmd';
 import { logger } from '$lib/utils/logger';
 import { type $ } from 'bun';
@@ -39,7 +46,7 @@ async function resticCommandToResult<T>(res: Result<$.ShellOutput, $.ShellOutput
     try {
         return ok(output.map(o => JSON.parse(o)) as T[]);
     } catch {
-        logger.error('Failed to parse restic output', res.value.text().trim());
+        logger.error(`Failed to parse restic output: ${res.value.text().trim()}`);
         return err({
             message_type: 'unknown',
             code: -1,
@@ -155,6 +162,81 @@ export async function readFileContent(url: string,
             'dump',
             snapshotId,
             fileName,
+        ],
+        {
+            env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env },
+        },
+    );
+
+    return resticCommandToResult<string>(res, false);
+}
+
+
+export async function getRepositoryLocks(url: string,
+                                         password: string,
+                                         env: Record<string, string>): Promise<ResultAsync<ResticLock[], string>> {
+    const locksResult = await runCommandSync(
+        'restic',
+        [
+            '-r', url,
+            'list',
+            'locks',
+            '--json',
+            '--no-lock',
+        ],
+        {
+            env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env },
+        },
+    );
+
+    const locks = await resticCommandToResult<string>(locksResult, false);
+    if (locks.isErr()) {
+        return err(locks.error.message);
+    }
+
+    const locksData = await Promise.all(locks.value.map(async (lock) => {
+        const lockResult = await runCommandSync(
+            'restic',
+            [
+                '-r', url,
+                'cat',
+                'lock',
+                lock,
+                '--no-lock',
+            ],
+            {
+                env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env },
+            },
+        );
+
+        const res = await resticCommandToResult<string>(lockResult, false);
+        if (res.isErr()) {
+            return err(res.error.message);
+        }
+        return ok(JSON.parse(res.value.join('\n')) as ResticLock);
+    }));
+
+    const errors = locksData.filter((lock) => lock.isErr());
+    if (errors.length > 0) {
+        return err(errors[0].error);
+    }
+
+    const data = locksData
+        .map((lock) => lock.unwrapOr(null))
+        .filter((lock) => lock !== null);
+
+    return ok(data);
+}
+
+
+export async function unlockRepository(url: string,
+                                       password: string,
+                                       env: Record<string, string>) {
+    const res = await runCommandSync(
+        'restic',
+        [
+            '-r', url,
+            'unlock',
         ],
         {
             env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env },
