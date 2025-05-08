@@ -18,6 +18,6 @@
 
 <ElementForm title="Repository health">
     <InputContainer label="Locks">
-        <LocksDisplay error={data.lockError} locks={data.locks}/>
+        <LocksDisplay/>
     </InputContainer>
 </ElementForm>

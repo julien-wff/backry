@@ -1,41 +1,61 @@
 <script lang="ts">
-    import { invalidateAll } from '$app/navigation';
     import { page } from '$app/state';
     import { OctagonAlert, ShieldCheck } from '$lib/components/icons.js';
     import type { ResticLock } from '$lib/types/restic';
+    import { onMount } from 'svelte';
 
-    interface Props {
-        error?: string | null;
-        locks?: ResticLock[];
+    let loading = $state(true);
+    let error = $state<string | null>(null);
+    let locks = $state<ResticLock[] | null>(null);
+
+    onMount(() => {
+        fetchLocks();
+    });
+
+    async function fetchLocks() {
+        error = null;
+        loading = true;
+
+        const res = await fetch(`/api/storages/${page.params['id']}/locks`);
+        if (!res.ok) {
+            const { error: reqError } = await res.json();
+            console.error('Error fetching locks:', reqError);
+            error = reqError || 'Failed to fetch locks';
+            loading = false;
+            return;
+        }
+
+        const { locks: fetchedLocks } = await res.json();
+        locks = fetchedLocks;
+        loading = false;
     }
 
-    let { error, locks }: Props = $props();
-
-    let unlockError = $state<string | null>(null);
-
     async function handleUnlockAll() {
-        const res = await fetch(`/api/storages/${page.params['id']}/unlock`, {
-            method: 'POST',
+        const res = await fetch(`/api/storages/${page.params['id']}/locks`, {
+            method: 'DELETE',
         });
 
         if (!res.ok) {
             const { error: reqError } = await res.json();
             console.error('Error unlocking all locks:', reqError);
-            unlockError = reqError || 'Failed to unlock all locks';
+            error = reqError || 'Failed to unlock all locks';
         } else {
-            await invalidateAll();
+            await fetchLocks();
         }
     }
 </script>
 
-{#if unlockError || error}
+{#if loading}
+    <div role="alert" class="alert alert-soft">
+        <span class="loading loading-spinner loading-sm"></span>
+        <span>Loading...</span>
+    </div>
+{:else if error}
     <div role="alert" class="alert alert-error alert-soft">
         <OctagonAlert class="w-4 h-4"/>
-        <span>{unlockError || error}</span>
+        <span>{error}</span>
     </div>
-{/if}
-
-{#if locks}
+{:else if locks}
     {#if locks.length === 0}
         <div role="alert" class="alert alert-success alert-soft">
             <ShieldCheck class="w-4 h-4"/>
@@ -54,7 +74,7 @@
             {/each}
         </div>
 
-        <button class="btn btn-primary btn-sm btn-soft mt-1 w-full" onclick={handleUnlockAll}>
+        <button class="btn btn-primary btn-sm btn-soft mt-1 w-full" onclick={handleUnlockAll} disabled={loading}>
             Unlock all
         </button>
     {/if}

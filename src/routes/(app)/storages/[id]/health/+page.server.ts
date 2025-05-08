@@ -1,5 +1,4 @@
 import { getStorage } from '$lib/queries/storages';
-import { getRepositoryLocks } from '$lib/storages/restic';
 import { parseIdOrNewParam } from '$lib/utils/params';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
@@ -15,11 +14,7 @@ export const load: PageServerLoad = async ({ params }) => {
         throw error(404, 'Storage not found');
     }
 
-    const locks = await getRepositoryLocks(storage.url, storage.password!, storage.env);
-
     return {
         storage,
-        locks: locks.isOk() ? locks.value : [],
-        lockError: locks.isErr() ? locks.error : null,
     };
 };
