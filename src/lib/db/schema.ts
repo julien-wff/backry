@@ -89,6 +89,7 @@ export const jobDatabasesRelations = relations(jobDatabases, ({ one, many }) => 
 export const executions = sqliteTable('executions', {
     id: integer('id').primaryKey({ autoIncrement: true }),
     jobDatabaseId: integer('job_database_id').notNull().references(() => jobDatabases.id, { onDelete: 'cascade' }),
+    runId: integer('run_id').notNull().$defaultFn(() => sql`(SELECT IFNULL(MAX(run_id), -1) + 1 FROM executions)`),
     fileName: text('file_name').notNull(),
     error: text('error'),
     startedAt: text('started_at').default(sql`(CURRENT_TIMESTAMP)`),

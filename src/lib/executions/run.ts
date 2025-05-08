@@ -1,3 +1,4 @@
+import type { executions } from '$lib/db/schema';
 import { ENGINES_METHODS } from '$lib/engines/enginesMethods';
 import { createExecution, getExecution, updateExecution } from '$lib/queries/executions';
 import { getJob } from '$lib/queries/jobs';
@@ -22,13 +23,18 @@ export async function startBackup(jobId: number, forcedDatabases: number[] | nul
         return err(`Job #${jobId} not found`);
     }
 
+    let runId = null;
     for (let i = 0; i < job.jobsDatabases.length; i++) {
         if (forcedDatabases && !forcedDatabases.includes(job.jobsDatabases[i].database.id)) {
             logger.debug(`Database #${i} is not in the forced list, skipping`);
             continue;
         }
 
-        await jobDatabaseBackup(job, i);
+        const res = await jobDatabaseBackup(job, i, runId, forcedDatabases !== null);
+        if (runId === null && res.isOk()) {
+            runId = res.value?.runId ?? null;
+        }
+
         // 1s delay between each database backup
         await new Promise(resolve => setTimeout(resolve, 1000));
     }
@@ -42,9 +48,11 @@ export async function startBackup(jobId: number, forcedDatabases: number[] | nul
  * Run a backup for a specific database in a job.
  * @param job The job to run the backup for.
  * @param jobIndex The index of the database in the job to run the backup for.
+ * @param runId The run ID to use to link backups together. If null, a new run ID will be created.
+ * @param force If true, the backup will be run even if the database is inactive.
  * @returns If error, the error message. If success, void.
  */
-async function jobDatabaseBackup(job: NonNullable<Awaited<ReturnType<typeof getJob>>>, jobIndex: number): Promise<ResultAsync<void, string>> {
+async function jobDatabaseBackup(job: NonNullable<Awaited<ReturnType<typeof getJob>>>, jobIndex: number, runId: number | null = null, force = false): Promise<ResultAsync<typeof executions.$inferSelect | null, string>> {
     logger.info(`Starting backup for job #${job.id} database #${jobIndex}`);
 
     const jobDatabase = job.jobsDatabases[jobIndex];
@@ -53,16 +61,16 @@ async function jobDatabaseBackup(job: NonNullable<Awaited<ReturnType<typeof getJ
         return err(`Cannot get database ${jobIndex} for job #${job.id}`);
     }
 
-    if (jobDatabase.status === 'inactive') {
+    if (!force && jobDatabase.status === 'inactive') {
         logger.info(`Database #${jobIndex} is inactive, skipping`);
-        return ok();
+        return ok(null);
     }
 
     const engine = ENGINES_METHODS[jobDatabase.database.engine];
     const databaseInfo = jobDatabase.database;
     const fileName = `${job.slug}_${databaseInfo.slug}.${engine.dumpFileExtension}`;
 
-    const { id: executionId } = await createExecution(jobDatabase.id, fileName);
+    const { id: executionId } = await createExecution(jobDatabase.id, fileName, runId);
     const execution = await getExecution(executionId);
     if (!execution) {
         logger.error(`Error creating execution, execution #${executionId} not found`);
@@ -113,5 +121,5 @@ async function jobDatabaseBackup(job: NonNullable<Awaited<ReturnType<typeof getJ
     }
 
     logger.info(`Backup for job #${job.id} database #${jobIndex} finished`);
-    return ok();
+    return ok(updatedExecution);
 }

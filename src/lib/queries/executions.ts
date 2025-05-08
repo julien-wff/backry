@@ -42,12 +42,13 @@ export const deleteExecution = async (id: number) =>
         .returning()
         .get();
 
-export const createExecution = async (jobDatabaseId: number, fileName: string) =>
+export const createExecution = async (jobDatabaseId: number, fileName: string, runId: number | null = null) =>
     db
         .insert(executions)
         .values({
             jobDatabaseId,
             fileName,
+            runId: runId ?? undefined,
         })
         .returning()
         .get();
