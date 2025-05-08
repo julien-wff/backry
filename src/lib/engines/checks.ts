@@ -2,6 +2,7 @@ import { db } from '$lib/db';
 import { DATABASE_ENGINES, databases } from '$lib/db/schema';
 import { ENGINE_META_ENTRIES } from '$lib/engines/enginesMeta';
 import { ENGINES_METHODS } from '$lib/engines/enginesMethods';
+import { logger } from '$lib/utils/logger';
 import { eq, or } from 'drizzle-orm';
 
 /**
@@ -28,17 +29,21 @@ export async function checkAllActiveDatabases() {
 export async function checkDatabase(database: typeof databases.$inferSelect) {
     const engine = ENGINES_METHODS[database.engine];
     const checkResult = await engine.checkConnection(database.connectionString);
+    logger.debug(`Checking database connection #${database.id} (${database.engine})`);
 
     // If the repository is not accessible, update the storage status to error
     if (checkResult.isErr()) {
-        await db
-            .update(databases)
-            .set({
-                status: 'error',
-                error: checkResult.error,
-            })
-            .where(eq(databases.id, database.id))
-            .execute();
+        if (checkResult.error !== database.error) {
+            logger.error(`Error checking database connection #${database.id} (${database.engine}): ${checkResult.error}`);
+            await db
+                .update(databases)
+                .set({
+                    status: 'error',
+                    error: checkResult.error,
+                })
+                .where(eq(databases.id, database.id))
+                .execute();
+        }
 
         return false;
     }
@@ -55,6 +60,7 @@ export async function checkDatabase(database: typeof databases.$inferSelect) {
             .execute();
     }
 
+    logger.debug(`Database connection #${database.id} (${database.engine}) is accessible`);
     return true;
 }
 

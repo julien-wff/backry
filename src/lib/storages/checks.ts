@@ -1,6 +1,7 @@
 import { db } from '$lib/db';
 import { storages } from '$lib/db/schema';
 import { getRepositoryStats } from '$lib/storages/restic';
+import { logger } from '$lib/utils/logger';
 import { eq, or } from 'drizzle-orm';
 import fs from 'fs/promises';
 import { err, ok, type ResultAsync } from 'neverthrow';
@@ -73,17 +74,21 @@ export async function checkAllActiveRepositories() {
  */
 export async function checkRepository(storage: typeof storages.$inferSelect) {
     const checkResult = await getRepositoryStats(storage.url, storage.password!, storage.env, true);
+    logger.debug(`Checking repository #${storage.id} (${storage.url})`);
 
     // If the repository is not accessible, update the storage status to error
     if (checkResult.isErr()) {
-        await db
-            .update(storages)
-            .set({
-                status: 'error',
-                error: checkResult.error.message,
-            })
-            .where(eq(storages.id, storage.id))
-            .execute();
+        if (checkResult.error.message !== storage.error) {
+            logger.error(`Error checking storage #${storage.id} (${storage.url}): ${checkResult.error.message}`);
+            await db
+                .update(storages)
+                .set({
+                    status: 'error',
+                    error: checkResult.error.message,
+                })
+                .where(eq(storages.id, storage.id))
+                .execute();
+        }
 
         return false;
     }
@@ -102,5 +107,6 @@ export async function checkRepository(storage: typeof storages.$inferSelect) {
             .execute();
     }
 
+    logger.debug(`Repository #${storage.id} (${storage.url}) is accessible`);
     return true;
 }

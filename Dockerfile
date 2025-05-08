@@ -43,6 +43,7 @@ ENV BACKRY_PGDUMP_CMD="/usr/bin/pg_dump"
 # Metadata
 
 ENV DATABASE_URL="/app/db/backry.db"
+ENV NODE_ENV="production"
 EXPOSE 3000
 VOLUME ["/app/db"]
 

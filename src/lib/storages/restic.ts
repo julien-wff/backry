@@ -1,5 +1,6 @@
 import type { ResticBackupStatus, ResticBackupSummary, ResticError, ResticInit, ResticStats } from '$lib/types/restic';
 import { runCommandStream, runCommandSync, type StreamCommandOptions } from '$lib/utils/cmd';
+import { logger } from '$lib/utils/logger';
 import { type $ } from 'bun';
 import { err, ok, Result, type ResultAsync } from 'neverthrow';
 
@@ -15,6 +16,7 @@ function formatResticError(shellOutput: $.ShellOutput) {
     try {
         return JSON.parse(error) as ResticError;
     } catch {
+        logger.error('Failed to parse restic error', error);
         return {
             message_type: 'unknown',
             code: -1,
@@ -25,6 +27,7 @@ function formatResticError(shellOutput: $.ShellOutput) {
 
 async function resticCommandToResult<T>(res: Result<$.ShellOutput, $.ShellOutput>, json = true): Promise<ResultAsync<T[], ResticError>> {
     if (res.isErr()) {
+        logger.error('Failed to run restic command', res.error.stderr.toString().trim());
         return err(formatResticError(res.error));
     }
 
@@ -36,6 +39,7 @@ async function resticCommandToResult<T>(res: Result<$.ShellOutput, $.ShellOutput
     try {
         return ok(output.map(o => JSON.parse(o)) as T[]);
     } catch {
+        logger.error('Failed to parse restic output', res.value.text().trim());
         return err({
             message_type: 'unknown',
             code: -1,

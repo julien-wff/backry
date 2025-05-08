@@ -3,6 +3,7 @@ import { createExecution, getExecution, updateExecution } from '$lib/queries/exe
 import { getJob } from '$lib/queries/jobs';
 import { executionEmitter } from '$lib/shared/events';
 import { backupFromCommand } from '$lib/storages/restic';
+import { logger } from '$lib/utils/logger';
 import { sql } from 'drizzle-orm';
 import { err, ok, type ResultAsync } from 'neverthrow';
 
@@ -12,8 +13,11 @@ import { err, ok, type ResultAsync } from 'neverthrow';
  * @returns If error, the error message. If success, void.
  */
 export async function startBackup(jobId: number): Promise<ResultAsync<void, string>> {
+    logger.info(`Starting backup for job #${jobId}`);
+
     const job = await getJob(jobId);
     if (!job) {
+        logger.error(`Job #${jobId} not found`);
         return err(`Job #${jobId} not found`);
     }
 
@@ -23,6 +27,7 @@ export async function startBackup(jobId: number): Promise<ResultAsync<void, stri
         await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
+    logger.info(`Backup for job #${jobId} finished`);
     return ok();
 }
 
@@ -34,12 +39,16 @@ export async function startBackup(jobId: number): Promise<ResultAsync<void, stri
  * @returns If error, the error message. If success, void.
  */
 async function jobDatabaseBackup(job: NonNullable<Awaited<ReturnType<typeof getJob>>>, jobIndex: number): Promise<ResultAsync<void, string>> {
+    logger.info(`Starting backup for job #${job.id} database #${jobIndex}`);
+
     const jobDatabase = job.jobsDatabases[jobIndex];
     if (!jobDatabase) {
+        logger.error(`Database #${jobIndex} not found for job #${job.id}`);
         return err(`Cannot get database ${jobIndex} for job #${job.id}`);
     }
 
     if (jobDatabase.status === 'inactive') {
+        logger.info(`Database #${jobIndex} is inactive, skipping`);
         return ok();
     }
 
@@ -50,6 +59,7 @@ async function jobDatabaseBackup(job: NonNullable<Awaited<ReturnType<typeof getJ
     const { id: executionId } = await createExecution(jobDatabase.id, fileName);
     const execution = await getExecution(executionId);
     if (!execution) {
+        logger.error(`Error creating execution, execution #${executionId} not found`);
         return err(`Execution #${executionId} not found`);
     }
 
@@ -92,8 +102,10 @@ async function jobDatabaseBackup(job: NonNullable<Awaited<ReturnType<typeof getJ
     executionEmitter.emit('update', updatedExecution);
 
     if (res.isErr()) {
+        logger.error(res.error, `Error running backup for job #${job.id} database #${jobIndex}`);
         return err(JSON.stringify(res.error));
     }
 
+    logger.info(`Backup for job #${job.id} database #${jobIndex} finished`);
     return ok();
 }

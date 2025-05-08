@@ -1,3 +1,4 @@
+import { logger } from '$lib/utils/logger';
 import { CronJob } from 'cron';
 
 type SystemCronId = `system:${'check-dbs' | 'check-storages'}`;
@@ -14,7 +15,10 @@ const cronJobs: Map<CronId, CronJob> = new Map();
  * @param callback Callback function to execute.
  */
 export const addOrUpdateCronJob = (id: CronId, cron: string, callback: () => any) => {
-    cronJobs.get(id)?.stop();
+    const oldCron = cronJobs.get(id);
+    oldCron?.stop();
+
+    logger.debug(`${oldCron ? 'Editing' : 'Adding'} cron job ${id} with cron expression ${cron}`);
 
     const job = new CronJob(
         cron,
@@ -39,6 +43,7 @@ export const addOrUpdateCronJob = (id: CronId, cron: string, callback: () => any
  * @returns True if the job was removed, false if it was not found.
  */
 export const stopCronJob = (id: CronId) => {
+    logger.debug(`Stopping cron job ${id}`);
     cronJobs.get(id)?.stop();
     return cronJobs.delete(id);
 };
