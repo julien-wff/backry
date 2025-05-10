@@ -15,7 +15,7 @@ import { err, ok, type ResultAsync } from 'neverthrow';
  * @param forcedDatabases The list of database IDs to run the backup for. If null, all databases in the job will be backed up.
  * @returns If error, the error message. If success, void.
  */
-export async function startBackup(jobId: number, forcedDatabases: number[] | null = null): Promise<ResultAsync<void, string>> {
+export async function runJob(jobId: number, forcedDatabases: number[] | null = null): Promise<ResultAsync<void, string>> {
     logger.info(`Starting backup for job #${jobId}`);
 
     const job = await getJob(jobId);

@@ -1,4 +1,4 @@
-import { startBackup } from '$lib/executions/run';
+import { runJob } from '$lib/executions/runJob';
 import { deleteJob, updateJob, updateJobStatus } from '$lib/queries/jobs';
 import { addOrUpdateCronJob, stopCronJob } from '$lib/shared/cron';
 import type { JobsCreateRequest } from '$lib/types/api';
@@ -45,7 +45,7 @@ export const PUT: RequestHandler = async ({ params, request }) => {
         stopCronJob(`job:${jobId}`);
     } else {
         addOrUpdateCronJob(`job:${jobId}`, updatedJob.cron, () => {
-            startBackup(jobId);
+            runJob(jobId);
         });
     }
 
@@ -76,7 +76,7 @@ export const PATCH: RequestHandler = async ({ params, request }) => {
         stopCronJob(`job:${jobId}`);
     } else {
         addOrUpdateCronJob(`job:${jobId}`, updatedJob.cron, () => {
-            startBackup(jobId);
+            runJob(jobId);
         });
     }
 

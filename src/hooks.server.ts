@@ -1,5 +1,5 @@
 import { checkAllActiveDatabases } from '$lib/engines/checks';
-import { startBackup } from '$lib/executions/run';
+import { runJob } from '$lib/executions/runJob';
 import { setUnfinishedExecutionsToError } from '$lib/queries/executions';
 import { getJobsToExecute } from '$lib/queries/jobs';
 import { addOrUpdateCronJob } from '$lib/shared/cron';
@@ -28,7 +28,7 @@ export const init: ServerInit = async () => {
         addOrUpdateCronJob(
             `job:${job.id}`,
             job.cron,
-            () => startBackup(job.id),
+            () => runJob(job.id),
         );
     }
 

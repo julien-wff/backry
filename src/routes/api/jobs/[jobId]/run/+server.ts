@@ -1,4 +1,4 @@
-import { startBackup } from '$lib/executions/run';
+import { runJob } from '$lib/executions/runJob';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
@@ -16,6 +16,6 @@ export const POST: RequestHandler = async ({ params, request }) => {
         return json({ error: 'Invalid job ID' }, { status: 400 });
     }
 
-    void startBackup(jobId, databasesToRun);
+    void runJob(jobId, databasesToRun);
     return json({});
 };

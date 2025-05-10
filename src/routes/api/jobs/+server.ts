@@ -1,4 +1,4 @@
-import { startBackup } from '$lib/executions/run';
+import { runJob } from '$lib/executions/runJob';
 import { createJob } from '$lib/queries/jobs';
 import { addOrUpdateCronJob } from '$lib/shared/cron';
 import type { JobsCreateRequest } from '$lib/types/api';
@@ -22,7 +22,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
     if (job.status === 'active')
         addOrUpdateCronJob(`job:${job.id}`, job.cron, () => {
-            startBackup(job.id);
+            runJob(job.id);
         });
 
     return json(job, { status: 201 });
