@@ -1,5 +1,6 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
+    import { page } from '$app/state';
     import Head from '$lib/components/common/Head.svelte';
     import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
@@ -12,16 +13,20 @@
     import type { PageProps } from './$types';
 
     let { data }: PageProps = $props();
+    const { searchParams } = page.url;
     let error = $state<{ current: null | string }>({ current: null });
 
-    let selectedEngine = $state<typeof DATABASE_ENGINES[number] | null>(data.database?.engine ?? null);
+    const urlEngine = (searchParams.has('engine') && Object.keys(ENGINES_META).includes(searchParams.get('engine')!)
+        ? page.url.searchParams.get('engine')
+        : null) as typeof DATABASE_ENGINES[number] | null;
+    let selectedEngine = $state<typeof DATABASE_ENGINES[number] | null>(data.database?.engine ?? urlEngine ?? null);
 
-    let dbName = $state(data.database?.name ?? '');
+    let dbName = $state(data.database?.name ?? searchParams.get('name') ?? '');
     let oldDbName = $state('');
     let slug = $state(data.database?.slug ?? '');
     $effect(() => updateSlug(dbName));
 
-    let connectionString = $state(data.database?.connectionString ?? '');
+    let connectionString = $state(data.database?.connectionString ?? searchParams.get('connectionString') ?? '');
     let connectionStringPlaceholder = $derived(
         (selectedEngine && ENGINES_META[selectedEngine].connectionStringPlaceholder) || '',
     );
