@@ -25,10 +25,10 @@
         <NavbarElement hasError={errors.storages > 0} href="/storages" icon={CloudUpload} label="Storage"/>
         <NavbarElement href="/jobs" icon={Timer} label="Jobs"/>
         <NavbarElement hasError={errors.backups > 0} href="/backups" icon={FileCheck} label="Backups"/>
-        <NavbarElement href="/integrations/docker" icon={Blocks} label="Integrations"/>
         <!--        <NavbarElement href="/restore" icon={History} label="Restore"/>-->
 
-        <div class="flex flex-1 flex-col justify-end">
+        <div class="flex flex-1 flex-col gap-4 justify-end">
+            <NavbarElement href="/integrations/docker" icon={Blocks} label="Integrations"/>
             <NavbarElement href="/settings" icon={Settings} label="Settings"/>
         </div>
     </nav>
