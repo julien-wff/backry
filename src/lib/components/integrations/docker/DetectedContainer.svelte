@@ -1,7 +1,7 @@
 <script lang="ts">
-    import type { ContainerInspectInfo, ImageInspectInfo } from 'dockerode';
     import { CirclePlus, OctagonAlert } from '$lib/components/icons';
     import type { DockerHostnamesCheckResponse } from '$lib/types/api';
+    import type { ContainerInspectInfo, ImageInspectInfo } from 'dockerode';
 
     interface Props {
         container: ContainerInspectInfo;
@@ -40,10 +40,10 @@
     }
 </script>
 
-<div class="bg-base-100 p-2 mt-1 rounded-box mb-1 flex flex-row gap-2 items-center">
+<div class="mt-1 mb-1 flex flex-row items-center gap-2 p-2 bg-base-100 rounded-box">
     <div class="flex-1">
-        <div class="flex flex-row gap-2 items-center">
-            <div class="badge badge-sm capitalize"
+        <div class="flex flex-row items-center gap-2">
+            <div class="capitalize badge badge-sm"
                  class:badge-error={container.State.Error}
                  class:badge-neutral={!container.State.Running && !container.State.Error}
                  class:badge-success={container.State.Running}>
@@ -62,7 +62,7 @@
     {#if canBeAdded}
         <div class="flex items-center">
             <button class="btn btn-primary btn-soft btn-square" onclick={showDialog}>
-                <CirclePlus class="w-6 h-6"/>
+                <CirclePlus class="h-6 w-6"/>
             </button>
         </div>
     {/if}
@@ -72,23 +72,23 @@
 {#if canBeAdded}
     <dialog bind:this={addDialog} class="modal">
         <div class="modal-box">
-            <h3 class="font-bold text-lg">Add {container.Name.slice(1)} to databases</h3>
+            <h3 class="text-lg font-bold">Add {container.Name.slice(1)} to databases</h3>
 
             {#if loading}
-                <div role="alert" class="alert alert-soft mt-4">
+                <div role="alert" class="mt-4 alert alert-soft">
                     <span class="loading loading-spinner loading-sm"></span>
                     <span>Finding reachable hostnames...</span>
                 </div>
             {:else if error}
                 <div role="alert" class="alert alert-error alert-soft">
-                    <OctagonAlert class="w-4 h-4"/>
+                    <OctagonAlert class="h-4 w-4"/>
                     <span>{error}</span>
                 </div>
             {:else if hostnameScanResult}
                 <div class="mt-4">Select the container hostname and port:</div>
                 <div class="mt-2 flex flex-col gap-2">
                     {#each hostnameScanResult as hostname}
-                        <label class="flex flex gap-2 items-center">
+                        <label class="flex items-center gap-2">
                             <input type="radio"
                                    name="hostname"
                                    class="radio radio-sm"
@@ -105,7 +105,7 @@
                             </span>
                         </label>
                     {/each}
-                    <label class="flex flex gap-2 items-center">
+                    <label class="flex items-center gap-2">
                         <input type="radio"
                                bind:group={selectedHostName}
                                name="hostname"

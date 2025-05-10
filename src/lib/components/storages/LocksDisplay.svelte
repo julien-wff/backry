@@ -56,19 +56,19 @@
     </div>
 {:else if error}
     <div role="alert" class="alert alert-error alert-soft">
-        <OctagonAlert class="w-4 h-4"/>
+        <OctagonAlert class="h-4 w-4"/>
         <span>{error}</span>
     </div>
 {:else if locks}
     {#if locks.length === 0}
         <div role="alert" class="alert alert-success alert-soft">
-            <ShieldCheck class="w-4 h-4"/>
+            <ShieldCheck class="h-4 w-4"/>
             <span>No locks found</span>
         </div>
     {:else}
         <div class="flex flex-col gap-1">
             {#each locks as lock}
-                <div class="bg-base-100 p-2 rounded-box mb-1">
+                <div class="mb-1 p-2 bg-base-100 rounded-box">
                     <div class="">Hostname: {lock.hostname}, user: {lock.username}</div>
                     <div class="text-sm">
                         Created on {new Date(lock.time).toLocaleString()} by PID {lock.pid}
@@ -78,8 +78,8 @@
             {/each}
         </div>
 
-        <button class="btn btn-primary btn-sm btn-soft mt-1 w-full" onclick={handleUnlockAll}>
-            <LockKeyholeOpen class="w-4 h-4"/>
+        <button class="mt-1 w-full btn btn-primary btn-sm btn-soft" onclick={handleUnlockAll}>
+            <LockKeyholeOpen class="h-4 w-4"/>
             Unlock all
         </button>
     {/if}

@@ -73,13 +73,13 @@
     </div>
 {:else if error}
     <div role="alert" class="alert alert-error alert-soft">
-        <OctagonAlert class="w-4 h-4"/>
+        <OctagonAlert class="h-4 w-4"/>
         <span>{error}</span>
     </div>
 {:else if snapshots}
     {#if snapshots.length === 0}
         <div role="alert" class="alert alert-success alert-soft">
-            <ShieldCheck class="w-4 h-4"/>
+            <ShieldCheck class="h-4 w-4"/>
             <span>No stale snapshots found</span>
         </div>
     {:else}
@@ -88,11 +88,11 @@
                 {@const jobId = snapshot.tags.find(t => t.startsWith('jobId:'))?.replace('jobId:', '')}
                 {@const dbId = snapshot.tags.find(t => t.startsWith('dbId:'))?.replace('dbId:', '')}
 
-                <div class="bg-base-100 p-2 rounded-box mb-1 flex flex-row gap-2 items-center">
+                <div class="mb-1 flex flex-row items-center gap-2 p-2 bg-base-100 rounded-box">
                     <div class="flex-1">
                         <div class="">Snapshot {snapshot.short_id} ({new Date(snapshot.time).toLocaleString()})</div>
                         <div class="text-sm">
-                            <div class="tooltip underline cursor-help" data-tip={snapshot.paths.join('\n')}>
+                            <div class="cursor-help underline tooltip" data-tip={snapshot.paths.join('\n')}>
                                 {snapshot.paths.length} file{snapshot.paths.length > 1 ? 's' : ''},
                             </div>
                             {formatSize(snapshot.summary.total_bytes_processed)} total,
@@ -117,10 +117,10 @@
                 </div>
             {/each}
 
-            <button class="btn btn-error btn-sm btn-soft w-full"
+            <button class="w-full btn btn-error btn-sm btn-soft"
                     onclick={() => deleteConfirmDialog?.showModal()}
                     disabled={loading || snapshotsToDelete.length === 0}>
-                <Trash2 class="w-4 h-4"/>
+                <Trash2 class="h-4 w-4"/>
                 Delete snapshots
             </button>
         </div>
