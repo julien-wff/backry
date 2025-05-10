@@ -121,4 +121,8 @@ export const backupsRelations = relations(backups, ({ one }) => ({
         fields: [ backups.jobDatabaseId ],
         references: [ jobDatabases.id ],
     }),
+    run: one(runs, {
+        fields: [ backups.runId ],
+        references: [ runs.id ],
+    }),
 }));
