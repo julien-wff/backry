@@ -15,9 +15,18 @@
 
 <div class="bg-base-100 p-2 mt-1 rounded-box mb-1 flex flex-row gap-2 items-center">
     <div class="flex-1">
-        <div>
-            {composeName ? `${composeName} >` : ''} {container.Name.slice(1)} ({container.Id.slice(0, 12)})
+        <div class="flex flex-row gap-2 items-center">
+            <div class="badge badge-sm capitalize"
+                 class:badge-error={container.State.Error}
+                 class:badge-neutral={!container.State.Running && !container.State.Error}
+                 class:badge-success={container.State.Running}>
+                {container.State.Status}
+            </div>
+            <span>
+                {composeName ? `${composeName} >` : ''} {container.Name.slice(1)} ({container.Id.slice(0, 12)})
+            </span>
         </div>
+
         <div class="text-sm">
             Image: {image?.RepoTags[0] ?? '<unknown>'}
         </div>
