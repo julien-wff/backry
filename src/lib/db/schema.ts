@@ -4,6 +4,7 @@ import { integer, real, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlit
 export const ELEMENT_STATUS = [ 'active', 'inactive', 'error' ] as const;
 export const DATABASE_ENGINES = [ 'postgresql', 'sqlite' ] as const;
 export const EXECUTION_STATUS = [ 'running', 'success', 'error' ] as const;
+export const RUN_ORIGIN = [ 'manual', 'cron' ] as const;
 
 export const databases = sqliteTable('databases', {
     id: integer('id').primaryKey({ autoIncrement: true }),
@@ -86,10 +87,21 @@ export const jobDatabasesRelations = relations(jobDatabases, ({ one, many }) => 
     executions: many(executions),
 }));
 
+export const runs = sqliteTable('runs', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    origin: text('origin', { enum: RUN_ORIGIN }).notNull(),
+    createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`),
+    updatedAt: text('updated_at').default(sql`(CURRENT_TIMESTAMP)`).$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
+});
+
+export const runsRelations = relations(runs, ({ many }) => ({
+    executions: many(executions),
+}));
+
 export const executions = sqliteTable('executions', {
     id: integer('id').primaryKey({ autoIncrement: true }),
     jobDatabaseId: integer('job_database_id').notNull().references(() => jobDatabases.id, { onDelete: 'cascade' }),
-    runId: integer('run_id').notNull().$defaultFn(() => sql`(SELECT IFNULL(MAX(run_id), -1) + 1 FROM executions)`),
+    runId: integer('run_id').notNull().references(() => runs.id, { onDelete: 'cascade' }),
     fileName: text('file_name').notNull(),
     error: text('error'),
     startedAt: text('started_at').default(sql`(CURRENT_TIMESTAMP)`),
