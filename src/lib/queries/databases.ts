@@ -5,7 +5,8 @@ import { eq } from 'drizzle-orm';
 /**
  * Fetches a complete list of all databases with all fields.
  */
-export const databasesList = () => db.select().from(databases);
+export const databasesList = () =>
+    db.select().from(databases).orderBy(databases.name);
 
 /**
  * Fetches a database by ID.

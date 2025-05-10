@@ -10,6 +10,7 @@ export const jobsListFull = async () => db
     .query
     .jobs
     .findMany({
+        orderBy: (jobs, { asc }) => asc(jobs.name),
         with: {
             jobsDatabases: {
                 with: {

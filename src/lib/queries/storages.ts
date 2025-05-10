@@ -6,7 +6,8 @@ import { eq } from 'drizzle-orm';
 /**
  * Fetches a complete list of all storages with all fields.
  */
-export const storagesList = () => db.select().from(storages);
+export const storagesList = () =>
+    db.select().from(storages).orderBy(storages.name);
 
 /**
  * Fetches a storage by ID.
