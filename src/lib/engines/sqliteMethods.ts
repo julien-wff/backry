@@ -1,6 +1,7 @@
 import type { EngineMethods } from '$lib/types/engine';
 import { runCommandSync } from '$lib/utils/cmd';
 import { Database } from 'bun:sqlite';
+import type { ContainerInspectInfo } from 'dockerode';
 import { err, ok, type ResultAsync } from 'neverthrow';
 
 export const sqliteMethods = {
@@ -32,5 +33,9 @@ export const sqliteMethods = {
 
     getDumpCommand(connectionString: string, additionalArgs?: string[]): string[] {
         return [ this.command, ...additionalArgs ?? [], '-readonly', connectionString, '.dump' ];
+    },
+
+    isDockerContainerFromEngine(container: ContainerInspectInfo): boolean {
+        return false;
     },
 } satisfies EngineMethods;

@@ -2,6 +2,7 @@ import type { Icon as IconType } from '@lucide/svelte';
 import ArchiveRestore from '@lucide/svelte/icons/archive-restore';
 import ArrowDown from '@lucide/svelte/icons/arrow-down';
 import ArrowUp from '@lucide/svelte/icons/arrow-up';
+import Blocks from '@lucide/svelte/icons/blocks';
 import CheckCircle from '@lucide/svelte/icons/check-circle';
 import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 import CircleHelp from '@lucide/svelte/icons/circle-help';
@@ -41,6 +42,7 @@ export {
     ArchiveRestore,
     ArrowDown,
     ArrowUp,
+    Blocks,
     CheckCircle,
     ChevronLeft,
     CircleHelp,

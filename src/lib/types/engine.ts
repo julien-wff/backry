@@ -1,3 +1,4 @@
+import type { ContainerInspectInfo } from 'dockerode';
 import type { ResultAsync } from 'neverthrow';
 
 /**
@@ -43,4 +44,11 @@ export interface EngineMethods {
      * @returns Empty ok or error message.
      */
     checkConnection(connectionString: string): Promise<ResultAsync<void, string>>;
+
+    /**
+     * Determine if the Docker container compatible with the engine.
+     * @param container Docker container information.
+     * @returns True if the container is compatible with the engine, false otherwise.
+     */
+    isDockerContainerFromEngine(container: ContainerInspectInfo): boolean;
 }
