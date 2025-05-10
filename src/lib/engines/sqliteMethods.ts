@@ -1,8 +1,8 @@
-import type { EngineMethods } from '$lib/types/engine';
+import type { ConnectionStringParams, EngineMethods } from '$lib/types/engine';
 import { runCommandSync } from '$lib/utils/cmd';
 import { Database } from 'bun:sqlite';
-import type { ContainerInspectInfo } from 'dockerode';
-import { err, ok, type ResultAsync } from 'neverthrow';
+import { type ContainerInspectInfo } from 'dockerode';
+import { err, ok, Result, type ResultAsync } from 'neverthrow';
 
 export const sqliteMethods = {
     command: process.env.BACKRY_SQLITE3_CMD ?? 'sqlite3',
@@ -37,5 +37,17 @@ export const sqliteMethods = {
 
     isDockerContainerFromEngine(container: ContainerInspectInfo): boolean {
         return false;
+    },
+
+    buildConnectionString(params: ConnectionStringParams): Result<string, string> {
+        if (!params.database) {
+            return err('Missing "database" parameter');
+        }
+
+        return ok(`sqlite://${params.database}`);
+    },
+
+    getCredentialsFromContainer(container: ContainerInspectInfo): ConnectionStringParams {
+        return {};
     },
 } satisfies EngineMethods;

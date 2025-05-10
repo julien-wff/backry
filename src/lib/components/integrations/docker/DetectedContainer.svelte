@@ -1,8 +1,9 @@
 <script lang="ts">
     import { CirclePlus, OctagonAlert } from '$lib/components/icons';
-    import type { DockerHostnamesCheckResponse } from '$lib/types/api';
+    import type { DockerConnectionStringRequest, DockerHostnamesCheckResponse } from '$lib/types/api';
     import type { ContainerInspectInfo, ImageInspectInfo } from 'dockerode';
     import { goto } from '$app/navigation';
+    import type { DATABASE_ENGINES } from '$lib/db/schema';
 
     interface Props {
         container: ContainerInspectInfo;
@@ -41,12 +42,37 @@
         hostnameScanResult = json;
     }
 
-    function redirectToNewDatabase() {
+    async function getConnectionString() {
+        const res = await fetch(`/api/integrations/docker/connection-string/${container.Id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                engine: engineId as typeof DATABASE_ENGINES[number],
+                hostname: selectedHostName ? selectedHostName.split(':')[0] : 'hostname',
+                port: selectedHostName ? parseInt(selectedHostName.split(':')[1]) : undefined,
+            } satisfies DockerConnectionStringRequest),
+        });
+        if (!res.ok) {
+            return null;
+        }
+        const { result } = await res.json();
+        return result;
+    }
+
+    async function redirectToNewDatabase() {
         const name = container.Name.slice(1).replace(/[-_]/g, ' ').replace(/ +/g, ' ').trim();
+        const connectionString = await getConnectionString();
+
         const params = new URLSearchParams({
             engine: engineId,
             name: name.slice(0, 1).toUpperCase() + name.slice(1),
         });
+
+        if (connectionString) {
+            params.set('connectionString', connectionString);
+        }
 
         goto(`/databases/new?${params}`);
     }

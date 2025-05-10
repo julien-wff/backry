@@ -1,5 +1,17 @@
 import type { ContainerInspectInfo } from 'dockerode';
-import type { ResultAsync } from 'neverthrow';
+import { Result, type ResultAsync } from 'neverthrow';
+
+/**
+ * Object to represent the base elements of any database connection string.
+ */
+export interface ConnectionStringParams {
+    username?: string;
+    password?: string;
+    hostname?: string;
+    port?: number;
+    /** Database name or file path */
+    database?: string;
+}
 
 /**
  * Client-side metadata for the engine.
@@ -51,4 +63,18 @@ export interface EngineMethods {
      * @returns True if the container is compatible with the engine, false otherwise.
      */
     isDockerContainerFromEngine(container: ContainerInspectInfo): boolean;
+
+    /**
+     * Create the connection string from the specified parameters.
+     * @param params Individual parameters.
+     * @return Connection string.
+     */
+    buildConnectionString(params: ConnectionStringParams): Result<string, string>;
+
+    /**
+     * Read some connection string parameters from the container information.
+     * @param container Docker container inspect information.
+     * @return Partially-filled connection string parameters.
+     */
+    getCredentialsFromContainer(container: ContainerInspectInfo): ConnectionStringParams;
 }

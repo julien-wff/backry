@@ -1,8 +1,9 @@
-import type { EngineMethods } from '$lib/types/engine';
+import type { ConnectionStringParams, EngineMethods } from '$lib/types/engine';
 import { runCommandSync } from '$lib/utils/cmd';
 import { SQL } from 'bun';
 import { type ContainerInspectInfo } from 'dockerode';
-import { err, ok, type ResultAsync } from 'neverthrow';
+import { err, ok, Result, type ResultAsync } from 'neverthrow';
+import { buildDbUrlFromParams } from '$lib/utils/url';
 
 export const postgresMethods = {
     command: process.env.BACKRY_PGDUMP_CMD ?? 'pg_dump',
@@ -42,5 +43,31 @@ export const postgresMethods = {
             || Object.keys(container.Config.Volumes ?? {}).some(v => v === '/var/lib/postgresql/data')
             || container.Config.Env.some(e => e.startsWith('PGDATA='))
             || container.Config.Env.some(e => e.startsWith('PG_VERSION='));
+    },
+
+    buildConnectionString(params: ConnectionStringParams): Result<string, string> {
+        if (!params.hostname) {
+            return err('Hostname is required');
+        }
+
+        const url = buildDbUrlFromParams('postgres', params);
+        return ok(url.toString());
+    },
+
+    getCredentialsFromContainer(container: ContainerInspectInfo): ConnectionStringParams {
+        const infos: ConnectionStringParams = {};
+
+        const userKey = container.Config.Env.find(e => e.startsWith('POSTGRES_USER='));
+        infos.username = userKey?.split('=')?.[1] ?? 'postgres';
+
+        const passwordKey = container.Config.Env.find(e => e.startsWith('POSTGRES_PASSWORD='));
+        if (passwordKey) {
+            infos.password = passwordKey.split('=')[1];
+        }
+
+        const dbKey = container.Config.Env.find(e => e.startsWith('POSTGRES_DB='));
+        infos.database = dbKey?.split('=')?.[1] ?? infos.username;
+
+        return infos;
     },
 } satisfies EngineMethods;

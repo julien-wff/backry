@@ -1,5 +1,6 @@
 import type { DATABASE_ENGINES } from '$lib/db/schema';
 import type { ResticError, ResticInit } from '$lib/types/restic';
+import type { ENGINES_METHODS } from '$lib/engines/enginesMethods';
 
 /** `POST /api/databases/check` */
 export interface DatabasesCheckRequest {
@@ -69,3 +70,10 @@ export type DockerHostnamesCheckResponse = {
     port: number;
     reachable: boolean;
 }[];
+
+/** `POST /api/integrations/docker/connection-string/[id]` */
+export interface DockerConnectionStringRequest {
+    hostname: string;
+    port?: number;
+    engine: keyof typeof ENGINES_METHODS;
+}
