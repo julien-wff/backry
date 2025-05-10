@@ -2,13 +2,15 @@
     import { CirclePlus, OctagonAlert } from '$lib/components/icons';
     import type { DockerHostnamesCheckResponse } from '$lib/types/api';
     import type { ContainerInspectInfo, ImageInspectInfo } from 'dockerode';
+    import { goto } from '$app/navigation';
 
     interface Props {
         container: ContainerInspectInfo;
         image?: ImageInspectInfo;
+        engineId: string;
     }
 
-    let { container, image }: Props = $props();
+    let { container, image, engineId }: Props = $props();
 
     let composeName = $derived(
         container.Config.Labels?.['com.docker.compose.project'] || container.Config.Labels?.['com.docker.compose.service'],
@@ -37,6 +39,16 @@
         }
 
         hostnameScanResult = json;
+    }
+
+    function redirectToNewDatabase() {
+        const name = container.Name.slice(1).replace(/[-_]/g, ' ').replace(/ +/g, ' ').trim();
+        const params = new URLSearchParams({
+            engine: engineId,
+            name: name.slice(0, 1).toUpperCase() + name.slice(1),
+        });
+
+        goto(`/databases/new?${params}`);
     }
 </script>
 
@@ -118,7 +130,9 @@
 
             <div class="modal-action">
                 <button class="btn" onclick={() => addDialog?.close()}>Cancel</button>
-                <button class="btn btn-primary" type="submit" disabled={loading || selectedHostName === null}>
+                <button class="btn btn-primary"
+                        onclick={redirectToNewDatabase}
+                        disabled={loading || selectedHostName === null}>
                     Continue
                 </button>
             </div>

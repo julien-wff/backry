@@ -24,8 +24,8 @@
         </div>
     {/if}
 
-    {#each Object.entries(data.containers) as [engineName, containers]}
-        {@const engine = ENGINES_META[engineName as keyof typeof ENGINES_META]}
+    {#each Object.entries(data.containers) as [engineId, containers]}
+        {@const engine = ENGINES_META[engineId as keyof typeof ENGINES_META]}
 
         <div>
             <div class="flex items-center gap-2">
@@ -39,7 +39,7 @@
                 </div>
             {:else}
                 {#each containers as container}
-                    <DetectedContainer {container} image={data.images[container.Image]}/>
+                    <DetectedContainer {container} image={data.images[container.Image]} {engineId}/>
                 {/each}
             {/if}
         </div>
