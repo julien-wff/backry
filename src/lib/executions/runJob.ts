@@ -2,7 +2,7 @@ import type { executions } from '$lib/db/schema';
 import { ENGINES_METHODS } from '$lib/engines/enginesMethods';
 import { createExecution, getExecution, updateExecution } from '$lib/queries/executions';
 import { getJob } from '$lib/queries/jobs';
-import { createRun } from '$lib/queries/runs';
+import { createRun, updateRun } from '$lib/queries/runs';
 import { executionEmitter } from '$lib/shared/events';
 import { backupFromCommand } from '$lib/storages/restic';
 import { logger } from '$lib/utils/logger';
@@ -25,17 +25,32 @@ export async function runJob(jobId: number, forcedDatabases: number[] | null = n
     }
 
     const run = createRun(forcedDatabases ? 'manual' : 'cron');
+    let totalDatabases = 0;
+    let successfulDatabases = 0;
+
     for (let i = 0; i < job.jobsDatabases.length; i++) {
         if (forcedDatabases && !forcedDatabases.includes(job.jobsDatabases[i].database.id)) {
             logger.debug(`Database #${i} is not in the forced list, skipping`);
             continue;
         }
 
-        await jobDatabaseBackup(job, i, run.id, forcedDatabases !== null);
+        const res = await jobDatabaseBackup(job, i, run.id, forcedDatabases !== null);
+
+        totalDatabases++;
+        if (res.isOk()) {
+            successfulDatabases++;
+        }
 
         // 1s delay between each database backup
         await new Promise(resolve => setTimeout(resolve, 1000));
     }
+
+    updateRun(run.id, {
+        // @ts-expect-error only accepts string, sql is not supported in type definition (but is for drizzle)
+        finishedAt: sql`(CURRENT_TIMESTAMP)`,
+        totalExecutionCount: totalDatabases,
+        successfulExecutionCount: successfulDatabases,
+    });
 
     logger.info(`Backup for job #${jobId} finished`);
     return ok();

@@ -92,6 +92,9 @@ export const runs = sqliteTable('runs', {
     origin: text('origin', { enum: RUN_ORIGIN }).notNull(),
     createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`),
     updatedAt: text('updated_at').default(sql`(CURRENT_TIMESTAMP)`).$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
+    finishedAt: text('finished_at'),
+    totalExecutionCount: integer('total_execution_count'),
+    successfulExecutionCount: integer('successful_execution_count'),
 });
 
 export const runsRelations = relations(runs, ({ many }) => ({
