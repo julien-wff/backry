@@ -1,6 +1,6 @@
 import { db } from '$lib/db';
 import { RUN_ORIGIN, runs } from '$lib/db/schema';
-import { eq } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 
 /**
  * Create a new run in the database.
@@ -15,3 +15,23 @@ export const createRun = (origin: typeof RUN_ORIGIN[number]) =>
  */
 export const updateRun = (id: number, payload: Partial<typeof runs.$inferInsert>) =>
     db.update(runs).set(payload).where(eq(runs.id, id)).returning().get();
+
+export const runsListFull = () => db.query.runs.findMany({
+    orderBy: (runs) => [ desc(runs.createdAt) ],
+    with: {
+        backups: {
+            with: {
+                jobDatabase: {
+                    with: {
+                        database: true,
+                        job: {
+                            with: {
+                                storage: true,
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    },
+});

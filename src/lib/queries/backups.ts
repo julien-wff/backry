@@ -15,6 +15,7 @@ export const backupsListFull = async () => db.query.backups.findMany({
                 },
             },
         },
+        run: true,
     },
 });
 

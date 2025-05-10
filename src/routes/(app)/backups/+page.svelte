@@ -3,20 +3,29 @@
     import BackupElement from '$lib/components/backups/BackupElement.svelte';
     import Head from '$lib/components/common/Head.svelte';
     import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
+    import RunOriginIndicator from '$lib/components/common/RunOriginIndicator.svelte';
     import { FileCheck } from '$lib/components/icons';
     import type { BackupUpdateEventPayload } from '$lib/shared/events';
     import { subscribeApi } from '$lib/utils/api';
+    import dayjs from 'dayjs';
+    import relativeTime from 'dayjs/plugin/relativeTime';
+    import utc from 'dayjs/plugin/utc';
     import { onMount } from 'svelte';
     import type { PageData } from './$types';
+
+    dayjs.extend(relativeTime);
+    dayjs.extend(utc);
 
     interface Props {
         data: PageData;
     }
 
     let { data }: Props = $props();
-    let backups = $state(data.backups);
+    let runs = $state(data.runs);
+    let knownBackupIds = $state(new Set(data.runs.flatMap(run => run.backups.map(backup => backup.id))));
     $effect(() => {
-        backups = data.backups;
+        runs = data.runs;
+        knownBackupIds = new Set(data.runs.flatMap(run => run.backups.map(backup => backup.id)));
     });
 
     onMount(() => {
@@ -24,11 +33,13 @@
     });
 
     function handleSubscriptionUpdate(chunk: BackupUpdateEventPayload) {
-        const backupRun = backups.find(backup => backup.id === chunk.id);
-        if (!backupRun) {
+        if (!knownBackupIds.has(chunk.id)) {
             invalidateAll();
         } else {
-            backups = backups.map(backup => (backup.id === chunk.id ? { ...backup, ...chunk } : backup));
+            runs = runs.map(run => ({
+                ...run,
+                backups: run.backups.map(backup => (backup.id === chunk.id ? { ...backup, ...chunk } : backup)),
+            }));
         }
     }
 </script>
@@ -40,7 +51,18 @@
 </PageContentHeader>
 
 <div class="grid grid-cols-1 gap-4">
-    {#each backups as backup (backup.id)}
-        <BackupElement {backup}/>
+    {#each runs as run (run.id)}
+        {#if run.backups.length > 0}
+            <div class="grid grid-cols-1 gap-2 p-2 bg-base-200 rounded-lg">
+                <div class="text-sm flex align-center gap-1">
+                    <RunOriginIndicator origin={run.origin}/>
+                    Run #{run.id} - {run.backups[0].jobDatabase.job.name} - {dayjs.utc(run.createdAt).fromNow()}
+                </div>
+
+                {#each run.backups as backup (backup.id)}
+                    <BackupElement {backup}/>
+                {/each}
+            </div>
+        {/if}
     {/each}
 </div>

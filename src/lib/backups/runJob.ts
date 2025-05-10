@@ -24,7 +24,7 @@ export async function runJob(jobId: number, forcedDatabases: number[] | null = n
         return err(`Job #${jobId} not found`);
     }
 
-    const run = createRun(forcedDatabases ? 'manual' : 'cron');
+    const run = createRun(forcedDatabases ? 'manual' : 'scheduled');
     let totalDatabases = 0;
     let successfulDatabases = 0;
 

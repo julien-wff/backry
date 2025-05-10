@@ -1,10 +1,10 @@
-import { backupsListFull } from '$lib/queries/backups';
+import { runsListFull } from '$lib/queries/runs';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async () => {
-    const backups = await backupsListFull();
+    const runs = await runsListFull();
 
     return {
-        backups,
+        runs,
     };
 };

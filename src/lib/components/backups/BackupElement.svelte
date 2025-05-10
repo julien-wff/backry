@@ -8,7 +8,7 @@
     import { formatDuration, formatSize } from '$lib/utils/format.js';
 
     interface Props {
-        backup: Awaited<ReturnType<typeof backupsListFull>>[number];
+        backup: Omit<Awaited<ReturnType<typeof backupsListFull>>[number], 'run'>;
     }
 
     let { backup }: Props = $props();
@@ -56,7 +56,7 @@
                  ondelete={handleDelete}
                  {secondaryBtns}
                  status={status}
-                 title="{backup.jobDatabase.job.name} - {backup.jobDatabase.database.name}">
+                 title={backup.jobDatabase.database.name}>
     <div class="flex items-center gap-1">
         <Clock class="w-4 h-4"/>
         Started: {backup.startedAt}

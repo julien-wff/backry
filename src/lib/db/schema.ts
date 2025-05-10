@@ -4,7 +4,7 @@ import { integer, real, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlit
 export const ELEMENT_STATUS = [ 'active', 'inactive', 'error' ] as const;
 export const DATABASE_ENGINES = [ 'postgresql', 'sqlite' ] as const;
 export const BACKUP_STATUS = [ 'running', 'success', 'error' ] as const;
-export const RUN_ORIGIN = [ 'manual', 'cron' ] as const;
+export const RUN_ORIGIN = [ 'manual', 'scheduled' ] as const;
 
 export const databases = sqliteTable('databases', {
     id: integer('id').primaryKey({ autoIncrement: true }),
