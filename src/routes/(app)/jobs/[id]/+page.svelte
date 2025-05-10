@@ -101,15 +101,15 @@
 {/snippet}
 
 
-<Head title="{data.job ? `Edit ${data.job.name}` : 'Add'} job pool"/>
+<Head title="{data.job ? `Edit ${data.job.name}` : 'Add'} job"/>
 
 <PageContentHeader buttonType="back" icon={Timer}>
-    {data.job ? 'Edit' : 'Add'} job pool
+    {data.job ? 'Edit' : 'Add'} job
 </PageContentHeader>
 
 <ElementForm bind:error={error}
              onsubmit={handleFormSubmit}
-             title="{data.job ? 'Edit' : 'Add'} job pool">
+             title="{data.job ? 'Edit' : 'Add'} job">
     <InputContainer for="job-name" label="Name">
         <input bind:value={jobName} class="input w-full" id="job-name" required>
     </InputContainer>

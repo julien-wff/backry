@@ -12,10 +12,10 @@
     let { data }: Props = $props();
 </script>
 
-<Head title="Backup jobs pools"/>
+<Head title="Backup jobs"/>
 
 <PageContentHeader buttonType="new" icon={Timer}>
-    Backup jobs pools
+    Backup jobs
 </PageContentHeader>
 
 <div class="grid grid-cols-1 gap-4">

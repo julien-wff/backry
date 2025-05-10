@@ -16,6 +16,7 @@ import Database from '@lucide/svelte/icons/database';
 import EllipsisVertical from '@lucide/svelte/icons/ellipsis-vertical';
 import EthernetPort from '@lucide/svelte/icons/ethernet-port';
 import FileChartPie from '@lucide/svelte/icons/file-chart-pie';
+import FileCheck from '@lucide/svelte/icons/file-check';
 import FileDown from '@lucide/svelte/icons/file-down';
 import FolderHeart from '@lucide/svelte/icons/folder-heart';
 import HardDrive from '@lucide/svelte/icons/hard-drive';
@@ -57,6 +58,7 @@ export {
     EllipsisVertical,
     EthernetPort,
     FileChartPie,
+    FileCheck,
     FileDown,
     FolderHeart,
     HardDrive,

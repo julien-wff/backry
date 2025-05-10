@@ -9,9 +9,9 @@
         CloudUpload,
         Database,
         FileChartPie,
+        FileCheck,
         HardDrive,
         LayoutDashboard,
-        RefreshCw,
         Timer,
     } from '$lib/components/icons';
     import { formatSize } from '$lib/utils/format';
@@ -43,7 +43,7 @@
                     href="/jobs"
                     icon={Timer}
                     inactive={data.stats.jobs.inactive}
-                    title="{data.stats.jobs.total} Backup job pools"/>
+                    title="{data.stats.jobs.total} Backup jobs"/>
     </div>
 
     <div class="grid grid-cols-2 gap-4">
@@ -53,9 +53,9 @@
 
     <div class="grid grid-cols-4 gap-4">
         <StatsCard href="/executions"
-                   icon={RefreshCw}
+                   icon={FileCheck}
                    stat={data.stats.executionsCount}
-                   title="Execution count">
+                   title="Backup count">
             backup{data.stats.executionsCount > 1 ? 's' : ''} total
         </StatsCard>
         <StatsCard href="/storages"
@@ -73,7 +73,7 @@
         <StatsCard href="/executions"
                    icon={Timer}
                    stat={formatDuration(data.stats.averageBackupDuration)}
-                   title="Execution duration">
+                   title="Backup duration">
             average
         </StatsCard>
     </div>

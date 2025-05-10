@@ -3,7 +3,7 @@
     import Head from '$lib/components/common/Head.svelte';
     import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
     import ExecutionElement from '$lib/components/executions/ExecutionElement.svelte';
-    import { RefreshCw } from '$lib/components/icons';
+    import { FileCheck } from '$lib/components/icons';
     import type { ExecutionUpdateEventPayload } from '$lib/shared/events';
     import { subscribeApi } from '$lib/utils/api';
     import { onMount } from 'svelte';
@@ -33,10 +33,10 @@
     }
 </script>
 
-<Head title="Executions"/>
+<Head title="Backups"/>
 
-<PageContentHeader icon={RefreshCw}>
-    Executions
+<PageContentHeader icon={FileCheck}>
+    Backups
 </PageContentHeader>
 
 <div class="grid grid-cols-1 gap-4">

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { RefreshCw } from '$lib/components/icons';
+    import { FileCheck } from '$lib/components/icons';
     import type { getDashboardStats } from '$lib/queries/shared';
     import { formatDuration, formatSize } from '$lib/utils/format.js';
     import dayjs from 'dayjs';
@@ -17,9 +17,9 @@
 
 <a class="w-full bg-base-100 rounded-box p-4" href="/executions">
     <div class="flex items-center gap-2">
-        <RefreshCw size={24}/>
+        <FileCheck size={24}/>
         <h3 class="text-lg font-bold">
-            Latest executions
+            Latest backups
         </h3>
     </div>
 
