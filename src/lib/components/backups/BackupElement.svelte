@@ -2,20 +2,20 @@
     import { invalidateAll } from '$app/navigation';
     import BaseListElement from '$lib/components/common/BaseListElement.svelte';
     import { Clock, FileChartPie, FileDown, HardDriveDownload, Timer } from '$lib/components/icons';
-    import type { EXECUTION_STATUS } from '$lib/db/schema';
-    import type { executionsListFull } from '$lib/queries/executions';
+    import type { BACKUP_STATUS } from '$lib/db/schema';
+    import type { backupsListFull } from '$lib/queries/backups';
     import { fetchApi } from '$lib/utils/api';
     import { formatDuration, formatSize } from '$lib/utils/format.js';
 
     interface Props {
-        execution: Awaited<ReturnType<typeof executionsListFull>>[number];
+        backup: Awaited<ReturnType<typeof backupsListFull>>[number];
     }
 
-    let { execution }: Props = $props();
-    let status = $derived(((): typeof EXECUTION_STATUS[number] => {
-        if (execution.error) {
+    let { backup }: Props = $props();
+    let status = $derived(((): typeof BACKUP_STATUS[number] => {
+        if (backup.error) {
             return 'error';
-        } else if (execution.finishedAt) {
+        } else if (backup.finishedAt) {
             return 'success';
         } else {
             return 'running';
@@ -26,7 +26,7 @@
 
     async function handleDelete() {
         loading = true;
-        await fetchApi('DELETE', `/api/executions/${execution.id}`, {});
+        await fetchApi('DELETE', `/api/backups/${backup.id}`, {});
         await invalidateAll();
         loading = false;
     }
@@ -34,12 +34,12 @@
 
 
 {#snippet secondaryBtns()}
-    {#if !execution.error && execution.dumpSize && execution.dumpSize < 10e6}
-        <a download href="/api/executions/{execution.id}/download" class="btn btn-sm btn-success btn-soft">
+    {#if !backup.error && backup.dumpSize && backup.dumpSize < 10e6}
+        <a download href="/api/backups/{backup.id}/download" class="btn btn-sm btn-success btn-soft">
             <FileDown class="w-4 h-4"/>
             Download
         </a>
-    {:else if !execution.error && execution.dumpSize}
+    {:else if !backup.error && backup.dumpSize}
         <div class="tooltip tooltip-error" data-tip="Cannot download dumps larger than 10MB">
             <button class="btn btn-sm btn-success btn-soft w-full" disabled>
                 <FileDown class="w-4 h-4"/>
@@ -52,34 +52,34 @@
 
 <BaseListElement deleteConfirmationMessage="This backup and the file stored in the repository will be deleted."
                  disabled={loading}
-                 error={execution.error}
+                 error={backup.error}
                  ondelete={handleDelete}
                  {secondaryBtns}
                  status={status}
-                 title="{execution.jobDatabase.job.name} - {execution.jobDatabase.database.name}">
+                 title="{backup.jobDatabase.job.name} - {backup.jobDatabase.database.name}">
     <div class="flex items-center gap-1">
         <Clock class="w-4 h-4"/>
-        Started: {execution.startedAt}
+        Started: {backup.startedAt}
     </div>
 
-    {#if execution.duration}
+    {#if backup.duration}
         <div class="flex items-center gap-1">
             <Timer class="w-4 h-4"/>
-            Duration: {formatDuration(execution.duration)}
+            Duration: {formatDuration(backup.duration)}
         </div>
     {/if}
 
-    {#if execution.dumpSize}
+    {#if backup.dumpSize}
         <div class="flex items-center gap-1">
             <FileChartPie class="w-4 h-4"/>
-            Dump size: {formatSize(execution.dumpSize)}
+            Dump size: {formatSize(backup.dumpSize)}
         </div>
     {/if}
 
-    {#if execution.dumpSpaceAdded}
+    {#if backup.dumpSpaceAdded}
         <div class="flex items-center gap-1">
             <HardDriveDownload class="w-4 h-4"/>
-            Space added: {formatSize(execution.dumpSpaceAdded)}
+            Space added: {formatSize(backup.dumpSpaceAdded)}
         </div>
     {/if}
 </BaseListElement>

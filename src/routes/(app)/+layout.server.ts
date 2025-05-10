@@ -8,7 +8,7 @@ export const load: LayoutServerLoad = async () => {
         errors: {
             databases: errors.databases,
             storages: errors.storages,
-            executions: errors.executions,
+            backups: errors.backups,
         },
     };
 };

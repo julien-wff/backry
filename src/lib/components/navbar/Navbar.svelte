@@ -6,7 +6,7 @@
         errors: {
             databases: number;
             storages: number;
-            executions: number;
+            backups: number;
         };
     }
 
@@ -24,7 +24,7 @@
         <NavbarElement hasError={errors.databases > 0} href="/databases" icon={Database} label="Databases"/>
         <NavbarElement hasError={errors.storages > 0} href="/storages" icon={CloudUpload} label="Storage"/>
         <NavbarElement href="/jobs" icon={Timer} label="Jobs"/>
-        <NavbarElement hasError={errors.executions > 0} href="/executions" icon={FileCheck} label="Backups"/>
+        <NavbarElement hasError={errors.backups > 0} href="/backups" icon={FileCheck} label="Backups"/>
         <NavbarElement href="/integrations/docker" icon={Blocks} label="Integrations"/>
         <!--        <NavbarElement href="/restore" icon={History} label="Restore"/>-->
 

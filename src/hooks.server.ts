@@ -1,7 +1,7 @@
+import { runJob } from '$lib/backups/runJob';
 import { checkAllActiveDatabases } from '$lib/engines/checks';
-import { runJob } from '$lib/executions/runJob';
-import { setUnfinishedExecutionsToError } from '$lib/queries/executions';
-import { getJobsToExecute } from '$lib/queries/jobs';
+import { setUnfinishedBackupsToError } from '$lib/queries/backups';
+import { getJobsToRun } from '$lib/queries/jobs';
 import { addOrUpdateCronJob } from '$lib/shared/cron';
 import { checkAllActiveRepositories } from '$lib/storages/checks';
 import { logger } from '$lib/utils/logger';
@@ -21,9 +21,9 @@ export const init: ServerInit = async () => {
         () => checkAllActiveDatabases(),
     );
 
-    await setUnfinishedExecutionsToError();
+    await setUnfinishedBackupsToError();
 
-    const jobs = await getJobsToExecute();
+    const jobs = await getJobsToRun();
     for (const job of jobs) {
         addOrUpdateCronJob(
             `job:${job.id}`,

@@ -1,7 +1,7 @@
 <script lang="ts">
     import Head from '$lib/components/common/Head.svelte';
     import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
-    import LatestExecutionsCard from '$lib/components/dashboard/LatestExecutionsCard.svelte';
+    import LatestBackupsCard from '$lib/components/dashboard/LatestBackupsCard.svelte';
     import NextJobsCard from '$lib/components/dashboard/NextJobsCard.svelte';
     import StatsCard from '$lib/components/dashboard/StatsCard.svelte';
     import StatusCard from '$lib/components/dashboard/StatusCard.svelte';
@@ -47,16 +47,16 @@
     </div>
 
     <div class="grid grid-cols-2 gap-4">
-        <LatestExecutionsCard executions={data.stats.latestExecutions}/>
+        <LatestBackupsCard backups={data.stats.latestBackups}/>
         <NextJobsCard jobs={data.stats.nextJobs}/>
     </div>
 
     <div class="grid grid-cols-4 gap-4">
-        <StatsCard href="/executions"
+        <StatsCard href="/backups"
                    icon={FileCheck}
-                   stat={data.stats.executionsCount}
+                   stat={data.stats.backupsCount}
                    title="Backup count">
-            backup{data.stats.executionsCount > 1 ? 's' : ''} total
+            backup{data.stats.backupsCount > 1 ? 's' : ''} total
         </StatsCard>
         <StatsCard href="/storages"
                    icon={HardDrive}
@@ -64,13 +64,13 @@
                    title="Total disk usage">
             used
         </StatsCard>
-        <StatsCard href="/executions"
+        <StatsCard href="/backups"
                    icon={FileChartPie}
                    stat={formatSize(data.stats.averageDumpSize)}
                    title="Dump size">
             average
         </StatsCard>
-        <StatsCard href="/executions"
+        <StatsCard href="/backups"
                    icon={Timer}
                    stat={formatDuration(data.stats.averageBackupDuration)}
                    title="Backup duration">

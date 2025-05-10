@@ -1,9 +1,9 @@
-import type { executions } from '$lib/db/schema';
+import type { backups } from '$lib/db/schema';
 import { ENGINES_METHODS } from '$lib/engines/enginesMethods';
-import { createExecution, getExecution, updateExecution } from '$lib/queries/executions';
+import { createBackup, updateBackup } from '$lib/queries/backups';
 import { getJob } from '$lib/queries/jobs';
 import { createRun, updateRun } from '$lib/queries/runs';
-import { executionEmitter } from '$lib/shared/events';
+import { backupEmitter } from '$lib/shared/events';
 import { backupFromCommand } from '$lib/storages/restic';
 import { logger } from '$lib/utils/logger';
 import { sql } from 'drizzle-orm';
@@ -48,8 +48,8 @@ export async function runJob(jobId: number, forcedDatabases: number[] | null = n
     updateRun(run.id, {
         // @ts-expect-error only accepts string, sql is not supported in type definition (but is for drizzle)
         finishedAt: sql`(CURRENT_TIMESTAMP)`,
-        totalExecutionCount: totalDatabases,
-        successfulExecutionCount: successfulDatabases,
+        totalBackupsCount: totalDatabases,
+        successfulBackupsCount: successfulDatabases,
     });
 
     logger.info(`Backup for job #${jobId} finished`);
@@ -65,7 +65,7 @@ export async function runJob(jobId: number, forcedDatabases: number[] | null = n
  * @param force If true, the backup will be run even if the database is inactive.
  * @returns If error, the error message. If success, void.
  */
-async function jobDatabaseBackup(job: NonNullable<Awaited<ReturnType<typeof getJob>>>, jobIndex: number, runId: number, force = false): Promise<ResultAsync<typeof executions.$inferSelect | null, string>> {
+async function jobDatabaseBackup(job: NonNullable<Awaited<ReturnType<typeof getJob>>>, jobIndex: number, runId: number, force = false): Promise<ResultAsync<typeof backups.$inferSelect | null, string>> {
     logger.info(`Starting backup for job #${job.id} database #${jobIndex}`);
 
     const jobDatabase = job.jobsDatabases[jobIndex];
@@ -83,13 +83,7 @@ async function jobDatabaseBackup(job: NonNullable<Awaited<ReturnType<typeof getJ
     const databaseInfo = jobDatabase.database;
     const fileName = `${job.slug}_${databaseInfo.slug}.${engine.dumpFileExtension}`;
 
-    const { id: executionId } = await createExecution(jobDatabase.id, fileName, runId);
-    const execution = await getExecution(executionId);
-    if (!execution) {
-        logger.error(`Error creating execution, execution #${executionId} not found`);
-        return err(`Execution #${executionId} not found`);
-    }
-
+    const backup = await createBackup(jobDatabase.id, fileName, runId);
     const startTime = Date.now();
 
     const res = await backupFromCommand(
@@ -103,8 +97,8 @@ async function jobDatabaseBackup(job: NonNullable<Awaited<ReturnType<typeof getJ
             `dbId:${databaseInfo.id}`,
         ],
         {
-            onStdout: e => e.message_type === 'status' && executionEmitter.emit('update', {
-                id: execution.id,
+            onStdout: e => e.message_type === 'status' && backupEmitter.emit('update', {
+                id: backup.id,
                 duration: (Date.now() - startTime) / 1000,
                 dumpSize: e.bytes_done ?? null,
             }),
@@ -116,7 +110,7 @@ async function jobDatabaseBackup(job: NonNullable<Awaited<ReturnType<typeof getJ
         : null;
     const noSummaryErrorMessage = !backupSummary ? 'No result found in command output' : null;
 
-    const updatedExecution = await updateExecution(execution.id, {
+    const updatedBackup = await updateBackup(backup.id, {
         // @ts-expect-error only accepts string, sql is not supported in type definition (but is for drizzle)
         finishedAt: sql`(CURRENT_TIMESTAMP)`,
         error: res.isErr() ? JSON.stringify(res.error) : noSummaryErrorMessage,
@@ -126,7 +120,7 @@ async function jobDatabaseBackup(job: NonNullable<Awaited<ReturnType<typeof getJ
         snapshotId: backupSummary?.snapshot_id,
     });
 
-    executionEmitter.emit('update', updatedExecution);
+    backupEmitter.emit('update', updatedBackup);
 
     if (res.isErr()) {
         logger.error(res.error, `Error running backup for job #${job.id} database #${jobIndex}`);
@@ -134,5 +128,5 @@ async function jobDatabaseBackup(job: NonNullable<Awaited<ReturnType<typeof getJ
     }
 
     logger.info(`Backup for job #${job.id} database #${jobIndex} finished`);
-    return ok(updatedExecution);
+    return ok(updatedBackup);
 }

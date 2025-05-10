@@ -42,7 +42,7 @@
         });
 
         if (res.ok) {
-            await goto('/executions');
+            await goto('/backups');
         } else {
             loading = false;
         }

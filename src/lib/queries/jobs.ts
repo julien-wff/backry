@@ -26,7 +26,7 @@ export const jobsListFull = async () => db
  * Get all active and errored jobs to create CRON jobs.
  * Errors are included so they can be retried.
  */
-export const getJobsToExecute = async () => db
+export const getJobsToRun = async () => db
     .query
     .jobs
     .findMany({

@@ -1,4 +1,4 @@
-import { runJob } from '$lib/executions/runJob';
+import { runJob } from '$lib/backups/runJob';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 

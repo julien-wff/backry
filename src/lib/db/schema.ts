@@ -3,7 +3,7 @@ import { integer, real, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlit
 
 export const ELEMENT_STATUS = [ 'active', 'inactive', 'error' ] as const;
 export const DATABASE_ENGINES = [ 'postgresql', 'sqlite' ] as const;
-export const EXECUTION_STATUS = [ 'running', 'success', 'error' ] as const;
+export const BACKUP_STATUS = [ 'running', 'success', 'error' ] as const;
 export const RUN_ORIGIN = [ 'manual', 'cron' ] as const;
 
 export const databases = sqliteTable('databases', {
@@ -84,7 +84,7 @@ export const jobDatabasesRelations = relations(jobDatabases, ({ one, many }) => 
         fields: [ jobDatabases.databaseId ],
         references: [ databases.id ],
     }),
-    executions: many(executions),
+    backups: many(backups),
 }));
 
 export const runs = sqliteTable('runs', {
@@ -93,15 +93,15 @@ export const runs = sqliteTable('runs', {
     createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`),
     updatedAt: text('updated_at').default(sql`(CURRENT_TIMESTAMP)`).$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
     finishedAt: text('finished_at'),
-    totalExecutionCount: integer('total_execution_count'),
-    successfulExecutionCount: integer('successful_execution_count'),
+    totalBackupsCount: integer('total_backups_count'),
+    successfulBackupsCount: integer('successful_backups_count'),
 });
 
 export const runsRelations = relations(runs, ({ many }) => ({
-    executions: many(executions),
+    backups: many(backups),
 }));
 
-export const executions = sqliteTable('executions', {
+export const backups = sqliteTable('backups', {
     id: integer('id').primaryKey({ autoIncrement: true }),
     jobDatabaseId: integer('job_database_id').notNull().references(() => jobDatabases.id, { onDelete: 'cascade' }),
     runId: integer('run_id').notNull().references(() => runs.id, { onDelete: 'cascade' }),
@@ -116,9 +116,9 @@ export const executions = sqliteTable('executions', {
     snapshotId: text('snapshot_id'),
 });
 
-export const executionsRelations = relations(executions, ({ one }) => ({
+export const backupsRelations = relations(backups, ({ one }) => ({
     jobDatabase: one(jobDatabases, {
-        fields: [ executions.jobDatabaseId ],
+        fields: [ backups.jobDatabaseId ],
         references: [ jobDatabases.id ],
     }),
 }));

@@ -2,11 +2,11 @@
     import ConfirmDeleteModal from '$lib/components/common/ConfirmDeleteModal.svelte';
     import StatusIndicator from '$lib/components/common/StatusIndicator.svelte';
     import { CopyPlus, EllipsisVertical, Pencil, Play, Power, PowerOff, Trash2 } from '$lib/components/icons';
-    import { type ELEMENT_STATUS, type EXECUTION_STATUS } from '$lib/db/schema';
+    import { type BACKUP_STATUS, type ELEMENT_STATUS } from '$lib/db/schema';
     import type { Snippet } from 'svelte';
 
     interface Props {
-        status?: typeof ELEMENT_STATUS[number] | typeof EXECUTION_STATUS[number];
+        status?: typeof ELEMENT_STATUS[number] | typeof BACKUP_STATUS[number];
         title: string;
         deleteConfirmationMessage?: string;
         children?: Snippet;

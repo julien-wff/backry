@@ -1,4 +1,4 @@
-import { runJob } from '$lib/executions/runJob';
+import { runJob } from '$lib/backups/runJob';
 import { createJob } from '$lib/queries/jobs';
 import { addOrUpdateCronJob } from '$lib/shared/cron';
 import type { JobsCreateRequest } from '$lib/types/api';

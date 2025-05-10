@@ -1,4 +1,4 @@
-import { executionEmitter } from '$lib/shared/events';
+import { backupEmitter } from '$lib/shared/events';
 import type { RequestHandler } from '@sveltejs/kit';
 
 export const GET: RequestHandler = async ({ request }) => {
@@ -11,11 +11,11 @@ export const GET: RequestHandler = async ({ request }) => {
             const onProgress = (data: any) => {
                 controller.enqueue('data: ' + JSON.stringify(data) + '\n\n');
             };
-            executionEmitter.on('update', onProgress);
+            backupEmitter.on('update', onProgress);
 
             cleanup = () => {
                 console.log('cleanup');
-                executionEmitter.off('update', onProgress);
+                backupEmitter.off('update', onProgress);
                 controller.close();
             };
 

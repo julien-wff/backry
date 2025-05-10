@@ -1,4 +1,4 @@
-import type { executions } from '$lib/db/schema';
+import type { backups } from '$lib/db/schema';
 import { EventEmitter as BaseEventEmitter } from 'node:events';
 
 export class EventEmitter<TEvents extends Record<string, any>> {
@@ -30,12 +30,12 @@ export class EventEmitter<TEvents extends Record<string, any>> {
     }
 }
 
-export type ExecutionUpdateEventPayload =
-    Partial<typeof executions.$inferSelect>
-    & Pick<typeof executions.$inferSelect, 'id'>;
+export type BackupUpdateEventPayload =
+    Partial<typeof backups.$inferSelect>
+    & Pick<typeof backups.$inferSelect, 'id'>;
 
-export interface ExecutionEvents {
-    update: [ ExecutionUpdateEventPayload ];
+export interface BackupEvents {
+    update: [ BackupUpdateEventPayload ];
 }
 
-export const executionEmitter = new EventEmitter<ExecutionEvents>();
+export const backupEmitter = new EventEmitter<BackupEvents>();

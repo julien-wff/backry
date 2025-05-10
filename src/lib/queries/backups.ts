@@ -1,9 +1,9 @@
 import { db } from '$lib/db';
-import { executions, jobDatabases, jobs, storages } from '$lib/db/schema';
+import { backups, jobDatabases, jobs, storages } from '$lib/db/schema';
 import { desc, eq, isNull } from 'drizzle-orm';
 
-export const executionsListFull = async () => db.query.executions.findMany({
-    orderBy: [ desc(executions.startedAt) ],
+export const backupsListFull = async () => db.query.backups.findMany({
+    orderBy: [ desc(backups.startedAt) ],
     with: {
         jobDatabase: {
             with: {
@@ -18,9 +18,9 @@ export const executionsListFull = async () => db.query.executions.findMany({
     },
 });
 
-export const getExecution = async (id: number) =>
-    db.query.executions.findFirst({
-        where: eq(executions.id, id),
+export const getBackup = async (id: number) =>
+    db.query.backups.findFirst({
+        where: eq(backups.id, id),
         with: {
             jobDatabase: {
                 with: {
@@ -37,34 +37,34 @@ export const getExecution = async (id: number) =>
 
 
 /**
- * Get all restic snapshot IDs for a given storage ID from the list of executions.
+ * Get all restic snapshot IDs for a given storage ID from the list of backups.
  * @param storageId Storage ID
  * @return Array of snapshot IDs
  */
 export const getSnapshotsIdsByStorageId = (storageId: number) =>
     db
-        .select({ snapshotId: executions.snapshotId })
-        .from(executions)
-        .leftJoin(jobDatabases, eq(jobDatabases.id, executions.jobDatabaseId))
+        .select({ snapshotId: backups.snapshotId })
+        .from(backups)
+        .leftJoin(jobDatabases, eq(jobDatabases.id, backups.jobDatabaseId))
         .leftJoin(jobs, eq(jobs.id, jobDatabases.jobId))
         .leftJoin(storages, eq(storages.id, jobs.storageId))
         .where(eq(storages.id, storageId))
-        .orderBy(desc(executions.startedAt))
+        .orderBy(desc(backups.startedAt))
         .all()
-        .map(exec => exec.snapshotId)
+        .map(backup => backup.snapshotId)
         .filter((snapshotId): snapshotId is string => snapshotId !== null);
 
 
-export const deleteExecution = async (id: number) =>
+export const deleteBackup = async (id: number) =>
     db
-        .delete(executions)
-        .where(eq(executions.id, id))
+        .delete(backups)
+        .where(eq(backups.id, id))
         .returning()
         .get();
 
-export const createExecution = async (jobDatabaseId: number, fileName: string, runId: number) =>
+export const createBackup = async (jobDatabaseId: number, fileName: string, runId: number) =>
     db
-        .insert(executions)
+        .insert(backups)
         .values({
             jobDatabaseId,
             fileName,
@@ -73,23 +73,23 @@ export const createExecution = async (jobDatabaseId: number, fileName: string, r
         .returning()
         .get();
 
-export const updateExecution = async (id: number, payload: Partial<typeof executions.$inferInsert>) =>
+export const updateBackup = async (id: number, payload: Partial<typeof backups.$inferInsert>) =>
     db
-        .update(executions)
+        .update(backups)
         .set(payload)
-        .where(eq(executions.id, id))
+        .where(eq(backups.id, id))
         .returning()
         .get();
 
 /**
- * Set all unfinished executions to error.
- * Used on startup to set all executions that are still running to error.
+ * Set all unfinished backups to error.
+ * Used on startup to set all backups that are still running to error.
  */
-export const setUnfinishedExecutionsToError = async () => db
-    .update(executions)
+export const setUnfinishedBackupsToError = async () => db
+    .update(backups)
     .set({
         error: 'Job timed out',
     })
-    .where(isNull(executions.finishedAt))
+    .where(isNull(backups.finishedAt))
     .returning()
     .get();

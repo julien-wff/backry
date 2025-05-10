@@ -1,4 +1,4 @@
-import type { ExecutionUpdateEventPayload } from '$lib/shared/events';
+import type { BackupUpdateEventPayload } from '$lib/shared/events';
 import { err, ok, ResultAsync } from 'neverthrow';
 
 /**
@@ -49,7 +49,7 @@ export async function fetchApi<B extends object, R extends object, E = string>(
 }
 
 
-export function subscribeApi<T extends ExecutionUpdateEventPayload>(endpoint: '/api/executions/subscribe', onChunk: (chunk: T) => void): () => void;
+export function subscribeApi<T extends BackupUpdateEventPayload>(endpoint: '/api/backups/subscribe', onChunk: (chunk: T) => void): () => void;
 export function subscribeApi<T>(endpoint: string, onChunk: (chunk: T) => void): () => void {
     const eventSource = new EventSource(endpoint);
 

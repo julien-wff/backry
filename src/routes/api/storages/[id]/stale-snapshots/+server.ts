@@ -1,5 +1,5 @@
 import type { storages } from '$lib/db/schema';
-import { getSnapshotsIdsByStorageId } from '$lib/queries/executions';
+import { getSnapshotsIdsByStorageId } from '$lib/queries/backups';
 import { getStorage } from '$lib/queries/storages';
 import { deleteSnapshots, getRepositorySnapshots } from '$lib/storages/restic';
 import { parseIdOrNewParam } from '$lib/utils/params';
@@ -21,7 +21,7 @@ async function getStorageFromDb(rawId: string | undefined): Promise<typeof stora
 
 export const GET: RequestHandler = async ({ params }) => {
     const storage = await getStorageFromDb(params.id);
-    const executionsSnapshotsIds = getSnapshotsIdsByStorageId(storage.id);
+    const backupsSnapshotsIds = getSnapshotsIdsByStorageId(storage.id);
 
     const res = await getRepositorySnapshots(storage.url, storage.password!, storage.env, true);
     if (res.isErr()) {
@@ -33,7 +33,7 @@ export const GET: RequestHandler = async ({ params }) => {
     }
 
     return json({
-        snapshots: res.value[0].filter(snapshot => !executionsSnapshotsIds.includes(snapshot.id)),
+        snapshots: res.value[0].filter(snapshot => !backupsSnapshotsIds.includes(snapshot.id)),
     });
 };
 

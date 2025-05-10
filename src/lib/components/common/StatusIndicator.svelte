@@ -1,9 +1,9 @@
 <script lang="ts">
     import { CheckCircle, CirclePlay, CircleX, OctagonAlert } from '$lib/components/icons';
-    import { type ELEMENT_STATUS, type EXECUTION_STATUS } from '$lib/db/schema';
+    import { type BACKUP_STATUS, type ELEMENT_STATUS } from '$lib/db/schema';
 
     interface Props {
-        status: typeof ELEMENT_STATUS[number] | typeof EXECUTION_STATUS[number];
+        status: typeof ELEMENT_STATUS[number] | typeof BACKUP_STATUS[number];
     }
 
     let { status }: Props = $props();

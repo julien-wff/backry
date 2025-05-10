@@ -1,39 +1,39 @@
 import { db } from '$lib/db';
-import { databases, executions, jobs, storages } from '$lib/db/schema';
+import { backups, databases, jobs, storages } from '$lib/db/schema';
 import type { getNextJobs } from '$lib/shared/cron';
 import { avg, count, desc, eq, inArray, isNotNull, sum } from 'drizzle-orm';
 
 /**
- * Get the number of errors for databases, storages, executions.
+ * Get the number of errors for databases, storages, backups.
  * @returns Error count per type.
  */
 export async function getErrorCountPerType() {
-    const [ errorDbs, errorStorages, errorExecutions ] = await Promise.all([
+    const [ errorDbs, errorStorages, errorBackups ] = await Promise.all([
         db.select({ id: databases.id }).from(databases).where(eq(databases.status, 'error')),
         db.select({ id: storages.id }).from(storages).where(eq(storages.status, 'error')),
-        db.select({ id: executions.id }).from(executions).where(isNotNull(executions.error)),
+        db.select({ id: backups.id }).from(backups).where(isNotNull(backups.error)),
     ]);
 
     return {
         databases: errorDbs.length,
         storages: errorStorages.length,
-        executions: errorExecutions.length,
+        backups: errorBackups.length,
     };
 }
 
 
 export async function getDashboardStats(nextJobParams: ReturnType<typeof getNextJobs> = []) {
-    const [ dbStats, storageStats, jobsCount, latestExecutions, nextJobs, executionsCount, totalStorageSize, avgExecutionSize, avgBackupDuration ] = await Promise.all([
+    const [ dbStats, storageStats, jobsCount, latestBackups, nextJobs, backupsCount, totalStorageSize, avgBackupSize, avgBackupDuration ] = await Promise.all([
         // Databases stats (active, error)
         db.select({ id: databases.id, status: databases.status }).from(databases),
         // Storages stats (active, error)
         db.select({ id: storages.id, status: storages.status }).from(storages),
         // Jobs stats (active, inactive)
         db.select({ id: jobs.id, status: jobs.status }).from(jobs),
-        // Latest executions
-        db.query.executions.findMany({
-            where: isNotNull(executions.finishedAt),
-            orderBy: desc(executions.finishedAt),
+        // Latest backups
+        db.query.backups.findMany({
+            where: isNotNull(backups.finishedAt),
+            orderBy: desc(backups.finishedAt),
             limit: 3,
             columns: {
                 id: true,
@@ -69,14 +69,14 @@ export async function getDashboardStats(nextJobParams: ReturnType<typeof getNext
                 },
             },
         }),
-        // Executions count
-        db.select({ count: count() }).from(executions),
+        // Backups count
+        db.select({ count: count() }).from(backups),
         // Total storage size
         db.select({ size: sum(storages.diskSize) }).from(storages),
         // Average dump size
-        db.select({ size: avg(executions.dumpSize) }).from(executions).where(isNotNull(executions.dumpSize)),
+        db.select({ size: avg(backups.dumpSize) }).from(backups).where(isNotNull(backups.dumpSize)),
         // Average backup duration
-        db.select({ duration: avg(executions.duration) }).from(executions).where(isNotNull(executions.duration)),
+        db.select({ duration: avg(backups.duration) }).from(backups).where(isNotNull(backups.duration)),
     ]);
 
     return {
@@ -95,14 +95,14 @@ export async function getDashboardStats(nextJobParams: ReturnType<typeof getNext
             active: jobsCount.filter(job => job.status === 'active').length,
             inactive: jobsCount.filter(job => job.status === 'inactive').length,
         },
-        latestExecutions,
+        latestBackups,
         nextJobs: nextJobParams.map(({ jobId, date: nextDate }) => ({
             ...nextJobs.find(j => j.id === jobId),
             nextDate,
         })),
-        executionsCount: executionsCount[0]?.count ?? 0,
+        backupsCount: backupsCount[0]?.count ?? 0,
         totalStorageSize: parseInt(totalStorageSize[0]?.size ?? '0'),
-        averageDumpSize: parseInt(avgExecutionSize[0]?.size ?? '0'),
+        averageDumpSize: parseInt(avgBackupSize[0]?.size ?? '0'),
         averageBackupDuration: parseFloat(avgBackupDuration[0]?.duration ?? '0'),
     };
 }
