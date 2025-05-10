@@ -7,6 +7,7 @@ import CheckCircle from '@lucide/svelte/icons/check-circle';
 import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 import CircleHelp from '@lucide/svelte/icons/circle-help';
 import CirclePlay from '@lucide/svelte/icons/circle-play';
+import CirclePlus from '@lucide/svelte/icons/circle-plus';
 import CircleX from '@lucide/svelte/icons/circle-x';
 import Clock from '@lucide/svelte/icons/clock';
 import CloudUpload from '@lucide/svelte/icons/cloud-upload';
@@ -47,6 +48,7 @@ export {
     ChevronLeft,
     CircleHelp,
     CirclePlay,
+    CirclePlus,
     CircleX,
     Clock,
     CloudUpload,

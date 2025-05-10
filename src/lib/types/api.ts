@@ -62,3 +62,10 @@ export interface JobsCreateRequest {
         enabled: boolean;
     }>;
 }
+
+/** `GET /api/integrations/docker/hostnames/[id]` */
+export type DockerHostnamesCheckResponse = {
+    host: string;
+    port: number;
+    reachable: boolean;
+}[];

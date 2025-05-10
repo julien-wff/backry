@@ -23,6 +23,21 @@ export async function getContainers(): Promise<ResultAsync<ContainerInspectInfo[
     }
 }
 
+
+/**
+ * Inspect a container by its ID
+ * @param containerId Docker ID of the container
+ * @return Either the ContainerInspectInfo or an error message
+ */
+export async function inspectContainer(containerId: string): Promise<ResultAsync<ContainerInspectInfo, string>> {
+    try {
+        return ok(await docker.getContainer(containerId).inspect());
+    } catch (error) {
+        logger.error(error, `Error inspecting container`);
+        return err(error instanceof Error ? error.message : 'Unknown error');
+    }
+}
+
 /**
  * Regroup containers by their database engine
  * @param containers Array of ContainerInspectInfo

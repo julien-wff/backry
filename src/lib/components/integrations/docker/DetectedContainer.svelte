@@ -1,5 +1,7 @@
 <script lang="ts">
     import type { ContainerInspectInfo, ImageInspectInfo } from 'dockerode';
+    import { CirclePlus, OctagonAlert } from '$lib/components/icons';
+    import type { DockerHostnamesCheckResponse } from '$lib/types/api';
 
     interface Props {
         container: ContainerInspectInfo;
@@ -11,6 +13,31 @@
     let composeName = $derived(
         container.Config.Labels?.['com.docker.compose.project'] || container.Config.Labels?.['com.docker.compose.service'],
     );
+    let canBeAdded = $derived(container.State.Running);
+
+    let addDialog = $state<HTMLDialogElement | null>(null);
+    let loading = $state(false);
+    let error = $state<string | null>(null);
+    let hostnameScanResult = $state<DockerHostnamesCheckResponse | null>(null);
+    let selectedHostName = $state<string | null>(null);
+
+    async function showDialog() {
+        addDialog?.showModal();
+        loading = true;
+        error = null;
+        selectedHostName = null;
+
+        const res = await fetch(`/api/integrations/docker/hostnames/${container.Id}`);
+        const json: DockerHostnamesCheckResponse | { error: string } = await res.json();
+        loading = false;
+
+        if ('error' in json) {
+            error = json.error;
+            return;
+        }
+
+        hostnameScanResult = json;
+    }
 </script>
 
 <div class="bg-base-100 p-2 mt-1 rounded-box mb-1 flex flex-row gap-2 items-center">
@@ -31,4 +58,70 @@
             Image: {image?.RepoTags[0] ?? '<unknown>'}
         </div>
     </div>
+
+    {#if canBeAdded}
+        <div class="flex items-center">
+            <button class="btn btn-primary btn-soft btn-square" onclick={showDialog}>
+                <CirclePlus class="w-6 h-6"/>
+            </button>
+        </div>
+    {/if}
 </div>
+
+
+{#if canBeAdded}
+    <dialog bind:this={addDialog} class="modal">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg">Add {container.Name.slice(1)} to databases</h3>
+
+            {#if loading}
+                <div role="alert" class="alert alert-soft mt-4">
+                    <span class="loading loading-spinner loading-sm"></span>
+                    <span>Finding reachable hostnames...</span>
+                </div>
+            {:else if error}
+                <div role="alert" class="alert alert-error alert-soft">
+                    <OctagonAlert class="w-4 h-4"/>
+                    <span>{error}</span>
+                </div>
+            {:else if hostnameScanResult}
+                <div class="mt-4">Select the container hostname and port:</div>
+                <div class="mt-2 flex flex-col gap-2">
+                    {#each hostnameScanResult as hostname}
+                        <label class="flex flex gap-2 items-center">
+                            <input type="radio"
+                                   name="hostname"
+                                   class="radio radio-sm"
+                                   class:radio-primary={hostname.reachable}
+                                   class:radio-error={!hostname.reachable}
+                                   bind:group={selectedHostName}
+                                   value="{hostname.host}:{hostname.port}"
+                                   disabled={!hostname.reachable}>
+                            <span class:opacity-70={!hostname.reachable}>
+                                {hostname.host}:{hostname.port}
+                                {#if !hostname.reachable}
+                                    (unreachable)
+                                {/if}
+                            </span>
+                        </label>
+                    {/each}
+                    <label class="flex flex gap-2 items-center">
+                        <input type="radio"
+                               bind:group={selectedHostName}
+                               name="hostname"
+                               class="radio radio-sm radio-primary"
+                               value="">
+                        Manually input at next step
+                    </label>
+                </div>
+            {/if}
+
+            <div class="modal-action">
+                <button class="btn" onclick={() => addDialog?.close()}>Cancel</button>
+                <button class="btn btn-primary" type="submit" disabled={loading || selectedHostName === null}>
+                    Continue
+                </button>
+            </div>
+        </div>
+    </dialog>
+{/if}
