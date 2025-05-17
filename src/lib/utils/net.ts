@@ -6,38 +6,37 @@ import { connect, type Socket } from 'bun';
  * @param host Host IP or hostname
  * @param timeout Timeout in milliseconds
  */
-export const isPortReachable = async (port: number, host: string, timeout = 1000) => new Promise<boolean>(async (resolve) => {
-    let socket: Socket;
+export const isPortReachable = async (port: number, host: string, timeout = 1000) =>
+    new Promise<boolean>(async (resolve) => {
+        let socket: Socket;
 
-    const timer = setTimeout(() => {
-        if (socket) {
-            socket.end();
+        const timer = setTimeout(() => {
+            socket?.end();
+            resolve(false);
+        }, timeout);
+
+        try {
+            socket = await connect({
+                hostname: host,
+                port: port,
+                socket: {
+                    open(socket) {
+                        clearTimeout(timer);
+                        socket.end();
+                        resolve(true);
+                    },
+                    error(socket, _) {
+                        clearTimeout(timer);
+                        socket.end();
+                        resolve(false);
+                    },
+                    data: () => {
+                        // Mandatory callback
+                    },
+                },
+            });
+        } catch {
+            clearTimeout(timer);
+            resolve(false);
         }
-        resolve(false);
-    }, timeout);
-
-    try {
-        socket = await connect({
-            hostname: host,
-            port: port,
-            socket: {
-                open(socket) {
-                    clearTimeout(timer);
-                    socket.end();
-                    resolve(true);
-                },
-                error(socket, error) {
-                    clearTimeout(timer);
-                    socket.end();
-                    resolve(false);
-                },
-                data: () => {
-                    // Mandatory callback
-                },
-            },
-        });
-    } catch (err) {
-        clearTimeout(timer);
-        resolve(false);
-    }
-});
+    });
