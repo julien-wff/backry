@@ -53,8 +53,8 @@
 <div class="grid grid-cols-1 gap-4">
     {#each runs as run (run.id)}
         {#if run.backups.length > 0}
-            <div class="grid grid-cols-1 gap-2 p-2 bg-base-200 rounded-lg">
-                <div class="text-sm flex align-center gap-1">
+            <div class="grid grid-cols-1 gap-2 rounded-lg p-2 bg-base-200">
+                <div class="flex gap-2 text-sm align-center">
                     <RunOriginIndicator origin={run.origin}/>
                     Run #{run.id} - {run.backups[0].jobDatabase.job.name} - {dayjs.utc(run.createdAt).fromNow()}
                 </div>
