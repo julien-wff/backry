@@ -1,6 +1,7 @@
 <script lang="ts">
     import { goto, invalidateAll } from '$app/navigation';
     import BaseListElement from '$lib/components/common/BaseListElement.svelte';
+    import Modal from '$lib/components/common/Modal.svelte';
     import { Clock, CloudUpload, Database, RefreshCw } from '$lib/components/icons';
     import type { jobsListFull } from '$lib/queries/jobs';
 
@@ -109,33 +110,25 @@
 </BaseListElement>
 
 
-<dialog bind:this={jobRunPopup} class="modal">
-    <div class="modal-box">
-        <h3 class="text-lg font-bold">Run {job.name} now</h3>
-
-        <div class="mt-4">Select databases to backup:</div>
-        <div class="mt-1 flex flex-col gap-1">
-            {#each job.jobsDatabases as db}
-                <label class="flex items-center gap-1 select-none">
-                    <input type="checkbox"
-                           class="checkbox checkbox-primary checkbox-xs"
-                           value="{db.database.id}"
-                           checked={jobRunDatabases.includes(db.database.id)}
-                           onchange={handleRunJobDatabaseChange}/>
-                    {db.database.name}
-                </label>
-            {/each}
-        </div>
-
-        <div class="modal-action">
-            <button class="btn" onclick={() => jobRunPopup?.close()}>Cancel</button>
-            <button class="btn btn-success" disabled={jobRunDatabases.length === 0} onclick={handleRunJob}>
-                Backup now
-            </button>
-        </div>
+<Modal bind:modal={jobRunPopup} title="Run {job.name} now">
+    <div>Select databases to backup:</div>
+    <div class="mt-1 flex flex-col gap-1">
+        {#each job.jobsDatabases as db}
+            <label class="flex items-center gap-1 select-none">
+                <input type="checkbox"
+                       class="checkbox checkbox-primary checkbox-xs"
+                       value="{db.database.id}"
+                       checked={jobRunDatabases.includes(db.database.id)}
+                       onchange={handleRunJobDatabaseChange}/>
+                {db.database.name}
+            </label>
+        {/each}
     </div>
 
-    <form class="modal-backdrop" method="dialog">
-        <button>close</button>
-    </form>
-</dialog>
+    <div class="modal-action">
+        <button class="btn">Cancel</button>
+        <button class="btn btn-success" disabled={jobRunDatabases.length === 0} onclick={handleRunJob} type="button">
+            Backup now
+        </button>
+    </div>
+</Modal>

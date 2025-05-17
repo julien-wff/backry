@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Modal from '$lib/components/common/Modal.svelte';
     import { CircleHelp, Hammer } from '$lib/components/icons';
     import type { Snippet } from 'svelte';
 
@@ -59,42 +60,26 @@
 
 
 {#if helpContent}
-    <dialog class="modal" bind:this={helpModal}>
-        <div class="modal-box">
-            <h3 class="mb-4 text-lg font-bold">{label}</h3>
+    <Modal bind:modal={helpModal} title={label}>
+        {@render helpContent()}
 
-            {@render helpContent()}
-
-            <div class="modal-action">
-                <form method="dialog">
-                    <button class="btn btn-primary">Close</button>
-                </form>
-            </div>
+        <div class="modal-action">
+            <form method="dialog">
+                <button class="btn btn-primary">Close</button>
+            </form>
         </div>
-
-        <form method="dialog" class="modal-backdrop">
-            <button>close</button>
-        </form>
-    </dialog>
+    </Modal>
 {/if}
 
 
 {#if editorContent}
-    <dialog class="modal" bind:this={editorModal} onclose={() => (editorModalOpened = false)}>
-        <div class="modal-box">
-            <h3 class="mb-4 text-lg font-bold">{label} editor</h3>
+    <Modal bind:modal={editorModal} onclose={() => (editorModalOpened = false)} title="{label} editor">
+        {@render editorContent({ opened: editorModalOpened })}
 
-            {@render editorContent({ opened: editorModalOpened })}
-
-            <div class="modal-action">
-                <form method="dialog">
-                    <button class="btn btn-primary">Close</button>
-                </form>
-            </div>
+        <div class="modal-action">
+            <form method="dialog">
+                <button class="btn btn-primary">Close</button>
+            </form>
         </div>
-
-        <form method="dialog" class="modal-backdrop">
-            <button>close</button>
-        </form>
-    </dialog>
+    </Modal>
 {/if}

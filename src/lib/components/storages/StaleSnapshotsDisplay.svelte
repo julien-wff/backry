@@ -1,5 +1,6 @@
 <script lang="ts">
     import { page } from '$app/state';
+    import Modal from '$lib/components/common/Modal.svelte';
     import { OctagonAlert, ShieldCheck, Trash2 } from '$lib/components/icons';
     import type { ResticSnapshot } from '$lib/types/restic';
     import { formatSize } from '$lib/utils/format';
@@ -127,22 +128,17 @@
     {/if}
 {/if}
 
-<dialog bind:this={deleteConfirmDialog} class="modal">
-    <div class="modal-box">
-        <h3 class="text-lg font-bold">
-            Delete {snapshotsToDelete.length} snapshot{snapshotsToDelete.length > 1 ? 's' : ''} from repository
-        </h3>
-
-        <div class="mt-4">
-            These snapshots and the files they contain will be deleted from the repository. This action cannot
-            be undone.
-            <br/>
-            Be sure that these files are backed up elsewhere or no longer needed before proceeding.
-        </div>
-
-        <div class="modal-action">
-            <button class="btn" onclick={() => deleteConfirmDialog?.close()}>Cancel</button>
-            <button class="btn btn-error" onclick={deleteSnapshots}>Delete</button>
-        </div>
+<Modal bind:modal={deleteConfirmDialog}
+       title="Delete {snapshotsToDelete.length} snapshot{snapshotsToDelete.length > 1 ? 's' : ''} from repository">
+    <div>
+        These snapshots and the files they contain will be deleted from the repository. This action cannot
+        be undone.
+        <br/>
+        Be sure that these files are backed up elsewhere or no longer needed before proceeding.
     </div>
-</dialog>
+
+    <div class="modal-action">
+        <button class="btn">Cancel</button>
+        <button class="btn btn-error" onclick={deleteSnapshots} type="button">Delete</button>
+    </div>
+</Modal>
