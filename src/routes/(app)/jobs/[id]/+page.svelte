@@ -7,6 +7,7 @@
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
     import { Timer } from '$lib/components/icons';
     import JobDatabaseSelector from '$lib/components/jobs/JobDatabaseSelector.svelte';
+    import JobDeletePolicyField from '$lib/components/jobs/JobDeletePolicyField.svelte';
     import type { JobsCreateRequest } from '$lib/types/api';
     import { slugify } from '$lib/utils/format';
     import { parseIdOrNewParam } from '$lib/utils/params';
@@ -27,6 +28,7 @@
     let slug = $state(data.job?.slug ?? '');
     let storageBackend = $state<number>(data.job?.storageId ?? -1);
     let cron = $state(data.job?.cron ?? '');
+    let deletePolicy = $state('');
     let selectedDatabases = $state(data.job?.jobsDatabases.map(jd => ({
         id: jd.databaseId,
         enabled: jd.status === 'active',
@@ -111,15 +113,15 @@
              onsubmit={handleFormSubmit}
              title="{data.job ? 'Edit' : 'Add'} job">
     <InputContainer for="job-name" label="Name">
-        <input bind:value={jobName} class="input w-full" id="job-name" required>
+        <input bind:value={jobName} class="w-full input" id="job-name" required>
     </InputContainer>
 
     <InputContainer for="slug" label="Slug">
-        <input bind:value={slug} class="input w-full" id="slug" pattern="^[a-z0-9\-]+$" required>
+        <input bind:value={slug} class="w-full input" id="slug" pattern="^[a-z0-9\-]+$" required>
     </InputContainer>
 
     <InputContainer for="backend" label="Storage backend">
-        <select bind:value={storageBackend} class="select w-full" id="backend" required>
+        <select bind:value={storageBackend} class="w-full select" id="backend" required>
             {#each data.storages as storage (storage.id)}
                 <option value={storage.id} disabled={storage.status !== 'active'}>
                     {storage.name}
@@ -129,8 +131,10 @@
     </InputContainer>
 
     <InputContainer for="cron" helpContent={cronHelp} label="Cron" subtitle={cronMessage}>
-        <input bind:value={cron} class="input w-full" id="cron" placeholder="0 0 */2 * *" required>
+        <input bind:value={cron} class="w-full input" id="cron" placeholder="0 0 */2 * *" required>
     </InputContainer>
+
+    <JobDeletePolicyField bind:deletePolicy {cron} isCronValid={validateCronExpression(cron).valid}/>
 
     <JobDatabaseSelector availableDatabases={data.databases} bind:selection={selectedDatabases}/>
 

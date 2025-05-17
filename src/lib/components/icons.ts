@@ -19,6 +19,7 @@ import FileChartPie from '@lucide/svelte/icons/file-chart-pie';
 import FileCheck from '@lucide/svelte/icons/file-check';
 import FileDown from '@lucide/svelte/icons/file-down';
 import FolderHeart from '@lucide/svelte/icons/folder-heart';
+import Hammer from '@lucide/svelte/icons/hammer';
 import HardDrive from '@lucide/svelte/icons/hard-drive';
 import HardDriveDownload from '@lucide/svelte/icons/hard-drive-download';
 import History from '@lucide/svelte/icons/history';
@@ -61,6 +62,7 @@ export {
     FileCheck,
     FileDown,
     FolderHeart,
+    Hammer,
     HardDrive,
     HardDriveDownload,
     History,
