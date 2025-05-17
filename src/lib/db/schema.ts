@@ -48,6 +48,7 @@ export const jobs = sqliteTable('jobs', {
     updatedAt: text('updated_at').default(sql`(CURRENT_TIMESTAMP)`).$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
     storageId: integer('storage_id').notNull().references(() => storages.id, { onDelete: 'cascade' }),
     cron: text('cron').notNull(),
+    deletePolicy: text('delete_policy'),
 });
 
 export const jobsRelations = relations(jobs, ({ one, many }) => ({

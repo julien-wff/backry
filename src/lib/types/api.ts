@@ -1,6 +1,6 @@
 import type { DATABASE_ENGINES } from '$lib/db/schema';
-import type { ResticError, ResticInit } from '$lib/types/restic';
 import type { ENGINES_METHODS } from '$lib/engines/enginesMethods';
+import type { ResticError, ResticInit } from '$lib/types/restic';
 
 /** `POST /api/databases/check` */
 export interface DatabasesCheckRequest {
@@ -58,6 +58,7 @@ export interface JobsCreateRequest {
     slug: string;
     storageId: number;
     cron: string;
+    deletePolicy: string;
     databases: Array<{
         id: number;
         enabled: boolean;

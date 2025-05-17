@@ -20,13 +20,17 @@
     let deletePolicies = $state<DeletePolicies>([]);
     let policyKeys = $derived(deletePolicies.map(([policyKey]) => policyKey));
     let remainingFlags = $state<string[]>([]);
+    let canUpdate = $state(false);
+
     $effect(() => {
         if (opened) {
             const parseResult = parsePolicyFlags(inputFieldArguments);
             deletePolicies = parseResult.policies;
             remainingFlags = parseResult.remainingFlags;
-        } else if (deletePolicies) {
+            canUpdate = true;
+        } else if (canUpdate) {
             inputFieldArguments = compilePolicyToFlags(deletePolicies, remainingFlags);
+            canUpdate = false;
         }
     });
 

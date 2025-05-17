@@ -28,7 +28,7 @@
     let slug = $state(data.job?.slug ?? '');
     let storageBackend = $state<number>(data.job?.storageId ?? -1);
     let cron = $state(data.job?.cron ?? '');
-    let deletePolicy = $state('');
+    let deletePolicy = $state(data.job?.deletePolicy ?? '');
     let selectedDatabases = $state(data.job?.jobsDatabases.map(jd => ({
         id: jd.databaseId,
         enabled: jd.status === 'active',
@@ -63,6 +63,7 @@
                 slug,
                 storageId: storageBackend,
                 cron,
+                deletePolicy,
                 databases: selectedDatabases,
             } satisfies JobsCreateRequest),
         });

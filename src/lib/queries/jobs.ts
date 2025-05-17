@@ -67,6 +67,7 @@ export async function createJob(req: JobsCreateRequest) {
             slug: req.slug,
             storageId: req.storageId,
             cron: req.cron,
+            deletePolicy: req.deletePolicy,
         })
         .returning()
         .get();
@@ -112,6 +113,7 @@ export const updateJob = async (id: number, job: JobsCreateRequest) => {
             slug: job.slug,
             storageId: job.storageId,
             cron: job.cron,
+            deletePolicy: job.deletePolicy,
         })
         .where(eq(jobs.id, id))
         .returning()
