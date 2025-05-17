@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Trash2 } from '$lib/components/icons';
+    import { CircleHelp, Trash2 } from '$lib/components/icons';
     import {
         AVAILABLE_DELETE_POLICIES,
         compilePolicyToFlags,
@@ -17,21 +17,21 @@
 
     let { opened, inputFieldArguments = $bindable(), cron, isCronValid }: Props = $props();
 
-    let deletePolicy = $state<DeletePolicies>([]);
-    let policyKeys = $derived(deletePolicy.map(([policyKey]) => policyKey));
+    let deletePolicies = $state<DeletePolicies>([]);
+    let policyKeys = $derived(deletePolicies.map(([policyKey]) => policyKey));
     let remainingFlags = $state<string[]>([]);
     $effect(() => {
         if (opened) {
             const parseResult = parsePolicyFlags(inputFieldArguments);
-            deletePolicy = parseResult.policies;
+            deletePolicies = parseResult.policies;
             remainingFlags = parseResult.remainingFlags;
-        } else if (deletePolicy) {
-            inputFieldArguments = compilePolicyToFlags(deletePolicy, remainingFlags);
+        } else if (deletePolicies) {
+            inputFieldArguments = compilePolicyToFlags(deletePolicies, remainingFlags);
         }
     });
 
     function handlePolicyRemove(index: number) {
-        deletePolicy = deletePolicy.filter((_, i) => i !== index);
+        deletePolicies = deletePolicies.filter((_, i) => i !== index);
     }
 
     function handlePolicyAdd() {
@@ -39,7 +39,7 @@
             .keys(AVAILABLE_DELETE_POLICIES)
             .find((policyId) => !policyKeys.includes(policyId as DeletePolicyIDs)) as DeletePolicyIDs;
 
-        deletePolicy.push([unassignedPolicy, 10]);
+        deletePolicies.push([unassignedPolicy, 10]);
     }
 </script>
 
@@ -56,10 +56,17 @@
     </a>.
 </div>
 
-{#each deletePolicy as [policyId], i (policyId)}
+{#if deletePolicies.length === 0}
+    <div role="alert" class="alert  alert-soft mb-2">
+        <CircleHelp size="16"/>
+        <span>No policy, backups will not be deleted.</span>
+    </div>
+{/if}
+
+{#each deletePolicies as [policyId], i (policyId)}
     <div class="mb-2 flex items-center gap-1">
         <div class="grid flex-1 grid-cols-4 gap-1">
-            <select class="col-span-3 select" bind:value={deletePolicy[i][0]}>
+            <select class="col-span-3 select" bind:value={deletePolicies[i][0]}>
                 {#each Object.entries(AVAILABLE_DELETE_POLICIES) as [availablePolicyId, availablePolicyName] (availablePolicyId)}
                     <option value={availablePolicyId}
                             disabled={availablePolicyId !== policyId && policyKeys.includes(availablePolicyId as DeletePolicyIDs)}>
@@ -72,7 +79,7 @@
                    placeholder="n"
                    type="number"
                    min="1"
-                   bind:value={deletePolicy[i][1]}>
+                   bind:value={deletePolicies[i][1]}>
         </div>
 
         <button class="btn btn-error btn-soft btn-square" type="button" onclick={() => handlePolicyRemove(i)}>
@@ -82,7 +89,7 @@
 {/each}
 
 <button class="w-full btn btn-primary btn-soft btn-sm"
-        disabled={deletePolicy.length >= Object.keys(AVAILABLE_DELETE_POLICIES).length}
+        disabled={deletePolicies.length >= Object.keys(AVAILABLE_DELETE_POLICIES).length}
         onclick={handlePolicyAdd}
         type="button">
     Add policy
