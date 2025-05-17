@@ -1,12 +1,5 @@
-import type { DATABASE_ENGINES } from '$lib/db/schema';
 import type { ENGINES_METHODS } from '$lib/engines/enginesMethods';
 import type { ResticError, ResticInit } from '$lib/types/restic';
-
-/** `POST /api/databases/check` */
-export interface DatabasesCheckRequest {
-    url: string;
-    engine: typeof DATABASE_ENGINES[number];
-}
 
 /** `POST /api/databases/check` */
 export interface DatabasesCheckResponse {

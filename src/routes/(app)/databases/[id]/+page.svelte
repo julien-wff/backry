@@ -7,7 +7,8 @@
     import { Database, OctagonAlert } from '$lib/components/icons';
     import type { DATABASE_ENGINES } from '$lib/db/schema';
     import { ENGINE_META_ENTRIES, ENGINES_META } from '$lib/engines/enginesMeta';
-    import type { DatabasesCheckRequest, DatabasesCheckResponse } from '$lib/types/api';
+    import type { DatabasesCheckRequest } from '$lib/schemas/api';
+    import type { DatabasesCheckResponse } from '$lib/types/api';
     import { customEnhance } from '$lib/utils/actions.js';
     import { slugify } from '$lib/utils/format';
     import type { PageProps } from './$types';
@@ -54,7 +55,7 @@
             method: 'POST',
             body: JSON.stringify({
                 engine: selectedEngine,
-                url: connectionString,
+                connectionString,
             } satisfies DatabasesCheckRequest),
             headers: {
                 'Content-Type': 'application/json',
@@ -63,17 +64,13 @@
 
         isConnectionTesting = false;
 
-        if (res.ok) {
-            const { error: responseError }: DatabasesCheckResponse = await res.json();
-            if (responseError) {
-                error.current = responseError;
-                databaseConnectionStatus = false;
-            } else {
-                error.current = null;
-                databaseConnectionStatus = true;
-            }
+        const { error: responseError }: DatabasesCheckResponse = await res.json();
+        if (responseError) {
+            error.current = responseError;
+            databaseConnectionStatus = false;
         } else {
-            error.current = 'Failed to test connection';
+            error.current = null;
+            databaseConnectionStatus = true;
         }
     }
 </script>
