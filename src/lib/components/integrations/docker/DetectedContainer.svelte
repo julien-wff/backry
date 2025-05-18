@@ -3,7 +3,12 @@
     import Modal from '$lib/components/common/Modal.svelte';
     import { CirclePlus, OctagonAlert } from '$lib/components/icons';
     import type { DATABASE_ENGINES } from '$lib/db/schema';
-    import type { DockerConnectionStringRequest, DockerHostnamesCheckResponse } from '$lib/types/api';
+    import {
+        type dockerConnectionStringRequest,
+        type DockerConnectionStringResponse,
+        type DockerHostnamesCheckResponse,
+    } from '$lib/schemas/api';
+    import { fetchApi } from '$lib/utils/api';
     import type { ContainerInspectInfo, ImageInspectInfo } from 'dockerode';
 
     interface Props {
@@ -22,7 +27,7 @@
     let addDialog = $state<HTMLDialogElement | null>(null);
     let loading = $state(false);
     let error = $state<string | null>(null);
-    let hostnameScanResult = $state<DockerHostnamesCheckResponse | null>(null);
+    let hostnameScanResult = $state<DockerHostnamesCheckResponse['ips'] | null>(null);
     let selectedHostName = $state<string | null>(null);
 
     async function showDialog() {
@@ -31,35 +36,33 @@
         error = null;
         selectedHostName = null;
 
-        const res = await fetch(`/api/integrations/docker/hostnames/${container.Id}`);
-        const json: DockerHostnamesCheckResponse | { error: string } = await res.json();
+        const res = await fetchApi<DockerHostnamesCheckResponse>('GET', `/api/integrations/docker/hostnames/${container.Id}`, null);
         loading = false;
 
-        if ('error' in json) {
-            error = json.error;
+        if (res.isErr()) {
+            error = res.error;
             return;
         }
 
-        hostnameScanResult = json;
+        hostnameScanResult = res.value.ips;
     }
 
     async function getConnectionString() {
-        const res = await fetch(`/api/integrations/docker/connection-string/${container.Id}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
+        const res = await fetchApi<DockerConnectionStringResponse, typeof dockerConnectionStringRequest>(
+            'POST',
+            `/api/integrations/docker/connection-string/${container.Id}`,
+            {
                 engine: engineId as typeof DATABASE_ENGINES[number],
                 hostname: selectedHostName ? selectedHostName.split(':')[0] : 'hostname',
                 port: selectedHostName ? parseInt(selectedHostName.split(':')[1]) : undefined,
-            } satisfies DockerConnectionStringRequest),
-        });
-        if (!res.ok) {
+            },
+        );
+        if (res.isErr()) {
+            console.log('Error building connection string', res.error);
             return null;
         }
-        const { result } = await res.json();
-        return result;
+
+        return res.value.result;
     }
 
     async function redirectToNewDatabase() {
@@ -75,7 +78,7 @@
             params.set('connectionString', connectionString);
         }
 
-        goto(`/databases/new?${params}`);
+        void goto(`/databases/new?${params}`);
     }
 </script>
 

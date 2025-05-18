@@ -128,3 +128,26 @@ export const jobRunRequest = z.object({
 
 /** `DELETE /api/backups/[id]` */
 export type BackupResponse = typeof backups.$inferSelect;
+
+// DOCKER INTEGRATION
+
+/** `POST /api/integrations/docker/connection-string` */
+export const dockerConnectionStringRequest = z.object({
+    port: z.number().positive().optional(),
+    hostname: z.string().nonempty(),
+    engine: z.enum(DATABASE_ENGINES),
+});
+
+/** `POST /api/integrations/docker/connection-string` */
+export interface DockerConnectionStringResponse {
+    result: string;
+}
+
+/** `GET /api/integrations/docker/hostnames/[id]` */
+export interface DockerHostnamesCheckResponse {
+    ips: {
+        host: string;
+        port: number;
+        reachable: boolean;
+    }[];
+}

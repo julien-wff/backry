@@ -1,32 +1,35 @@
-import { json, type RequestHandler } from '@sveltejs/kit';
-import { inspectContainer } from '$lib/integrations/docker';
-import type { DockerConnectionStringRequest } from '$lib/types/api';
 import { ENGINES_METHODS } from '$lib/engines/enginesMethods';
-import type { ConnectionStringParams } from '$lib/types/engine';
+import { inspectContainer } from '$lib/integrations/docker';
+import { parseRequestBody } from '$lib/schemas';
+import { dockerConnectionStringRequest, type DockerConnectionStringResponse } from '$lib/schemas/api';
+import { apiError, apiSuccess } from '$lib/utils/responses';
+import { type RequestHandler } from '@sveltejs/kit';
 
 /**
  * Generate a connection string for the specified container ID
  */
 export const POST: RequestHandler = async ({ params, request }) => {
+    const body = await parseRequestBody(request, dockerConnectionStringRequest);
+    if (body.isErr()) {
+        return apiError(body.error);
+    }
+
     const containerId = params.id as string;
     const container = await inspectContainer(containerId);
     if (container.isErr()) {
-        return json({ error: container.error }, { status: 404 });
+        return apiError(container.error, 404);
     }
 
-    const { port, hostname, engine } = await request.json() as DockerConnectionStringRequest;
-    const engineMethods = ENGINES_METHODS[engine];
+    const engineMethods = ENGINES_METHODS[body.value.engine];
 
-    const connectionInfo = {
+    const connectionString = engineMethods.buildConnectionString({
         ...engineMethods.getCredentialsFromContainer(container.value),
-        hostname,
-        port,
-    } satisfies ConnectionStringParams;
-
-    const connectionString = engineMethods.buildConnectionString(connectionInfo);
+        hostname: body.value.hostname,
+        port: body.value.port,
+    });
     if (connectionString.isErr()) {
-        return json({ error: connectionString.error }, { status: 400 });
+        return apiError(connectionString.error);
     }
 
-    return json({ result: connectionString.value.toString() });
+    return apiSuccess<DockerConnectionStringResponse>({ result: connectionString.value.toString() });
 };

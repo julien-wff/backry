@@ -1,15 +1,15 @@
-import type { RequestHandler } from '@sveltejs/kit';
-import { json } from '@sveltejs/kit';
 import { inspectContainer } from '$lib/integrations/docker';
+import type { DockerHostnamesCheckResponse } from '$lib/schemas/api';
 import { isPortReachable } from '$lib/utils/net';
-import type { DockerHostnamesCheckResponse } from '$lib/types/api';
+import { apiError, apiSuccess } from '$lib/utils/responses';
+import type { RequestHandler } from '@sveltejs/kit';
 
 export const GET: RequestHandler = async ({ params }) => {
     const containerId = params['id'] as string;
 
     const containerInfos = await inspectContainer(containerId);
     if (containerInfos.isErr()) {
-        return json({ error: containerInfos.error }, { status: 500 });
+        return apiError(containerInfos.error, 500);
     }
 
     const internalPorts = Object.keys(containerInfos.value.NetworkSettings.Ports)
@@ -37,7 +37,7 @@ export const GET: RequestHandler = async ({ params }) => {
     ].map(async ip => ({
         ...ip,
         reachable: await isPortReachable(ip.port, ip.host),
-    }))) satisfies DockerHostnamesCheckResponse;
+    }))) satisfies DockerHostnamesCheckResponse['ips'];
 
-    return json(ips);
+    return apiSuccess<DockerHostnamesCheckResponse>({ ips });
 };
