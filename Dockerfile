@@ -18,6 +18,8 @@ WORKDIR /app
 # Install tools
 
 RUN apk add --no-cache \
+    mariadb-client \
+    mariadb-connector-c \
     postgresql16-client \
     sqlite && \
     # Restic 0.18.0
@@ -39,6 +41,8 @@ COPY --from=builder /app/build .
 
 ENV BACKRY_SQLITE_DUMP_CMD="/usr/bin/sqlite3"
 ENV BACKRY_POSTGRES_DUMP_CMD="/usr/bin/pg_dump"
+ENV BACKRY_MYSQL_DUMP_CMD="/usr/bin/mysqldump"
+ENV BACKRY_MYSQL_CHECK_CMD="/usr/bin/mysql"
 
 # Metadata
 
