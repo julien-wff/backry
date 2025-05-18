@@ -42,14 +42,14 @@ export interface StoragesCheckResponse {
     resticError: ResticError | null;
 }
 
-/** `POST /api/storages/create-repository` */
+/** `POST /api/storages/init-repository` */
 export const storageInitRepositoryRequest = z.object({
     url: z.string().nonempty(),
     password: z.string().nonempty(),
     env: z.record(z.string()),
 });
 
-/** `POST /api/storages/create-repository` */
+/** `POST /api/storages/init-repository` */
 export interface StoragesInitRepositoryResponse {
     output: ResticInit;
 }

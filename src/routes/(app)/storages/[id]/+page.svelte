@@ -10,7 +10,8 @@
         type storageCreateRequest,
         storageInitRepositoryRequest,
         type StorageResponse,
-        storagesCheckRequest, type StoragesCheckResponse,
+        storagesCheckRequest,
+        type StoragesCheckResponse,
         type StoragesInitRepositoryResponse,
     } from '$lib/schemas/api';
     import { fetchApi } from '$lib/utils/api';
@@ -89,7 +90,7 @@
     async function initRepository() {
         const res = await fetchApi<StoragesInitRepositoryResponse, typeof storageInitRepositoryRequest>(
             'POST',
-            '/api/storages/create-repository',
+            '/api/storages/init-repository',
             {
                 url: repoUrl,
                 password,
