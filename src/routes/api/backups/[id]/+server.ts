@@ -5,7 +5,7 @@ import { apiError, apiSuccess } from '$lib/utils/responses';
 import { type RequestHandler } from '@sveltejs/kit';
 
 export const DELETE: RequestHandler = async ({ params }) => {
-    const backupId = parseInt(params.backupId || '');
+    const backupId = parseInt(params.id || '');
     if (isNaN(backupId) || backupId < 0) {
         return apiError('Invalid backup ID', 400);
     }

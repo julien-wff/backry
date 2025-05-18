@@ -4,7 +4,7 @@ import { formatSize } from '$lib/utils/format';
 import { error, type RequestHandler } from '@sveltejs/kit';
 
 export const GET: RequestHandler = async ({ params }) => {
-    const backupId = parseInt(params.backupId || '');
+    const backupId = parseInt(params.id || '');
     if (isNaN(backupId) || backupId < 0) {
         return error(400, 'Invalid backup ID');
     }
