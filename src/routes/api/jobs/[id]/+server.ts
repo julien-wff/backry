@@ -7,7 +7,7 @@ import { apiError, apiSuccess } from '$lib/utils/responses';
 import { type RequestHandler } from '@sveltejs/kit';
 
 export const DELETE: RequestHandler = async ({ params }) => {
-    const jobId = parseInt(params.jobId || '');
+    const jobId = parseInt(params.id || '');
     if (isNaN(jobId) || jobId < 0) {
         return apiError('Invalid job ID');
     }
@@ -26,7 +26,7 @@ export const DELETE: RequestHandler = async ({ params }) => {
 
 
 export const PUT: RequestHandler = async ({ params, request }) => {
-    const jobId = parseInt(params.jobId || '');
+    const jobId = parseInt(params.id || '');
     if (isNaN(jobId) || jobId < 0) {
         return apiError('Invalid job ID');
     }
@@ -56,7 +56,7 @@ export const PUT: RequestHandler = async ({ params, request }) => {
 
 
 export const PATCH: RequestHandler = async ({ params, request }) => {
-    const jobId = parseInt(params.jobId || '');
+    const jobId = parseInt(params.id || '');
     if (isNaN(jobId) || jobId < 0) {
         return apiError('Invalid job ID');
     }

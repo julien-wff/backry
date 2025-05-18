@@ -10,7 +10,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
         return apiError(body.error);
     }
 
-    const jobId = parseInt(params.jobId);
+    const jobId = parseInt(params.id);
     if (isNaN(jobId) || jobId < 0) {
         return apiError('Invalid job ID', 400);
     }
