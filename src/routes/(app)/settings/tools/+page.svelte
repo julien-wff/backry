@@ -24,5 +24,6 @@
     <ToolVersion {...data.svelteKit} name="SvelteKit"/>
     <ToolVersion {...data.restic} name="Restic"/>
     <ToolVersion {...data.postgresql} name="PGDump"/>
+    <ToolVersion {...data.mysql} name="MySQL Dump"/>
     <ToolVersion {...data.sqlite} name="SQLite"/>
 </div>

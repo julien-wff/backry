@@ -1,3 +1,4 @@
+import type { databases } from '$lib/db/schema';
 import type { ContainerInspectInfo } from 'dockerode';
 import { Result, type ResultAsync } from 'neverthrow';
 
@@ -43,17 +44,23 @@ export interface EngineMethods {
     dumpFileExtension: string;
 
     /**
-     * Get the version of the check command.
-     * If no check command is defined, this must not be defined.
-     * @returns CLI output, or error message.
-     */
-    getCheckCmdVersion?: () => Promise<ResultAsync<string, string>>;
-
-    /**
      * Get the version of the dump command.
      * @returns CLI output, or error message.
      */
     getDumpCmdVersion(): Promise<ResultAsync<string, string>>;
+
+    /**
+     * Get the environment variables to use for the dump command, if any.
+     * @returns Environment variables.
+     */
+    getDumpEnv?(database: typeof databases.$inferSelect): Record<string, string>;
+
+    /**
+     * Get the version of the check command.
+     * If no check command is defined, this must not be defined.
+     * @returns CLI output, or error message.
+     */
+    getCheckCmdVersion?(): Promise<ResultAsync<string, string>>;
 
     /**
      * Generate the dump command for the engine.

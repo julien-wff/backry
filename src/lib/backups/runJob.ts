@@ -5,6 +5,7 @@ import { getJob } from '$lib/queries/jobs';
 import { createRun, updateRun } from '$lib/queries/runs';
 import { backupEmitter } from '$lib/shared/events';
 import { backupFromCommand } from '$lib/storages/restic';
+import type { EngineMethods } from '$lib/types/engine';
 import { logger } from '$lib/utils/logger';
 import { sql } from 'drizzle-orm';
 import { err, ok, type ResultAsync } from 'neverthrow';
@@ -79,7 +80,7 @@ async function jobDatabaseBackup(job: NonNullable<Awaited<ReturnType<typeof getJ
         return ok(null);
     }
 
-    const engine = ENGINES_METHODS[jobDatabase.database.engine];
+    const engine: EngineMethods = ENGINES_METHODS[jobDatabase.database.engine];
     const databaseInfo = jobDatabase.database;
     const fileName = `${job.slug}_${databaseInfo.slug}.${engine.dumpFileExtension}`;
 
@@ -89,7 +90,10 @@ async function jobDatabaseBackup(job: NonNullable<Awaited<ReturnType<typeof getJ
     const res = await backupFromCommand(
         job.storage.url,
         job.storage.password!,
-        job.storage.env,
+        {
+            ...job.storage.env,
+            ...engine.getDumpEnv?.(databaseInfo),
+        },
         engine.getDumpCommand(databaseInfo.connectionString),
         fileName,
         [

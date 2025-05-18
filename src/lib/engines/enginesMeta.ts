@@ -12,6 +12,11 @@ export const ENGINES_META = {
         icon: '/icons/sqlite.svg',
         connectionStringPlaceholder: 'sqlite:///path/to/database.db',
     },
+    mysql: {
+        displayName: 'MySQL',
+        icon: '/icons/mysql.svg',
+        connectionStringPlaceholder: 'mysql://user:password@host:port/database',
+    },
 } as const satisfies Record<typeof DATABASE_ENGINES[number], EngineMeta>;
 
 export const ENGINE_META_ENTRIES = Object.entries(ENGINES_META) as Array<[ typeof DATABASE_ENGINES[number], EngineMeta ]>;
