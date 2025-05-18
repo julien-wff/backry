@@ -1,4 +1,4 @@
-import { DATABASE_ENGINES, storages } from '$lib/db/schema';
+import { backups, DATABASE_ENGINES, storages } from '$lib/db/schema';
 import type { ResticError, ResticInit } from '$lib/types/restic';
 import { z } from 'zod';
 
@@ -53,3 +53,8 @@ export const storageInitRepositoryRequest = z.object({
 export interface StoragesInitRepositoryResponse {
     output: ResticInit;
 }
+
+// BACKUPS
+
+/** `DELETE /api/backups/[id]` */
+export type BackupResponse = typeof backups.$inferSelect;

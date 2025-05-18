@@ -12,7 +12,7 @@ import { type z, type ZodSchema } from 'zod';
  * @template R Type of the response body
  * @template B Zod schema for the request body, or null for empty body
  */
-export async function fetchApi<R extends object, B extends ZodSchema | null>(
+export async function fetchApi<R extends object, B extends ZodSchema | null = null>(
     method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
     url: string,
     body: B extends ZodSchema ? z.infer<B> : null,

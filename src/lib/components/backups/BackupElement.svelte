@@ -4,6 +4,7 @@
     import { Clock, FileChartPie, FileDown, HardDriveDownload, Timer } from '$lib/components/icons';
     import type { BACKUP_STATUS } from '$lib/db/schema';
     import type { backupsListFull } from '$lib/queries/backups';
+    import type { BackupResponse } from '$lib/schemas/api';
     import { fetchApi } from '$lib/utils/api';
     import { formatDuration, formatSize } from '$lib/utils/format.js';
 
@@ -26,7 +27,7 @@
 
     async function handleDelete() {
         loading = true;
-        await fetchApi('DELETE', `/api/backups/${backup.id}`, {});
+        await fetchApi<BackupResponse>('DELETE', `/api/backups/${backup.id}`, null);
         await invalidateAll();
         loading = false;
     }
