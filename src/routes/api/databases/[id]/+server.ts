@@ -1,17 +1,19 @@
 import { deleteDatabase } from '$lib/queries/databases';
-import { json, type RequestHandler } from '@sveltejs/kit';
+import type { DatabaseResponse } from '$lib/schemas/api';
+import { apiError, apiSuccess } from '$lib/utils/responses';
+import { type RequestHandler } from '@sveltejs/kit';
 
 export const DELETE: RequestHandler = async ({ params }) => {
     const databaseId = parseInt(params.id || '');
     if (isNaN(databaseId) || databaseId < 0) {
-        return json({ error: 'Invalid database ID' }, { status: 400 });
+        return apiError('Invalid database ID');
     }
 
     // Delete from database
     const deletedDatabase = deleteDatabase(databaseId);
     if (!deletedDatabase) {
-        return json({ error: 'Database not found' }, { status: 404 });
+        return apiError('Database not found', 404);
     }
 
-    return json(deletedDatabase);
+    return apiSuccess<DatabaseResponse>(deletedDatabase);
 };

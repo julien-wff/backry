@@ -4,6 +4,8 @@
     import EngineIndicator from '$lib/components/common/EngineIndicator.svelte';
     import { EthernetPort } from '$lib/components/icons';
     import type { databases } from '$lib/db/schema';
+    import type { DatabaseResponse } from '$lib/schemas/api';
+    import { fetchApi } from '$lib/utils/api';
 
     interface Props {
         database: typeof databases.$inferSelect;
@@ -15,11 +17,9 @@
 
     async function deleteDatabase() {
         loading = true;
-        const res = await fetch(`/api/databases/${database.id}`, {
-            method: 'DELETE',
-        });
+        const res = await fetchApi<DatabaseResponse>('DELETE', `/api/databases/${database.id}`, null);
 
-        if (res.ok) {
+        if (res.isOk()) {
             await invalidateAll();
         }
 

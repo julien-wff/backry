@@ -1,4 +1,4 @@
-import { backups, DATABASE_ENGINES, storages } from '$lib/db/schema';
+import { backups, DATABASE_ENGINES, databases, storages } from '$lib/db/schema';
 import type { ResticError, ResticInit } from '$lib/types/restic';
 import { z } from 'zod';
 
@@ -9,6 +9,9 @@ export const databasesCheckRequest = z.object({
     connectionString: z.string().nonempty(),
     engine: z.enum(DATABASE_ENGINES),
 });
+
+/** `DELETE /api/databases/[id]` */
+export type DatabaseResponse = typeof databases.$inferSelect;
 
 // STORAGES
 
