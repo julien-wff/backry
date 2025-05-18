@@ -2,21 +2,20 @@ import { ENGINES_METHODS } from '$lib/engines/enginesMethods';
 import { parseRequestBody } from '$lib/schemas';
 import { databasesCheckRequest } from '$lib/schemas/api';
 import type { DatabasesCheckResponse } from '$lib/types/api';
-import { json } from '@sveltejs/kit';
+import { apiError, apiSuccess } from '$lib/utils/responses';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request }) => {
     const body = await parseRequestBody(request, databasesCheckRequest);
     if (body.isErr()) {
-        return json({
-            error: body.error,
-        } satisfies DatabasesCheckResponse, { status: 400 });
+        return apiError(body.error);
     }
 
     const engineInstance = ENGINES_METHODS[body.value.engine];
     const res = await engineInstance.checkConnection(body.value.connectionString);
 
-    return json({
+    return apiSuccess<DatabasesCheckResponse>({
+        success: res.isOk(),
         error: res.isErr() ? res.error : null,
-    } satisfies DatabasesCheckResponse);
+    });
 };

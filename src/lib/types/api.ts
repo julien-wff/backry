@@ -1,8 +1,17 @@
 import type { ENGINES_METHODS } from '$lib/engines/enginesMethods';
 import type { ResticError, ResticInit } from '$lib/types/restic';
 
+export type ApiResponse<T extends object> = {
+    error: null;
+    data: T;
+} | {
+    error: string;
+    data: null;
+}
+
 /** `POST /api/databases/check` */
 export interface DatabasesCheckResponse {
+    success: boolean;
     error: string | null;
 }
 

@@ -8,7 +8,7 @@
     import type { DATABASE_ENGINES } from '$lib/db/schema';
     import { ENGINE_META_ENTRIES, ENGINES_META } from '$lib/engines/enginesMeta';
     import type { DatabasesCheckRequest } from '$lib/schemas/api';
-    import type { DatabasesCheckResponse } from '$lib/types/api';
+    import type { ApiResponse, DatabasesCheckResponse } from '$lib/types/api';
     import { customEnhance } from '$lib/utils/actions.js';
     import { slugify } from '$lib/utils/format';
     import type { PageProps } from './$types';
@@ -64,9 +64,9 @@
 
         isConnectionTesting = false;
 
-        const { error: responseError }: DatabasesCheckResponse = await res.json();
-        if (responseError) {
-            error.current = responseError;
+        const { error: responseError, data }: ApiResponse<DatabasesCheckResponse> = await res.json();
+        if (responseError ?? data.error) {
+            error.current = responseError ?? data.error;
             databaseConnectionStatus = false;
         } else {
             error.current = null;
