@@ -1,7 +1,6 @@
 import { ENGINES_METHODS } from '$lib/engines/enginesMethods';
 import { parseRequestBody } from '$lib/schemas';
 import { databasesCheckRequest } from '$lib/schemas/api';
-import type { DatabasesCheckResponse } from '$lib/types/api';
 import { apiError, apiSuccess } from '$lib/utils/responses';
 import type { RequestHandler } from './$types';
 
@@ -14,8 +13,9 @@ export const POST: RequestHandler = async ({ request }) => {
     const engineInstance = ENGINES_METHODS[body.value.engine];
     const res = await engineInstance.checkConnection(body.value.connectionString);
 
-    return apiSuccess<DatabasesCheckResponse>({
-        success: res.isOk(),
-        error: res.isErr() ? res.error : null,
-    });
+    if (res.isErr()) {
+        return apiError(res.error);
+    }
+
+    return apiSuccess<{}>({});
 };

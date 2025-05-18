@@ -9,12 +9,6 @@ export type ApiResponse<T extends object> = {
     data: null;
 }
 
-/** `POST /api/databases/check` */
-export interface DatabasesCheckResponse {
-    success: boolean;
-    error: string | null;
-}
-
 /** `POST /api/storages` */
 export interface StoragesCreateRequest {
     name: string;

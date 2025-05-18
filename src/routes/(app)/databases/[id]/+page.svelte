@@ -8,7 +8,6 @@
     import type { DATABASE_ENGINES } from '$lib/db/schema';
     import { ENGINE_META_ENTRIES, ENGINES_META } from '$lib/engines/enginesMeta';
     import { databasesCheckRequest } from '$lib/schemas/api';
-    import type { DatabasesCheckResponse } from '$lib/types/api';
     import { customEnhance } from '$lib/utils/actions.js';
     import { fetchApi } from '$lib/utils/api';
     import { slugify } from '$lib/utils/format';
@@ -52,7 +51,7 @@
         error.current = null;
         isConnectionTesting = true;
 
-        const res = await fetchApi<DatabasesCheckResponse, typeof databasesCheckRequest>(
+        const res = await fetchApi<{}, typeof databasesCheckRequest>(
             'POST',
             '/api/databases/check',
             {
@@ -63,8 +62,8 @@
 
         isConnectionTesting = false;
 
-        if (res.isErr() || res.value.error) {
-            error.current = res.isErr() ? res.error : res.value.error;
+        if (res.isErr()) {
+            error.current = res.error;
             databaseConnectionStatus = false;
         } else {
             error.current = null;
