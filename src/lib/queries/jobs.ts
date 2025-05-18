@@ -1,6 +1,6 @@
 import { db } from '$lib/db';
 import { jobDatabases, jobs } from '$lib/db/schema';
-import type { JobsCreateRequest } from '$lib/types/api';
+import type { JobRequest } from '$lib/schemas/api';
 import { and, eq, notInArray, or } from 'drizzle-orm';
 
 /**
@@ -59,7 +59,7 @@ export const getJob = async (id: number) => db
  * Create a new job with its databases to back up
  * @param req
  */
-export async function createJob(req: JobsCreateRequest) {
+export async function createJob(req: JobRequest) {
     const job = db
         .insert(jobs)
         .values({
@@ -105,7 +105,7 @@ export const deleteJob = async (id: number) => db
  * @param id Job ID
  * @param job Job data
  */
-export const updateJob = async (id: number, job: JobsCreateRequest) => {
+export const updateJob = async (id: number, job: JobRequest) => {
     const updatedJob = db
         .update(jobs)
         .set({

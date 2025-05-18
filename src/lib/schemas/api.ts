@@ -1,5 +1,6 @@
-import { backups, DATABASE_ENGINES, databases, storages } from '$lib/db/schema';
+import { backups, DATABASE_ENGINES, databases, jobs, storages } from '$lib/db/schema';
 import type { ResticError, ResticInit } from '$lib/types/restic';
+import { validateCronExpression } from 'cron';
 import { z } from 'zod';
 
 // DATABASES
@@ -56,6 +57,52 @@ export const storageInitRepositoryRequest = z.object({
 export interface StoragesInitRepositoryResponse {
     output: ResticInit;
 }
+
+// JOBS
+
+/**
+ * `POST /api/jobs`
+ * `PUT /api/jobs/[id]`
+ */
+export const jobRequest = z.object({
+    name: z.string().min(3),
+    slug: z.string().min(3),
+    storageId: z.number().positive(),
+    cron: z.string().min(2).refine(val => validateCronExpression(val).valid, 'Invalid cron expression'),
+    deletePolicy: z.string().optional(),
+    databases: z.array(
+        z.object({
+            id: z.number().positive(),
+            enabled: z.boolean(),
+        }),
+    ).min(1),
+});
+
+/**
+ * `POST /api/jobs`
+ * `PUT /api/jobs/[id]`
+ */
+export type JobRequest = z.infer<typeof jobRequest>;
+
+/** `PATCH /api/jobs/[id]` */
+export const jobPatchRequest = z.object({
+    status: z.enum([ 'active', 'inactive' ]),
+});
+
+/**
+ * `POST /api/jobs`
+ * `PUT /api/jobs/[id]`
+ * `PATCH /api/jobs/[id]`
+ * `DELETE /api/jobs/[id]`
+ */
+export type JobResponse = typeof jobs.$inferSelect;
+
+/** `POST /api/jobs/[id]/run` */
+export const jobRunRequest = z.object({
+    databases: z.array(
+        z.number().min(0),
+    ).optional(),
+});
 
 // BACKUPS
 

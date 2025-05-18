@@ -8,7 +8,8 @@
     import { Timer } from '$lib/components/icons';
     import JobDatabaseSelector from '$lib/components/jobs/JobDatabaseSelector.svelte';
     import JobDeletePolicyField from '$lib/components/jobs/JobDeletePolicyField.svelte';
-    import type { JobsCreateRequest } from '$lib/types/api';
+    import { jobRequest, type JobResponse } from '$lib/schemas/api';
+    import { fetchApi } from '$lib/utils/api';
     import { slugify } from '$lib/utils/format';
     import { parseIdOrNewParam } from '$lib/utils/params';
     import { sendAt, validateCronExpression } from 'cron';
@@ -53,25 +54,20 @@
     async function handleFormSubmit() {
         isLoading = true;
 
-        const res = await fetch(isNew ? `/api/jobs` : `/api/jobs/${id}`, {
-            method: isNew ? 'POST' : 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
+        const res = await fetchApi<JobResponse, typeof jobRequest>(
+            isNew ? 'POST' : 'PUT',
+            isNew ? `/api/jobs` : `/api/jobs/${id}`, {
                 name: jobName,
                 slug,
                 storageId: storageBackend,
                 cron,
                 deletePolicy,
                 databases: selectedDatabases,
-            } satisfies JobsCreateRequest),
-        });
+            },
+        );
 
-        const body = await res.json();
-
-        if (body.error) {
-            error = body.error;
+        if (res.isErr()) {
+            error = res.error;
             isLoading = false;
             return;
         }

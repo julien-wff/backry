@@ -8,19 +8,6 @@ export type ApiResponse<T extends object> = {
     data: null;
 }
 
-/** `POST /api/jobs` */
-export interface JobsCreateRequest {
-    name: string;
-    slug: string;
-    storageId: number;
-    cron: string;
-    deletePolicy: string;
-    databases: Array<{
-        id: number;
-        enabled: boolean;
-    }>;
-}
-
 /** `GET /api/integrations/docker/hostnames/[id]` */
 export type DockerHostnamesCheckResponse = {
     host: string;

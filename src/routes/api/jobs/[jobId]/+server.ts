@@ -1,43 +1,45 @@
 import { runJob } from '$lib/backups/runJob';
 import { deleteJob, updateJob, updateJobStatus } from '$lib/queries/jobs';
+import { parseRequestBody } from '$lib/schemas';
+import { jobPatchRequest, jobRequest, type JobResponse } from '$lib/schemas/api';
 import { addOrUpdateCronJob, stopCronJob } from '$lib/shared/cron';
-import type { JobsCreateRequest } from '$lib/types/api';
-import { json, type RequestHandler } from '@sveltejs/kit';
+import { apiError, apiSuccess } from '$lib/utils/responses';
+import { type RequestHandler } from '@sveltejs/kit';
 
 export const DELETE: RequestHandler = async ({ params }) => {
     const jobId = parseInt(params.jobId || '');
     if (isNaN(jobId) || jobId < 0) {
-        return json({ error: 'Invalid job ID' }, { status: 400 });
+        return apiError('Invalid job ID');
     }
 
     // Delete from database
     const deletedJob = await deleteJob(jobId);
     if (!deletedJob) {
-        return json({ error: 'Job not found' }, { status: 404 });
+        return apiError('Job not found', 404);
     }
 
     // Stop cron job
     stopCronJob(`job:${jobId}`);
 
-    return json({});
+    return apiSuccess<JobResponse>(deletedJob);
 };
 
 
 export const PUT: RequestHandler = async ({ params, request }) => {
     const jobId = parseInt(params.jobId || '');
     if (isNaN(jobId) || jobId < 0) {
-        return json({ error: 'Invalid job ID' }, { status: 400 });
+        return apiError('Invalid job ID');
     }
 
-    const body: JobsCreateRequest = await request.json();
-    if (!body) {
-        return json({ error: 'Invalid request body' }, { status: 400 });
+    const body = await parseRequestBody(request, jobRequest);
+    if (body.isErr()) {
+        return apiError(body.error);
     }
 
     // Update job in database
-    const updatedJob = await updateJob(jobId, body);
+    const updatedJob = await updateJob(jobId, body.value);
     if (!updatedJob) {
-        return json({ error: 'Job not found' }, { status: 404 });
+        return apiError('Job not found', 404);
     }
 
     // Update cron job
@@ -49,26 +51,26 @@ export const PUT: RequestHandler = async ({ params, request }) => {
         });
     }
 
-    return json(updatedJob);
+    return apiSuccess<JobResponse>(updatedJob);
 };
 
 
 export const PATCH: RequestHandler = async ({ params, request }) => {
     const jobId = parseInt(params.jobId || '');
     if (isNaN(jobId) || jobId < 0) {
-        return json({ error: 'Invalid job ID' }, { status: 400 });
+        return apiError('Invalid job ID');
     }
 
     // Validate request body
-    const body: { status: 'active' | 'inactive' } = await request.json();
-    if (!body) {
-        return json({ error: 'Invalid request body' }, { status: 400 });
+    const body = await parseRequestBody(request, jobPatchRequest);
+    if (body.isErr()) {
+        return apiError(body.error);
     }
 
     // Update job in database
-    const updatedJob = await updateJobStatus(jobId, body.status);
+    const updatedJob = await updateJobStatus(jobId, body.value.status);
     if (!updatedJob) {
-        return json({ error: 'Job not found' }, { status: 404 });
+        return apiError('Job not found', 404);
     }
 
     // Update cron job
@@ -80,5 +82,5 @@ export const PATCH: RequestHandler = async ({ params, request }) => {
         });
     }
 
-    return json(updatedJob);
+    return apiSuccess<JobResponse>(updatedJob);
 };

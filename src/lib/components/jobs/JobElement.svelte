@@ -4,6 +4,8 @@
     import Modal from '$lib/components/common/Modal.svelte';
     import { Clock, CloudUpload, Database, RefreshCw } from '$lib/components/icons';
     import type { jobsListFull } from '$lib/queries/jobs';
+    import { type jobPatchRequest, type JobResponse, jobRunRequest } from '$lib/schemas/api';
+    import { fetchApi } from '$lib/utils/api';
 
     interface Props {
         job: Awaited<ReturnType<typeof jobsListFull>>[number];
@@ -32,17 +34,11 @@
 
     async function handleRunJob() {
         loading = true;
-        const res = await fetch(`/api/jobs/${job.id}/run`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                databases: jobRunDatabases,
-            }),
+        const res = await fetchApi<{}, typeof jobRunRequest>('POST', `/api/jobs/${job.id}/run`, {
+            databases: jobRunDatabases,
         });
 
-        if (res.ok) {
+        if (res.isOk()) {
             await goto('/backups');
         } else {
             loading = false;
@@ -51,11 +47,9 @@
 
     async function deleteJob() {
         loading = true;
-        const res = await fetch(`/api/jobs/${job.id}`, {
-            method: 'DELETE',
-        });
+        const res = await fetchApi<JobResponse>('DELETE', `/api/jobs/${job.id}`, null);
 
-        if (res.ok) {
+        if (res.isOk()) {
             await invalidateAll();
         }
 
@@ -64,13 +58,12 @@
 
     async function changeJobStatus() {
         loading = true;
-        const res = await fetch(`/api/jobs/${job.id}`, {
-            method: 'PATCH',
-            body: JSON.stringify({ status: status === 'inactive' ? 'active' : 'inactive' }),
+        const res = await fetchApi<JobResponse, typeof jobPatchRequest>('PATCH', `/api/jobs/${job.id}`, {
+            status: status === 'inactive' ? 'active' : 'inactive',
         });
 
-        if (res.ok) {
-            status = status === 'inactive' ? 'active' : 'inactive';
+        if (res.isOk()) {
+            status = res.value.status;
         }
 
         loading = false;

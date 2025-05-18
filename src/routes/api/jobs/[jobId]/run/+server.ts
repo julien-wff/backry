@@ -1,21 +1,20 @@
 import { runJob } from '$lib/backups/runJob';
-import { json } from '@sveltejs/kit';
+import { parseRequestBody } from '$lib/schemas';
+import { jobRunRequest } from '$lib/schemas/api';
+import { apiError, apiSuccess } from '$lib/utils/responses';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ params, request }) => {
-    let databasesToRun: number[] | null = null;
-    if (request.headers.get('Content-Type') === 'application/json') {
-        const body = await request.json();
-        if (Array.isArray(body.databases)) {
-            databasesToRun = body.databases;
-        }
+    const body = await parseRequestBody(request, jobRunRequest);
+    if (body.isErr()) {
+        return apiError(body.error);
     }
 
     const jobId = parseInt(params.jobId);
     if (isNaN(jobId) || jobId < 0) {
-        return json({ error: 'Invalid job ID' }, { status: 400 });
+        return apiError('Invalid job ID', 400);
     }
 
-    void runJob(jobId, databasesToRun);
-    return json({});
+    void runJob(jobId, body.value.databases);
+    return apiSuccess({});
 };

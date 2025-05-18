@@ -1,29 +1,23 @@
 import { runJob } from '$lib/backups/runJob';
 import { createJob } from '$lib/queries/jobs';
+import { parseRequestBody } from '$lib/schemas';
+import { jobRequest, type JobResponse } from '$lib/schemas/api';
 import { addOrUpdateCronJob } from '$lib/shared/cron';
-import type { JobsCreateRequest } from '$lib/types/api';
-import { json } from '@sveltejs/kit';
-import { validateCronExpression } from 'cron';
+import { apiError, apiSuccess } from '$lib/utils/responses';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request }) => {
-    const body = await request.json() as JobsCreateRequest;
-
-    // Validate the cron
-    const cronValidation = validateCronExpression(body.cron);
-    if (!cronValidation.valid || cronValidation.error) {
-        return json(
-            { error: `Invalid cron: ${cronValidation.error?.message}` || 'Invalid cron' },
-            { status: 400 },
-        );
+    const body = await parseRequestBody(request, jobRequest);
+    if (body.isErr()) {
+        return apiError(body.error);
     }
 
-    const job = await createJob(body);
+    const job = await createJob(body.value);
 
     if (job.status === 'active')
         addOrUpdateCronJob(`job:${job.id}`, job.cron, () => {
             runJob(job.id);
         });
 
-    return json(job, { status: 201 });
+    return apiSuccess<JobResponse>(job, 201);
 };
