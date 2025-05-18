@@ -19,10 +19,12 @@ export async function fetchApi<R extends object, B extends ZodSchema | null = nu
 ): Promise<ResultAsync<R, string>> {
     const res = await fetch(url, {
         method,
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
+        ...(method !== 'GET' && body && {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(body),
+        }),
     });
 
     let response: ApiResponse<R> | null;
