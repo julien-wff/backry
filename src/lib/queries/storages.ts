@@ -1,6 +1,6 @@
 import { db } from '$lib/db';
 import { storages } from '$lib/db/schema';
-import type { StorageCreateRequest } from '$lib/schemas/api';
+import type { StorageRequest } from '$lib/schemas/api';
 import { eq } from 'drizzle-orm';
 
 /**
@@ -25,11 +25,24 @@ export const getStorage = (id: number) =>
  * Creates a new storage from an HTTP request.
  * @param storage Fields from request body.
  */
-export const createStorage = (storage: StorageCreateRequest) => db
+export const createStorage = (storage: StorageRequest) => db
     .insert(storages)
     .values(storage)
     .returning()
     .get();
+
+/**
+ * Updates a storage by ID.
+ * @param id Storage ID.
+ * @param storage Fields from request body.
+ */
+export const updateStorage = (id: number, storage: Partial<typeof storages.$inferInsert>) =>
+    db
+        .update(storages)
+        .set(storage)
+        .where(eq(storages.id, id))
+        .returning()
+        .get();
 
 /**
  * Deletes a storage by ID.

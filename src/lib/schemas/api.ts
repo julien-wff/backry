@@ -32,19 +32,26 @@ export type DatabaseResponse = typeof databases.$inferSelect;
 
 // STORAGES
 
-/** `POST /api/storages` */
-export const storageCreateRequest = z.object({
+/**
+ * `POST /api/storages`
+ * `PUT /api/storages/[id]`
+ */
+export const storageRequest = z.object({
     name: z.string().min(3),
     url: z.string().nonempty(),
     password: z.string().nonempty(),
     env: z.record(z.string()),
 });
 
-/** `POST /api/storages` */
-export type StorageCreateRequest = z.infer<typeof storageCreateRequest>;
+/**
+ * `POST /api/storages`
+ * `PUT /api/storages/[id]`
+ */
+export type StorageRequest = z.infer<typeof storageRequest>;
 
 /**
  * `POST /api/storages`
+ * `PUT /api/storages/[id]`
  * `DELETE /api/storages/[id]`
  */
 export type StorageResponse = typeof storages.$inferSelect;

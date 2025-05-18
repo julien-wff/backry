@@ -1,11 +1,11 @@
 import { createStorage } from '$lib/queries/storages';
 import { parseRequestBody } from '$lib/schemas';
-import { storageCreateRequest, type StorageResponse } from '$lib/schemas/api';
+import { storageRequest, type StorageResponse } from '$lib/schemas/api';
 import { apiError, apiSuccess } from '$lib/utils/responses';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request }) => {
-    const body = await parseRequestBody(request, storageCreateRequest);
+    const body = await parseRequestBody(request, storageRequest);
     if (body.isErr()) {
         return apiError(body.error);
     }

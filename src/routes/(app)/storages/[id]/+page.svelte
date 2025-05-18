@@ -7,8 +7,8 @@
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
     import { ArchiveRestore, CloudUpload, PackageOpen } from '$lib/components/icons';
     import {
-        type storageCreateRequest,
         storageInitRepositoryRequest,
+        type storageRequest,
         type StorageResponse,
         storagesCheckRequest,
         type StoragesCheckResponse,
@@ -74,7 +74,7 @@
             if (res.value.resticError) {
                 error = res.value.resticError.message;
             } else {
-                await saveRepositoryToDb();
+                await saveStorageAndRedirect();
             }
             return;
         }
@@ -103,16 +103,20 @@
             return;
         }
 
-        await saveRepositoryToDb();
+        await saveStorageAndRedirect();
     }
 
-    async function saveRepositoryToDb() {
-        const res = await fetchApi<StorageResponse, typeof storageCreateRequest>('POST', '/api/storages', {
-            name: repoName,
-            url: repoUrl,
-            password,
-            env: envRecords,
-        });
+    async function saveStorageAndRedirect() {
+        const res = await fetchApi<StorageResponse, typeof storageRequest>(
+            data.storage ? 'PUT' : 'POST',
+            data.storage ? `/api/storages/${data.storage.id}` : '/api/storages',
+            {
+                name: repoName,
+                url: repoUrl,
+                password,
+                env: envRecords,
+            },
+        );
 
         if (res.isErr()) {
             error = res.error;
