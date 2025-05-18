@@ -102,6 +102,7 @@ export const mysqlMethods = {
         }
 
         const url = buildDbUrlFromParams('mysql', params);
+        url.searchParams.set('protocol', 'TCP');
         return ok(url.toString());
     },
 
@@ -118,7 +119,7 @@ export const mysqlMethods = {
         }
 
         const dbKey = container.Config.Env.find(e => e.startsWith('MYSQL_DATABASE='));
-        infos.database = dbKey?.split('=')?.[1];
+        infos.database = dbKey?.split('=')?.[1] ?? 'database';
 
         return infos;
     },
