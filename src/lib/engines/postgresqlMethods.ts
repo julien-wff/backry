@@ -6,11 +6,11 @@ import { type ContainerInspectInfo } from 'dockerode';
 import { err, ok, Result, type ResultAsync } from 'neverthrow';
 
 export const postgresMethods = {
-    command: process.env.BACKRY_PGDUMP_CMD ?? 'pg_dump',
+    dumpCommand: process.env.BACKRY_POSTGRES_DUMP_CMD ?? 'pg_dump',
     dumpFileExtension: 'sql',
 
-    async getVersion(): Promise<ResultAsync<string, string>> {
-        const res = await runCommandSync(this.command, [ '--version' ]);
+    async getDumpCmdVersion(): Promise<ResultAsync<string, string>> {
+        const res = await runCommandSync(this.dumpCommand, [ '--version' ]);
         if (res.isErr()) {
             return err(res.error.stderr.toString().trim());
         }
@@ -19,7 +19,7 @@ export const postgresMethods = {
     },
 
     getDumpCommand(connectionString, additionalArgs = []) {
-        return [ this.command, ...additionalArgs, connectionString ];
+        return [ this.dumpCommand, ...additionalArgs, connectionString ];
     },
 
     async checkConnection(connectionString): Promise<ResultAsync<void, string>> {

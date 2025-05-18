@@ -37,8 +37,8 @@ COPY --from=builder /app/build .
 
 # Database engines
 
-ENV BACKRY_SQLITE3_CMD="/usr/bin/sqlite3"
-ENV BACKRY_PGDUMP_CMD="/usr/bin/pg_dump"
+ENV BACKRY_SQLITE_DUMP_CMD="/usr/bin/sqlite3"
+ENV BACKRY_POSTGRES_DUMP_CMD="/usr/bin/pg_dump"
 
 # Metadata
 

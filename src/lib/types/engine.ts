@@ -29,7 +29,13 @@ export interface EngineMethods {
     /**
      * Engine dump command
      */
-    command: string;
+    dumpCommand: string;
+
+    /**
+     * Command to ping the database.
+     * Can be optional in the case of internal checks, like with `bun:sqlite` or `Bun.SQL`.
+     */
+    checkCommand?: string;
 
     /**
      * File extension for the dump file.
@@ -37,10 +43,17 @@ export interface EngineMethods {
     dumpFileExtension: string;
 
     /**
-     * Get the version of the engine.
-     * @returns Version of the engine, or error message.
+     * Get the version of the check command.
+     * If no check command is defined, this must not be defined.
+     * @returns CLI output, or error message.
      */
-    getVersion(): Promise<ResultAsync<string, string>>;
+    getCheckCmdVersion?: () => Promise<ResultAsync<string, string>>;
+
+    /**
+     * Get the version of the dump command.
+     * @returns CLI output, or error message.
+     */
+    getDumpCmdVersion(): Promise<ResultAsync<string, string>>;
 
     /**
      * Generate the dump command for the engine.

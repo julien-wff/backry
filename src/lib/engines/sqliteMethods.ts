@@ -5,11 +5,11 @@ import { type ContainerInspectInfo } from 'dockerode';
 import { err, ok, Result, type ResultAsync } from 'neverthrow';
 
 export const sqliteMethods = {
-    command: process.env.BACKRY_SQLITE3_CMD ?? 'sqlite3',
+    dumpCommand: process.env.BACKRY_SQLITE_DUMP_CMD ?? 'sqlite3',
     dumpFileExtension: 'sql',
 
-    async getVersion(): Promise<ResultAsync<string, string>> {
-        const res = await runCommandSync(this.command, [ '--version' ]);
+    async getDumpCmdVersion(): Promise<ResultAsync<string, string>> {
+        const res = await runCommandSync(this.dumpCommand, [ '--version' ]);
         if (res.isErr()) {
             return err(res.error.stderr.toString().trim());
         }
@@ -32,7 +32,7 @@ export const sqliteMethods = {
     },
 
     getDumpCommand(connectionString: string, additionalArgs?: string[]): string[] {
-        return [ this.command, ...additionalArgs ?? [], '-readonly', connectionString, '.dump' ];
+        return [ this.dumpCommand, ...additionalArgs ?? [], '-readonly', connectionString, '.dump' ];
     },
 
     isDockerContainerFromEngine(container: ContainerInspectInfo): boolean {

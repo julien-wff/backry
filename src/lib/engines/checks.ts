@@ -69,7 +69,7 @@ export async function getAllEnginesVersionsOrError() {
     const result = {} as Record<typeof DATABASE_ENGINES[number], { version: string | null; error: string | null }>;
 
     for (const [ engineId ] of ENGINE_META_ENTRIES) {
-        const version = await ENGINES_METHODS[engineId].getVersion();
+        const version = await ENGINES_METHODS[engineId].getDumpCmdVersion();
         if (version.isOk()) {
             result[engineId] = { version: version.value, error: null };
         } else {
