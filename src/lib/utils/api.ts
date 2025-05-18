@@ -1,23 +1,22 @@
 import type { BackupUpdateEventPayload } from '$lib/shared/events';
+import type { ApiResponse } from '$lib/types/api';
 import { err, ok, ResultAsync } from 'neverthrow';
+import { type z, type ZodSchema } from 'zod';
 
 /**
  * Fetch API wrapper
  * @param method HTTP method
  * @param url URL to fetch
  * @param body Request body
- * @param createError Function to create error message in case the body is empty or unreadable, to match the type `E`
  * @returns ResultAsync with either the parsed response or an error
- * @template B Type of the request body
  * @template R Type of the response body
- * @template E Type of the error
+ * @template B Zod schema for the request body, or null for empty body
  */
-export async function fetchApi<B extends object, R extends object, E = string>(
+export async function fetchApi<R extends object, B extends ZodSchema | null>(
     method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
     url: string,
-    body: B,
-    createError: ((error: string) => E) = (e => e as E),
-): Promise<ResultAsync<R, E>> {
+    body: B extends ZodSchema ? z.infer<B> : null,
+): Promise<ResultAsync<R, string>> {
     const res = await fetch(url, {
         method,
         headers: {
@@ -26,26 +25,26 @@ export async function fetchApi<B extends object, R extends object, E = string>(
         body: JSON.stringify(body),
     });
 
-    let response: R | { error: E } | null;
+    let response: ApiResponse<R> | null;
     try {
         response = await res.json();
     } catch {
         response = null;
     }
 
-    if (response && 'error' in response && response.error) {
+    if (response && response.error !== null) {
         return err(response.error);
     }
 
     if (!res.ok) {
-        return err(createError(`Fetch error: ${res.status} ${res.statusText}`));
+        return err(`Fetch error: ${res.status} ${res.statusText}`);
     }
 
     if (!response) {
-        return err(createError('Fetch error: empty response'));
+        return err('Fetch error: empty response');
     }
 
-    return ok(response as R);
+    return ok(response.data);
 }
 
 

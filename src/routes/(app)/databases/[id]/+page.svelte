@@ -7,9 +7,10 @@
     import { Database, OctagonAlert } from '$lib/components/icons';
     import type { DATABASE_ENGINES } from '$lib/db/schema';
     import { ENGINE_META_ENTRIES, ENGINES_META } from '$lib/engines/enginesMeta';
-    import type { DatabasesCheckRequest } from '$lib/schemas/api';
-    import type { ApiResponse, DatabasesCheckResponse } from '$lib/types/api';
+    import { databasesCheckRequest } from '$lib/schemas/api';
+    import type { DatabasesCheckResponse } from '$lib/types/api';
     import { customEnhance } from '$lib/utils/actions.js';
+    import { fetchApi } from '$lib/utils/api';
     import { slugify } from '$lib/utils/format';
     import type { PageProps } from './$types';
 
@@ -51,22 +52,19 @@
         error.current = null;
         isConnectionTesting = true;
 
-        const res = await fetch('/api/databases/check', {
-            method: 'POST',
-            body: JSON.stringify({
+        const res = await fetchApi<DatabasesCheckResponse, typeof databasesCheckRequest>(
+            'POST',
+            '/api/databases/check',
+            {
                 engine: selectedEngine,
                 connectionString,
-            } satisfies DatabasesCheckRequest),
-            headers: {
-                'Content-Type': 'application/json',
             },
-        });
+        );
 
         isConnectionTesting = false;
 
-        const { error: responseError, data }: ApiResponse<DatabasesCheckResponse> = await res.json();
-        if (responseError ?? data.error) {
-            error.current = responseError ?? data.error;
+        if (res.isErr() || res.value.error) {
+            error.current = res.isErr() ? res.error : res.value.error;
             databaseConnectionStatus = false;
         } else {
             error.current = null;
