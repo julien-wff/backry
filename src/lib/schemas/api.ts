@@ -5,13 +5,29 @@ import { z } from 'zod';
 
 // DATABASES
 
+/**
+ * `POST /api/databases`
+ * `PUT /api/databases/[id]`
+ */
+export const databaseRequest = z.object({
+    engine: z.enum(DATABASE_ENGINES),
+    name: z.string().min(2),
+    slug: z.string().min(2).regex(/^[a-z0-9-]+$/),
+    connectionString: z.string().min(2),
+});
+
+
 /** `POST /api/databases/check` */
 export const databasesCheckRequest = z.object({
     connectionString: z.string().nonempty(),
     engine: z.enum(DATABASE_ENGINES),
 });
 
-/** `DELETE /api/databases/[id]` */
+/**
+ * `POST /api/databases`
+ * `PUT /api/databases/[id]`
+ * `DELETE /api/databases/[id]`
+ */
 export type DatabaseResponse = typeof databases.$inferSelect;
 
 // STORAGES

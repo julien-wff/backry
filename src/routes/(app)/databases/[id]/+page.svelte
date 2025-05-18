@@ -1,21 +1,21 @@
 <script lang="ts">
-    import { enhance } from '$app/forms';
+    import { goto } from '$app/navigation';
     import { page } from '$app/state';
     import Head from '$lib/components/common/Head.svelte';
     import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
+    import ElementForm from '$lib/components/forms/ElementForm.svelte';
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
-    import { Database, OctagonAlert } from '$lib/components/icons';
+    import { Database } from '$lib/components/icons';
     import type { DATABASE_ENGINES } from '$lib/db/schema';
     import { ENGINE_META_ENTRIES, ENGINES_META } from '$lib/engines/enginesMeta';
-    import { databasesCheckRequest } from '$lib/schemas/api';
-    import { customEnhance } from '$lib/utils/actions.js';
+    import { type databaseRequest, type DatabaseResponse, type databasesCheckRequest } from '$lib/schemas/api';
     import { fetchApi } from '$lib/utils/api';
     import { slugify } from '$lib/utils/format';
     import type { PageProps } from './$types';
 
     let { data }: PageProps = $props();
     const { searchParams } = page.url;
-    let error = $state<{ current: null | string }>({ current: null });
+    let error = $state<null | string>(null);
 
     const urlEngine = (searchParams.has('engine') && Object.keys(ENGINES_META).includes(searchParams.get('engine')!)
         ? page.url.searchParams.get('engine')
@@ -41,14 +41,15 @@
 
     let isConnectionTesting = $state(false);
     let databaseConnectionStatus = $state<boolean | null>(null);
+    let isFormSubmitting = $state(false);
 
     async function testDbConnection() {
         if (!selectedEngine) {
-            error.current = 'Please select a database engine';
+            error = 'Please select a database engine';
             return;
         }
 
-        error.current = null;
+        error = null;
         isConnectionTesting = true;
 
         const res = await fetchApi<{}, typeof databasesCheckRequest>(
@@ -63,12 +64,37 @@
         isConnectionTesting = false;
 
         if (res.isErr()) {
-            error.current = res.error;
+            error = res.error;
             databaseConnectionStatus = false;
         } else {
-            error.current = null;
+            error = null;
             databaseConnectionStatus = true;
         }
+    }
+
+    async function handleFormSubmit() {
+        if (!selectedEngine) {
+            return 'Please select a database engine';
+        }
+        isFormSubmitting = true;
+
+        const res = await fetchApi<DatabaseResponse, typeof databaseRequest>(
+            data.database ? 'PUT' : 'POST',
+            data.database ? `/api/databases/${data.database.id}` : '/api/databases',
+            {
+                name: dbName,
+                slug,
+                engine: selectedEngine,
+                connectionString,
+            },
+        );
+        isFormSubmitting = false;
+
+        if (res.isErr()) {
+            return res.error;
+        }
+
+        await goto('/databases');
     }
 </script>
 
@@ -78,21 +104,9 @@
     {data.database ? 'Edit' : 'Add'} database
 </PageContentHeader>
 
-<form class="rounded-box bg-base-200 p-4 flex flex-col gap-4 max-w-xl w-full mx-auto"
-      method="POST"
-      use:customEnhance={{ enhance, error }}>
-
-    <h2 class="font-bold text-lg">
-        {data.database ? 'Edit' : 'Add new'} database connection
-    </h2>
-
-    {#if error.current}
-        <div role="alert" class="alert alert-error alert-soft">
-            <OctagonAlert class="w-4 h-4"/>
-            <span class="whitespace-break-spaces">{error.current}</span>
-        </div>
-    {/if}
-
+<ElementForm error={error}
+             onsubmit={handleFormSubmit}
+             title="{data.database ? 'Edit' : 'Add new'} database connection">
     <InputContainer label="Engine">
         <div class="flex gap-2">
             {#each ENGINE_META_ENTRIES as [engineId, engine] (engineId)}
@@ -153,8 +167,8 @@
             {/if}
         </button>
 
-        <button class="btn btn-primary flex-1" disabled={!databaseConnectionStatus} type="submit">
+        <button class="btn btn-primary flex-1" disabled={!databaseConnectionStatus || isFormSubmitting} type="submit">
             Save
         </button>
     </div>
-</form>
+</ElementForm>
