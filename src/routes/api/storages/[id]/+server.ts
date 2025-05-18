@@ -1,17 +1,19 @@
 import { deleteStorage } from '$lib/queries/storages';
-import { json, type RequestHandler } from '@sveltejs/kit';
+import type { StorageResponse } from '$lib/schemas/api';
+import { apiError, apiSuccess } from '$lib/utils/responses';
+import { type RequestHandler } from '@sveltejs/kit';
 
 export const DELETE: RequestHandler = async ({ params }) => {
     const storageId = parseInt(params.id || '');
     if (isNaN(storageId) || storageId < 0) {
-        return json({ error: 'Invalid storage ID' }, { status: 400 });
+        return apiError('Invalid storage ID');
     }
 
     // Delete from database
     const deletedStorage = deleteStorage(storageId);
     if (!deletedStorage) {
-        return json({ error: 'Storage not found' }, { status: 404 });
+        return apiError('Storage not found', 404);
     }
 
-    return json(deletedStorage);
+    return apiSuccess<StorageResponse>(deletedStorage);
 };

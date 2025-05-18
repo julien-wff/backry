@@ -1,52 +1,64 @@
-import type { storages } from '$lib/db/schema';
 import { getSnapshotsIdsByStorageId } from '$lib/queries/backups';
-import { getStorage } from '$lib/queries/storages';
+import { parseRequestBody } from '$lib/schemas';
+import { storageStaleSnapshotsDeleteRequest, type StorageStaleSnapshotsResponse } from '$lib/schemas/api';
+import { getStorageFromRequest } from '$lib/storages/api';
 import { deleteSnapshots, getRepositorySnapshots } from '$lib/storages/restic';
-import { parseIdOrNewParam } from '$lib/utils/params';
-import { error, json, type RequestHandler } from '@sveltejs/kit';
+import { apiError, apiSuccess } from '$lib/utils/responses';
+import { type RequestHandler } from '@sveltejs/kit';
 
-async function getStorageFromDb(rawId: string | undefined): Promise<typeof storages.$inferSelect> {
-    const { id, isNew } = parseIdOrNewParam(rawId ?? '');
-    if (id === null || isNew) {
-        throw error(400, 'Invalid storage ID');
-    }
-
-    const storage = getStorage(id);
-    if (!storage) {
-        throw error(404, 'Storage not found');
-    }
-
-    return storage;
-}
-
+/**
+ * Get 'restic' labelled snapshots that have no corresponding backup in the database
+ */
 export const GET: RequestHandler = async ({ params }) => {
-    const storage = await getStorageFromDb(params.id);
-    const backupsSnapshotsIds = getSnapshotsIdsByStorageId(storage.id);
+    const storage = await getStorageFromRequest(params.id);
+    if (storage.isErr()) {
+        return storage.error;
+    }
 
-    const res = await getRepositorySnapshots(storage.url, storage.password!, storage.env, true);
+    const backupsSnapshotsIds = getSnapshotsIdsByStorageId(storage.value.id);
+
+    const res = await getRepositorySnapshots(
+        storage.value.url,
+        storage.value.password!,
+        storage.value.env,
+        true,
+    );
     if (res.isErr()) {
-        return json({ error: res.error.message }, { status: 500 });
+        return apiError(res.error.message, 500);
     }
 
     if (res.value.length === 0 || !Array.isArray(res.value[0])) {
-        return json({ snapshots: [] });
+        return apiSuccess<StorageStaleSnapshotsResponse>({ snapshots: [] });
     }
 
-    return json({
+    return apiSuccess<StorageStaleSnapshotsResponse>({
         snapshots: res.value[0].filter(snapshot => !backupsSnapshotsIds.includes(snapshot.id)),
     });
 };
 
+/**
+ * Delete snapshots from repository without deleting them from the database (because they are not supposed to be there)
+ */
 export const DELETE: RequestHandler = async ({ request, params }) => {
-    const storage = await getStorageFromDb(params.id);
-    const { snapshots } = await request.json() as { snapshots: string[] };
-
-    const res = await deleteSnapshots(storage.url, storage.password!, storage.env, snapshots);
-    if (res.isErr()) {
-        return json({ error: res.error.message }, { status: 500 });
+    const storage = await getStorageFromRequest(params.id);
+    if (storage.isErr()) {
+        return storage.error;
     }
 
-    return json({
-        snapshots,
-    });
+    const body = await parseRequestBody(request, storageStaleSnapshotsDeleteRequest);
+    if (body.isErr()) {
+        return apiError(body.error);
+    }
+
+    const res = await deleteSnapshots(
+        storage.value.url,
+        storage.value.password!,
+        storage.value.env,
+        body.value.snapshots,
+    );
+    if (res.isErr()) {
+        return apiError(res.error.message, 500);
+    }
+
+    return apiSuccess({});
 };

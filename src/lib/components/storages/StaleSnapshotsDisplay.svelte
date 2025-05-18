@@ -2,7 +2,9 @@
     import { page } from '$app/state';
     import Modal from '$lib/components/common/Modal.svelte';
     import { OctagonAlert, ShieldCheck, Trash2 } from '$lib/components/icons';
+    import { storageStaleSnapshotsDeleteRequest, type StorageStaleSnapshotsResponse } from '$lib/schemas/api';
     import type { ResticSnapshot } from '$lib/types/restic';
+    import { fetchApi } from '$lib/utils/api';
     import { formatSize } from '$lib/utils/format';
     import { onMount } from 'svelte';
 
@@ -29,17 +31,14 @@
         error = null;
         loading = true;
 
-        const res = await fetch(`/api/storages/${page.params['id']}/stale-snapshots`);
-        if (!res.ok) {
-            const { error: reqError } = await res.json();
-            console.error('Error fetching snapshots:', reqError);
-            error = reqError || 'Failed to fetch snapshots';
+        const res = await fetchApi<StorageStaleSnapshotsResponse>('GET', `/api/storages/${page.params['id']}/stale-snapshots`, null);
+        if (res.isErr()) {
+            error = res.error;
             loading = false;
             return;
         }
 
-        const { snapshots: fetchedSnapshots } = await res.json();
-        snapshots = fetchedSnapshots;
+        snapshots = res.value.snapshots;
         loading = false;
     }
 
@@ -47,18 +46,14 @@
         deleteConfirmDialog?.close();
         loading = true;
 
-        const res = await fetch(`/api/storages/${page.params['id']}/stale-snapshots`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ snapshots: snapshotsToDelete }),
-        });
+        const res = await fetchApi<{}, typeof storageStaleSnapshotsDeleteRequest>(
+            'DELETE',
+            `/api/storages/${page.params['id']}/stale-snapshots`,
+            { snapshots: snapshotsToDelete },
+        );
 
-        if (!res.ok) {
-            const { error: reqError } = await res.json();
-            console.error('Error deleting snapshots:', reqError);
-            error = reqError || 'Failed to delete snapshots';
+        if (res.isErr()) {
+            error = res.error;
             loading = false;
             return;
         }

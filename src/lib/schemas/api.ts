@@ -1,5 +1,5 @@
 import { backups, DATABASE_ENGINES, databases, jobs, storages } from '$lib/db/schema';
-import type { ResticError, ResticInit } from '$lib/types/restic';
+import type { ResticError, ResticInit, ResticLock, ResticSnapshot } from '$lib/types/restic';
 import { validateCronExpression } from 'cron';
 import { z } from 'zod';
 
@@ -27,7 +27,10 @@ export const storageCreateRequest = z.object({
 /** `POST /api/storages` */
 export type StorageCreateRequest = z.infer<typeof storageCreateRequest>;
 
-/** `POST /api/storages` */
+/**
+ * `POST /api/storages`
+ * `DELETE /api/storages/[id]`
+ */
 export type StorageResponse = typeof storages.$inferSelect;
 
 /** `POST /api/storages/check` */
@@ -57,6 +60,23 @@ export const storageInitRepositoryRequest = z.object({
 export interface StoragesInitRepositoryResponse {
     output: ResticInit;
 }
+
+// STORAGES HEALTH
+
+/** `GET /api/storages/[id]/locks` */
+export interface StorageLocksResponse {
+    locks: ResticLock[];
+}
+
+/** `GET /api/storages/[id]/stale-snapshots` */
+export interface StorageStaleSnapshotsResponse {
+    snapshots: ResticSnapshot[];
+}
+
+/** `DELETE /api/storages/[id]/stale-snapshots` */
+export const storageStaleSnapshotsDeleteRequest = z.object({
+    snapshots: z.array(z.string()),
+});
 
 // JOBS
 

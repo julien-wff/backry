@@ -1,41 +1,39 @@
-import type { storages } from '$lib/db/schema';
-import { getStorage } from '$lib/queries/storages';
+import type { StorageLocksResponse } from '$lib/schemas/api';
+import { getStorageFromRequest } from '$lib/storages/api';
 import { getRepositoryLocks, unlockRepository } from '$lib/storages/restic';
-import { parseIdOrNewParam } from '$lib/utils/params';
-import { error, json, type RequestHandler } from '@sveltejs/kit';
+import { apiError, apiSuccess } from '$lib/utils/responses';
+import { type RequestHandler } from '@sveltejs/kit';
 
-
-async function getStorageFromDb(rawId: string | undefined): Promise<typeof storages.$inferSelect> {
-    const { id, isNew } = parseIdOrNewParam(rawId ?? '');
-    if (id === null || isNew) {
-        throw error(400, 'Invalid storage ID');
-    }
-
-    const storage = getStorage(id);
-    if (!storage) {
-        throw error(404, 'Storage not found');
-    }
-
-    return storage;
-}
-
+/**
+ * Get locks from repository
+ */
 export const GET: RequestHandler = async ({ params }) => {
-    const storage = await getStorageFromDb(params.id);
-    const locks = await getRepositoryLocks(storage.url, storage.password!, storage.env);
-
-    if (locks.isErr()) {
-        return json({ error: locks.error }, { status: 500 });
+    const storage = await getStorageFromRequest(params.id);
+    if (storage.isErr()) {
+        return storage.error;
     }
 
-    return json({ locks: locks.value }, { status: 200 });
+    const locks = await getRepositoryLocks(storage.value.url, storage.value.password!, storage.value.env);
+    if (locks.isErr()) {
+        return apiError(locks.error, 500);
+    }
+
+    return apiSuccess<StorageLocksResponse>({ locks: locks.value });
 };
 
+/**
+ * Remove all locks from repository
+ */
 export const DELETE: RequestHandler = async ({ params }) => {
-    const storage = await getStorageFromDb(params.id);
-    const res = await unlockRepository(storage.url, storage.password!, storage.env);
-    if (res.isErr()) {
-        return json({ error: res.error }, { status: 500 });
+    const storage = await getStorageFromRequest(params.id);
+    if (storage.isErr()) {
+        return storage.error;
     }
 
-    return json({ message: 'Repository unlocked successfully' }, { status: 200 });
+    const res = await unlockRepository(storage.value.url, storage.value.password!, storage.value.env);
+    if (res.isErr()) {
+        return apiError(res.error.message, 500);
+    }
+
+    return apiSuccess({});
 };

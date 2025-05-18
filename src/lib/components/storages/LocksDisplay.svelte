@@ -1,7 +1,9 @@
 <script lang="ts">
     import { page } from '$app/state';
     import { LockKeyholeOpen, OctagonAlert, ShieldCheck } from '$lib/components/icons';
+    import type { StorageLocksResponse } from '$lib/schemas/api';
     import type { ResticLock } from '$lib/types/restic';
+    import { fetchApi } from '$lib/utils/api';
     import { onMount } from 'svelte';
 
     let loading = $state(true);
@@ -16,17 +18,14 @@
         error = null;
         loading = true;
 
-        const res = await fetch(`/api/storages/${page.params['id']}/locks`);
-        if (!res.ok) {
-            const { error: reqError } = await res.json();
-            console.error('Error fetching locks:', reqError);
-            error = reqError || 'Failed to fetch locks';
+        const res = await fetchApi<StorageLocksResponse>('GET', `/api/storages/${page.params['id']}/locks`, null);
+        if (res.isErr()) {
+            error = res.error;
             loading = false;
             return;
         }
 
-        const { locks: fetchedLocks } = await res.json();
-        locks = fetchedLocks;
+        locks = res.value.locks;
         loading = false;
     }
 
@@ -34,14 +33,10 @@
         error = null;
         loading = true;
 
-        const res = await fetch(`/api/storages/${page.params['id']}/locks`, {
-            method: 'DELETE',
-        });
+        const res = await fetchApi('DELETE', `/api/storages/${page.params['id']}/locks`, null);
 
-        if (!res.ok) {
-            const { error: reqError } = await res.json();
-            console.error('Error unlocking all locks:', reqError);
-            error = reqError || 'Failed to unlock all locks';
+        if (res.isErr()) {
+            error = res.error;
             loading = false;
         } else {
             await fetchLocks();

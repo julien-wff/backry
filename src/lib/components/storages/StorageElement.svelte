@@ -3,6 +3,8 @@
     import BaseListElement from '$lib/components/common/BaseListElement.svelte';
     import { FolderHeart, HardDrive, Link } from '$lib/components/icons';
     import { type storages } from '$lib/db/schema';
+    import type { StorageResponse } from '$lib/schemas/api';
+    import { fetchApi } from '$lib/utils/api';
     import { formatSize } from '$lib/utils/format';
 
     interface Props {
@@ -15,11 +17,9 @@
 
     async function deleteStorage() {
         loading = true;
-        const res = await fetch(`/api/storages/${storage.id}`, {
-            method: 'DELETE',
-        });
+        const res = await fetchApi<StorageResponse>('DELETE', `/api/storages/${storage.id}`, null);
 
-        if (res.ok) {
+        if (res.isOk()) {
             await invalidateAll();
         }
 
