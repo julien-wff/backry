@@ -1,9 +1,9 @@
 import type { ConnectionStringParams, EngineMethods } from '$lib/types/engine';
 import { runCommandSync } from '$lib/utils/cmd';
+import { buildDbUrlFromParams } from '$lib/utils/url';
 import { SQL } from 'bun';
 import { type ContainerInspectInfo } from 'dockerode';
 import { err, ok, Result, type ResultAsync } from 'neverthrow';
-import { buildDbUrlFromParams } from '$lib/utils/url';
 
 export const postgresMethods = {
     command: process.env.BACKRY_PGDUMP_CMD ?? 'pg_dump',
@@ -23,17 +23,22 @@ export const postgresMethods = {
     },
 
     async checkConnection(connectionString): Promise<ResultAsync<void, string>> {
-        const con = new SQL({
-            url: connectionString,
-            connectionTimeout: 5,
-        });
+        let con: SQL;
+        try {
+            con = new SQL({
+                url: connectionString,
+                connectionTimeout: 3,
+            });
+        } catch (e) {
+            return err(e instanceof Error ? e.message : 'Error creating instance');
+        }
 
         try {
             await con.connect();
             await con.close();
             return ok();
         } catch (e) {
-            return err(e instanceof Error ? e.message : 'Unknown error');
+            return err(e instanceof Error ? e.message : 'Error connecting to database');
         }
     },
 
