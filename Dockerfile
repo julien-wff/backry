@@ -1,4 +1,4 @@
-FROM oven/bun:1.2.11-alpine AS builder
+FROM oven/bun:1.2.13-alpine AS builder
 
 WORKDIR /app
 
@@ -11,7 +11,7 @@ COPY . .
 RUN bun -c run build
 
 
-FROM oven/bun:1.2.11-alpine AS runtime
+FROM oven/bun:1.2.13-alpine AS runtime
 
 WORKDIR /app
 
