@@ -1,6 +1,6 @@
 import { db } from '$lib/db';
 import { storages } from '$lib/db/schema';
-import type { StoragesCreateRequest } from '$lib/types/api';
+import type { StorageCreateRequest } from '$lib/schemas/api';
 import { eq } from 'drizzle-orm';
 
 /**
@@ -25,7 +25,7 @@ export const getStorage = (id: number) =>
  * Creates a new storage from an HTTP request.
  * @param storage Fields from request body.
  */
-export const createStorage = (storage: StoragesCreateRequest) => db
+export const createStorage = (storage: StorageCreateRequest) => db
     .insert(storages)
     .values(storage)
     .returning()

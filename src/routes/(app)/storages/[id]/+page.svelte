@@ -6,7 +6,14 @@
     import EnvVarInput from '$lib/components/forms/EnvVarInput.svelte';
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
     import { ArchiveRestore, CloudUpload, PackageOpen } from '$lib/components/icons';
-    import type { StoragesCheckRequest, StoragesCheckResponse, StoragesCreateRequest } from '$lib/types/api';
+    import {
+        type storageCreateRequest,
+        storageInitRepositoryRequest,
+        type StorageResponse,
+        storagesCheckRequest, type StoragesCheckResponse,
+        type StoragesInitRepositoryResponse,
+    } from '$lib/schemas/api';
+    import { fetchApi } from '$lib/utils/api';
     import type { PageProps } from './$types';
 
     let { data }: PageProps = $props();
@@ -34,47 +41,44 @@
         if (!arePreChecksValid) {
             await checkURL();
         } else {
-            await createRepository();
+            await initRepository();
         }
 
         isLoading = false;
     }
 
     async function checkURL() {
-        const res = await fetch('/api/storages/check', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            },
-            body: JSON.stringify({
-                url: repoUrl,
-                password,
-                env: envRecords,
-                checkRepository: isExistingRepository,
-            } as StoragesCheckRequest),
+        const res = await fetchApi<StoragesCheckResponse, typeof storagesCheckRequest>('POST', '/api/storages/check', {
+            url: repoUrl,
+            password,
+            env: envRecords,
+            checkRepository: isExistingRepository,
         });
-        const data = await res.json() as StoragesCheckResponse;
 
-        if (data.newLocalUrl) {
-            repoUrl = data.newLocalUrl;
+        if (res.isErr()) {
+            error = res.error;
+            return;
         }
 
-        if (data.error !== null) {
-            error = data.error;
+        if (res.value.newLocalUrl) {
+            repoUrl = res.value.newLocalUrl;
+        }
+
+        if (res.value.error !== null) {
+            error = res.value.error;
             return;
         }
 
         if (isExistingRepository) {
-            if (data.resticError) {
-                error = data.resticError.message;
+            if (res.value.resticError) {
+                error = res.value.resticError.message;
             } else {
                 await saveRepositoryToDb();
             }
             return;
         }
 
-        if (!isExistingRepository && data.isLocalFolderEmptyEmpty === false) {
+        if (!isExistingRepository && res.value.isLocalFolderEmptyEmpty === false) {
             error = 'Folder must be empty to initialize a new repository';
             return;
         }
@@ -82,24 +86,19 @@
         arePreChecksValid = true;
     }
 
-    async function createRepository() {
-        const res = await fetch('/api/storages/create-repository', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            },
-            body: JSON.stringify({
-                name: repoName,
+    async function initRepository() {
+        const res = await fetchApi<StoragesInitRepositoryResponse, typeof storageInitRepositoryRequest>(
+            'POST',
+            '/api/storages/create-repository',
+            {
                 url: repoUrl,
                 password,
                 env: envRecords,
-            } as StoragesCheckRequest),
-        });
-        const data = await res.json();
+            },
+        );
 
-        if (data.error) {
-            error = data.error.message || data.error;
+        if (res.isErr()) {
+            error = res.error;
             return;
         }
 
@@ -107,23 +106,15 @@
     }
 
     async function saveRepositoryToDb() {
-        const res = await fetch('/api/storages', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            },
-            body: JSON.stringify({
-                name: repoName,
-                url: repoUrl,
-                password,
-                env: envRecords,
-            } as StoragesCreateRequest),
+        const res = await fetchApi<StorageResponse, typeof storageCreateRequest>('POST', '/api/storages', {
+            name: repoName,
+            url: repoUrl,
+            password,
+            env: envRecords,
         });
 
-        if (!res.ok) {
-            const data = await res.json();
-            error = data.error || 'Failed to save repository';
+        if (res.isErr()) {
+            error = res.error;
             return;
         }
 
