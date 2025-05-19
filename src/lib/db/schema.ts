@@ -2,7 +2,7 @@ import { relations, sql } from 'drizzle-orm';
 import { integer, real, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
 export const ELEMENT_STATUS = [ 'active', 'inactive', 'error' ] as const;
-export const DATABASE_ENGINES = [ 'postgresql', 'sqlite', 'mysql' ] as const;
+export const DATABASE_ENGINES = [ 'postgresql', 'sqlite', 'mysql', 'mongodb' ] as const;
 export const BACKUP_STATUS = [ 'running', 'success', 'error' ] as const;
 export const RUN_ORIGIN = [ 'manual', 'scheduled' ] as const;
 

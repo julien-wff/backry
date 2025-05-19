@@ -20,6 +20,7 @@ WORKDIR /app
 RUN apk add --no-cache \
     mariadb-client \
     mariadb-connector-c \
+    mongodb-tools \
     postgresql16-client \
     sqlite && \
     # Restic 0.18.0

@@ -27,4 +27,5 @@
     <ToolVersion {...data['mysql:check']} name="MySQL"/>
     <ToolVersion {...data['mysql:dump']} name="MySQL Dump"/>
     <ToolVersion {...data['sqlite:dump']} name="SQLite"/>
+    <ToolVersion {...data['mongodb:dump']} name="MongoDB Dump"/>
 </div>

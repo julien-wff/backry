@@ -17,6 +17,11 @@ export const ENGINES_META = {
         icon: '/icons/mysql.svg',
         connectionStringPlaceholder: 'mysql://user:password@host:port/database',
     },
+    mongodb: {
+        displayName: 'MongoDB',
+        icon: '/icons/mongodb.svg',
+        connectionStringPlaceholder: 'mongodb://user:password@host:port/database',
+    },
 } as const satisfies Record<typeof DATABASE_ENGINES[number], EngineMeta>;
 
 export const ENGINE_META_ENTRIES = Object.entries(ENGINES_META) as Array<[ typeof DATABASE_ENGINES[number], EngineMeta ]>;
