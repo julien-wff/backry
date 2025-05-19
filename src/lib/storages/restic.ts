@@ -12,6 +12,8 @@ import { logger } from '$lib/utils/logger';
 import { type $ } from 'bun';
 import { err, ok, Result, type ResultAsync } from 'neverthrow';
 
+export const RESTIC_CMD = process.env.BACKRY_RESTIC_CMD || 'restic';
+
 export const RESTIC_DEFAULT_ENV = {
     'RESTIC_CACHE_DIR': process.env.RESTIC_CACHE_DIR ?? '',
     'XDG_CACHE_DIR': process.env.XDG_CACHE_DIR ?? '',
@@ -58,7 +60,7 @@ async function resticCommandToResult<T>(res: Result<$.ShellOutput, $.ShellOutput
 
 
 export async function getResticVersion(): Promise<ResultAsync<string, string>> {
-    const res = await runCommandSync('restic', [ 'version' ]);
+    const res = await runCommandSync(RESTIC_CMD, [ 'version' ]);
     if (res.isErr()) {
         return err(res.error.stderr.toString().trim());
     }
@@ -76,7 +78,7 @@ export async function getResticVersion(): Promise<ResultAsync<string, string>> {
  */
 export async function getRepositoryStats(path: string, password: string, env: Record<string, string>, onlyBackry = false) {
     const res = await runCommandSync(
-        'restic',
+        RESTIC_CMD,
         [ 'stats', '-r', path, '--json', '--mode', 'raw-data', ...(onlyBackry ? [ '--tag', 'backry' ] : []) ],
         { env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env } },
     );
@@ -95,7 +97,7 @@ export async function getRepositoryStats(path: string, password: string, env: Re
  */
 export async function getRepositorySnapshots(path: string, password: string, env: Record<string, string>, onlyBackry = false) {
     const res = await runCommandSync(
-        'restic',
+        RESTIC_CMD,
         [ 'snapshots', '-r', path, '--json', '--no-lock', ...(onlyBackry ? [ '--tag', 'backry' ] : []) ],
         { env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env } },
     );
@@ -106,7 +108,7 @@ export async function getRepositorySnapshots(path: string, password: string, env
 
 export async function initRepository(path: string, password: string, env: Record<string, string>) {
     const res = await runCommandSync(
-        'restic',
+        RESTIC_CMD,
         [ 'init', '-r', path, '--json' ],
         { env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env } },
     );
@@ -129,7 +131,7 @@ export async function backupFromCommand(url: string,
     tags = [ 'backry', ...tags.map((tag) => tag.replace(/,/g, '_')) ];
 
     return runCommandStream(
-        'restic',
+        RESTIC_CMD,
         [
             '-r', url,
             'backup',
@@ -162,7 +164,7 @@ export async function deleteSnapshots(url: string,
     // forget with --prune does not yet support JSON output as of restic v0.18.0
     // https://restic.readthedocs.io/en/v0.18.0/075_scripting.html#forget
     const res = await runCommandSync(
-        'restic',
+        RESTIC_CMD,
         [
             '-r', url,
             'forget',
@@ -184,7 +186,7 @@ export async function readFileContent(url: string,
                                       snapshotId: string,
                                       fileName: string) {
     const res = await runCommandSync(
-        'restic',
+        RESTIC_CMD,
         [
             '-r', url,
             'dump',
@@ -204,7 +206,7 @@ export async function getRepositoryLocks(url: string,
                                          password: string,
                                          env: Record<string, string>): Promise<ResultAsync<ResticLock[], string>> {
     const locksResult = await runCommandSync(
-        'restic',
+        RESTIC_CMD,
         [
             '-r', url,
             'list',
@@ -224,7 +226,7 @@ export async function getRepositoryLocks(url: string,
 
     const locksData = await Promise.all(locks.value.map(async (lock) => {
         const lockResult = await runCommandSync(
-            'restic',
+            RESTIC_CMD,
             [
                 '-r', url,
                 'cat',
@@ -261,7 +263,7 @@ export async function unlockRepository(url: string,
                                        password: string,
                                        env: Record<string, string>) {
     const res = await runCommandSync(
-        'restic',
+        RESTIC_CMD,
         [
             '-r', url,
             'unlock',

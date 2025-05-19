@@ -1,5 +1,5 @@
 import { getAllEnginesVersionsOrError } from '$lib/engines/checks';
-import { getResticVersion } from '$lib/storages/restic';
+import { getResticVersion, RESTIC_CMD } from '$lib/storages/restic';
 import { VERSION as svelteKitVersion } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
@@ -23,7 +23,7 @@ export const load: PageServerLoad = async ({}) => {
         restic: {
             version: resticVersion.isOk() ? resticVersion.value : null,
             error: resticVersion.isErr() ? resticVersion.error : null,
-            cmd: 'restic',
+            cmd: RESTIC_CMD,
         },
         ...enginesVersions,
     };
