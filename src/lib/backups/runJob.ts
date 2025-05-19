@@ -117,7 +117,7 @@ async function jobDatabaseBackup(job: NonNullable<Awaited<ReturnType<typeof getJ
     const updatedBackup = await updateBackup(backup.id, {
         // @ts-expect-error only accepts string, sql is not supported in type definition (but is for drizzle)
         finishedAt: sql`(CURRENT_TIMESTAMP)`,
-        error: res.isErr() ? JSON.stringify(res.error) : noSummaryErrorMessage,
+        error: res.isErr() ? res.error[0].message : noSummaryErrorMessage,
         dumpSize: backupSummary?.total_bytes_processed,
         dumpSpaceAdded: backupSummary?.data_added_packed,
         duration: backupSummary?.total_duration,

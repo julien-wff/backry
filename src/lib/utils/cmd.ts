@@ -57,7 +57,11 @@ async function readAndDecodeStream<T>(
 
                 let parsedLine: T;
                 if (json) {
-                    parsedLine = JSON.parse(line) as T;
+                    try {
+                        parsedLine = JSON.parse(line) as T;
+                    } catch {
+                        throw new Error(`Failed to parse JSON: ${line}`);
+                    }
                 } else {
                     parsedLine = line as T;
                 }
@@ -76,7 +80,7 @@ async function readAndDecodeStream<T>(
 }
 
 
-export async function runCommandStream<O, E>(command: string, args: string[] = [], options?: StreamCommandOptions<O, E>): Promise<ResultAsync<O[], E[] | Error>> {
+export async function runCommandStream<O, E>(command: string, args: string[] = [], options?: StreamCommandOptions<O, E>): Promise<ResultAsync<O[], (E | Error)[]>> {
     const subprocess = Bun.spawn([ command, ...args ], {
         cwd: options?.cwd,
         env: options?.env,
@@ -88,15 +92,15 @@ export async function runCommandStream<O, E>(command: string, args: string[] = [
     const stderrStream = subprocess.stderr.getReader();
     const [ stdoutResult, stderrResult ] = await Promise.all([
         readAndDecodeStream<O>(stdoutStream, options?.json ?? false, options?.onStdout),
-        readAndDecodeStream<E>(stderrStream, false, options?.onStderr),
+        readAndDecodeStream<E>(stderrStream, options?.json ?? false, options?.onStderr),
     ]);
 
     if (stdoutResult.isErr()) {
-        return err(stdoutResult.error);
+        return err([ stdoutResult.error ]);
     }
 
     if (stderrResult.isErr()) {
-        return err(stderrResult.error);
+        return err([ stderrResult.error ]);
     }
 
     if (stderrResult.value.length > 0) {

@@ -117,7 +117,7 @@ export async function initRepository(path: string, password: string, env: Record
 }
 
 type BackupFromCommandExtras = Pick<
-    StreamCommandOptions<ResticBackupSummary | ResticBackupStatus, string>,
+    StreamCommandOptions<ResticBackupSummary | ResticBackupStatus, ResticError>,
     'onStdout' | 'onStderr'
 >;
 
