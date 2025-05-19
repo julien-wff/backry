@@ -70,7 +70,7 @@
                  title={backup.jobDatabase.database.name}>
     <div class="flex items-center gap-1">
         <Clock class="w-4 h-4"/>
-        Started: {backup.startedAt}
+        Started: {formatUtcDate(backup.startedAt!)}
     </div>
 
     {#if backup.duration}

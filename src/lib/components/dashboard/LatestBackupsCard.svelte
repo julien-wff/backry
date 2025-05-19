@@ -4,8 +4,10 @@
     import { formatDuration, formatSize } from '$lib/utils/format.js';
     import dayjs from 'dayjs';
     import relativeTime from 'dayjs/plugin/relativeTime';
+    import utc from 'dayjs/plugin/utc';
 
     dayjs.extend(relativeTime);
+    dayjs.extend(utc);
 
     interface Props {
         backups: Awaited<ReturnType<typeof getDashboardStats>>['latestBackups'];
@@ -25,7 +27,7 @@
 
     <div class="flex flex-col gap-2 mt-4">
         {#each backups as backup (backup.id)}
-            {@const backupDate = dayjs(backup.finishedAt).fromNow()}
+            {@const backupDate = dayjs.utc(backup.finishedAt).fromNow()}
 
             <div class="flex items-center justify-between gap-2 bg-base-200 py-2 px-3 rounded-box">
                 <div class="flex flex-col">
