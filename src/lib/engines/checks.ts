@@ -2,6 +2,7 @@ import { db } from '$lib/db';
 import { DATABASE_ENGINES, databases } from '$lib/db/schema';
 import { ENGINE_META_ENTRIES } from '$lib/engines/enginesMeta';
 import { ENGINES_METHODS } from '$lib/engines/enginesMethods';
+import type { EngineMethods } from '$lib/types/engine';
 import { logger } from '$lib/utils/logger';
 import { eq, or } from 'drizzle-orm';
 
@@ -66,14 +67,29 @@ export async function checkDatabase(database: typeof databases.$inferSelect) {
 
 
 export async function getAllEnginesVersionsOrError() {
-    const result = {} as Record<typeof DATABASE_ENGINES[number], { version: string | null; error: string | null }>;
+    const result = {} as Record<
+        `${typeof DATABASE_ENGINES[number]}:${'dump' | 'check'}`,
+        { version: string | null; error: string | null }
+    >;
 
     for (const [ engineId ] of ENGINE_META_ENTRIES) {
-        const version = await ENGINES_METHODS[engineId].getDumpCmdVersion();
-        if (version.isOk()) {
-            result[engineId] = { version: version.value, error: null };
+        const engine: EngineMethods = ENGINES_METHODS[engineId];
+
+        const dumpVersion = await engine.getDumpCmdVersion();
+        if (dumpVersion.isOk()) {
+            result[`${engineId}:dump`] = { version: dumpVersion.value, error: null };
         } else {
-            result[engineId] = { version: null, error: version.error };
+            result[`${engineId}:dump`] = { version: null, error: dumpVersion.error };
+        }
+
+        const checkVersion = await engine.getCheckCmdVersion?.();
+        if (!checkVersion) {
+            continue;
+        }
+        if (checkVersion.isOk()) {
+            result[`${engineId}:check`] = { version: checkVersion.value, error: null };
+        } else {
+            result[`${engineId}:check`] = { version: null, error: checkVersion.error };
         }
     }
 

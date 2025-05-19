@@ -23,7 +23,8 @@
     <ToolVersion {...data.bun} name="Bun"/>
     <ToolVersion {...data.svelteKit} name="SvelteKit"/>
     <ToolVersion {...data.restic} name="Restic"/>
-    <ToolVersion {...data.postgresql} name="PGDump"/>
-    <ToolVersion {...data.mysql} name="MySQL Dump"/>
-    <ToolVersion {...data.sqlite} name="SQLite"/>
+    <ToolVersion {...data['postgresql:dump']} name="PGDump"/>
+    <ToolVersion {...data['mysql:check']} name="MySQL"/>
+    <ToolVersion {...data['mysql:dump']} name="MySQL Dump"/>
+    <ToolVersion {...data['sqlite:dump']} name="SQLite"/>
 </div>

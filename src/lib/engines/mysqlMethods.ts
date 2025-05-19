@@ -59,6 +59,15 @@ export const mysqlMethods = {
         return ok(res.value.text().trim());
     },
 
+    async getCheckCmdVersion(): Promise<ResultAsync<string, string>> {
+        const res = await runCommandSync(this.checkCommand!, [ '--version' ]);
+        if (res.isErr()) {
+            return err(res.error.stderr.toString().trim());
+        }
+
+        return ok(res.value.text().trim());
+    },
+
     getDumpCommand(connectionString, additionalArgs = []) {
         return [ this.dumpCommand, ...additionalArgs, ...connectionStringToOptions(connectionString, false) ];
     },
