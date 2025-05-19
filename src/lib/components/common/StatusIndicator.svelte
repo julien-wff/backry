@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { CheckCircle, CirclePlay, CircleX, OctagonAlert } from '$lib/components/icons';
+    import { CircleCheck, CirclePlay, CircleX, OctagonAlert } from '$lib/components/icons';
     import { type BACKUP_STATUS, type ELEMENT_STATUS } from '$lib/db/schema';
 
     interface Props {
@@ -16,7 +16,7 @@
      class:badge-neutral={status === 'inactive'}
      class:badge-success={status === 'active' || status === 'success'}>
     {#if status === 'active'}
-        <CheckCircle class="w-4 h-4"/>
+        <CircleCheck class="w-4 h-4"/>
         Active
     {:else if status === 'inactive'}
         <CircleX class="w-4 h-4"/>
@@ -28,7 +28,7 @@
         <CirclePlay class="w-4 h-4"/>
         Running
     {:else if status === 'success'}
-        <CheckCircle class="w-4 h-4"/>
+        <CircleCheck class="w-4 h-4"/>
         Success
     {/if}
 </div>

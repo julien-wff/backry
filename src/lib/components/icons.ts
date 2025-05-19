@@ -3,8 +3,8 @@ import ArchiveRestore from '@lucide/svelte/icons/archive-restore';
 import ArrowDown from '@lucide/svelte/icons/arrow-down';
 import ArrowUp from '@lucide/svelte/icons/arrow-up';
 import Blocks from '@lucide/svelte/icons/blocks';
-import CheckCircle from '@lucide/svelte/icons/check-circle';
 import ChevronLeft from '@lucide/svelte/icons/chevron-left';
+import CircleCheck from '@lucide/svelte/icons/circle-check';
 import CircleHelp from '@lucide/svelte/icons/circle-help';
 import CirclePlay from '@lucide/svelte/icons/circle-play';
 import CirclePlus from '@lucide/svelte/icons/circle-plus';
@@ -46,8 +46,8 @@ export {
     ArrowDown,
     ArrowUp,
     Blocks,
-    CheckCircle,
     ChevronLeft,
+    CircleCheck,
     CircleHelp,
     CirclePlay,
     CirclePlus,
