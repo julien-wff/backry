@@ -69,7 +69,7 @@ export async function checkDatabase(database: typeof databases.$inferSelect) {
 export async function getAllEnginesVersionsOrError() {
     const result = {} as Record<
         `${typeof DATABASE_ENGINES[number]}:${'dump' | 'check'}`,
-        { version: string | null; error: string | null, cmd: string }
+        { version: string | null; error: string | null, cmd: string, cmdResolved: string | null }
     >;
 
     for (const [ engineId ] of ENGINE_META_ENTRIES) {
@@ -77,9 +77,19 @@ export async function getAllEnginesVersionsOrError() {
 
         const dumpVersion = await engine.getDumpCmdVersion();
         if (dumpVersion.isOk()) {
-            result[`${engineId}:dump`] = { version: dumpVersion.value, error: null, cmd: engine.dumpCommand };
+            result[`${engineId}:dump`] = {
+                version: dumpVersion.value,
+                error: null,
+                cmd: engine.dumpCommand,
+                cmdResolved: Bun.which(engine.dumpCommand),
+            };
         } else {
-            result[`${engineId}:dump`] = { version: null, error: dumpVersion.error, cmd: engine.dumpCommand };
+            result[`${engineId}:dump`] = {
+                version: null,
+                error: dumpVersion.error,
+                cmd: engine.dumpCommand,
+                cmdResolved: Bun.which(engine.dumpCommand),
+            };
         }
 
         if (!engine.checkCommand || !engine.getCheckCmdVersion) {
@@ -88,9 +98,19 @@ export async function getAllEnginesVersionsOrError() {
 
         const checkVersion = await engine.getCheckCmdVersion();
         if (checkVersion.isOk()) {
-            result[`${engineId}:check`] = { version: checkVersion.value, error: null, cmd: engine.checkCommand };
+            result[`${engineId}:check`] = {
+                version: checkVersion.value,
+                error: null,
+                cmd: engine.checkCommand,
+                cmdResolved: Bun.which(engine.checkCommand),
+            };
         } else {
-            result[`${engineId}:check`] = { version: null, error: checkVersion.error, cmd: engine.checkCommand };
+            result[`${engineId}:check`] = {
+                version: null,
+                error: checkVersion.error,
+                cmd: engine.checkCommand,
+                cmdResolved: Bun.which(engine.checkCommand),
+            };
         }
     }
 
