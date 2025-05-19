@@ -92,10 +92,10 @@ export interface ResticForget {
     tags: string[] | null,
     host: string,
     paths: string[],
-    keep: ResticSnapshot[],
-    remove: ResticSnapshot[],
+    keep: ResticSnapshot[] | null,
+    remove: ResticSnapshot[] | null,
     reasons: Array<{
         snapshot: ResticSnapshot,
         matches: string[],
-    }>
+    }> | null,
 }

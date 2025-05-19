@@ -147,16 +147,16 @@ async function jobDatabaseBackup(job: NonNullable<Awaited<ReturnType<typeof getJ
         }
 
         const forgetStats = forgetResult.value[0][0];
-        logger.info(`Forget policy applied for job #${job.id} database #${jobIndex}: ${forgetStats.remove.length} snapshots removed, ${forgetStats.keep.length} kept`);
+        logger.info(`Forget policy applied for job #${job.id} database #${jobIndex}: ${forgetStats.remove?.length ?? 0} snapshots removed, ${forgetStats.keep?.length ?? 0} kept`);
         logger.debug({
-            snapshotKept: forgetStats.keep.map(s => ({
+            snapshotKept: forgetStats.keep?.map(s => ({
                 id: s.short_id,
-                matches: forgetStats.reasons.find(r => r.snapshot.short_id === s.short_id)?.matches,
+                matches: forgetStats.reasons?.find(r => r.snapshot.short_id === s.short_id)?.matches,
             })),
-            snapshotRemoved: forgetStats.remove.map(s => s.short_id),
+            snapshotRemoved: forgetStats.remove?.map(s => s.short_id),
         }, 'Forget summary');
 
-        if (forgetStats.remove.length > 0) {
+        if (forgetStats.remove && forgetStats.remove.length > 0) {
             const updatedBackups = await setBackupsToPruned(forgetStats.remove.map(s => s.id));
             for (const backup of updatedBackups) {
                 backupEmitter.emit('update', backup);
