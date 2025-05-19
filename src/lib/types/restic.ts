@@ -87,3 +87,15 @@ export interface ResticLock {
     username: string,
     pid: number,
 }
+
+export interface ResticForget {
+    tags: string[] | null,
+    host: string,
+    paths: string[],
+    keep: ResticSnapshot[],
+    remove: ResticSnapshot[],
+    reasons: Array<{
+        snapshot: ResticSnapshot,
+        matches: string[],
+    }>
+}

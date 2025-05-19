@@ -2,6 +2,7 @@ import type {
     ResticBackupStatus,
     ResticBackupSummary,
     ResticError,
+    ResticForget,
     ResticInit,
     ResticLock,
     ResticSnapshot,
@@ -35,7 +36,21 @@ function formatResticError(shellOutput: $.ShellOutput) {
     }
 }
 
-async function resticCommandToResult<T>(res: Result<$.ShellOutput, $.ShellOutput>, json = true): Promise<ResultAsync<T[], ResticError>> {
+/**
+ * Take a Bun Shell command output from Restic and parse it into an array of passed type.
+ * Each line will result in a separate element in the array.
+ * @param res The result of the command
+ * @param json If the output from stdout should be parsed as JSON. If one of the lines is not valid JSON, an error will be returned.
+ * @param firstLines If set, only the first N lines will be parsed and returned.
+ *                   This can be useful for e.g. for pruning, where only the first line is JSON.
+ * @return The parsed output as an array of the passed type, or a Restic error (from the command or created from parsing error)
+ * @template T The type of the stdout output lines
+ */
+async function resticCommandToResult<T>(
+    res: Result<$.ShellOutput, $.ShellOutput>,
+    json = true,
+    firstLines: number = Number.MAX_SAFE_INTEGER,
+): Promise<ResultAsync<T[], ResticError>> {
     if (res.isErr()) {
         logger.error(`Failed to run restic command: ${res.error.stderr.toString().trim()}`);
         return err(formatResticError(res.error));
@@ -47,7 +62,7 @@ async function resticCommandToResult<T>(res: Result<$.ShellOutput, $.ShellOutput
     }
 
     try {
-        return ok(output.map(o => JSON.parse(o)) as T[]);
+        return ok(output.slice(0, firstLines).map(o => JSON.parse(o)) as T[]);
     } catch {
         logger.error(`Failed to parse restic output: ${res.value.text().trim()}`);
         return err({
@@ -274,4 +289,43 @@ export async function unlockRepository(url: string,
     );
 
     return resticCommandToResult<string>(res, false);
+}
+
+
+/**
+ * Apply a forget policy to delete snapshots from a repository.
+ * The snapshots are filtered by the tags `backry`, `jobId:<jobId>` and `dbId:<databaseId>`.
+ * The policy is passed as a string to the `restic forget` command.
+ * The reposotory is also pruned to definitely delete the data.
+ * @param url URL to the restic repository
+ * @param password Repository password
+ * @param env Additional environment variables to set
+ * @param policy Policy to apply (e.g. --keep-last 10). This is passed as a string to the `restic forget` command.
+ * @param jobId Job ID to filter the snapshots by.
+ * @param databaseId Database ID to filter the snapshots by.
+ */
+export async function applyForgetPolicy(url: string,
+                                        password: string,
+                                        env: Record<string, string>,
+                                        policy: string,
+                                        jobId: number,
+                                        databaseId: number) {
+    const res = await runCommandSync(
+        RESTIC_CMD,
+        [
+            '-r', url,
+            'forget',
+            '--json',
+            '--tag', 'backry',
+            '--tag', `jobId:${jobId}`,
+            '--tag', `dbId:${databaseId}`,
+            '--prune',
+            ...policy.split(' '),
+        ],
+        {
+            env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env },
+        },
+    );
+
+    return resticCommandToResult<ResticForget[]>(res, true, 1);
 }

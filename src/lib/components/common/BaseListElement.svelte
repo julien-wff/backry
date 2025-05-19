@@ -7,6 +7,7 @@
 
     interface Props {
         status?: typeof ELEMENT_STATUS[number] | typeof BACKUP_STATUS[number];
+        statusTooltip?: string | null;
         title: string;
         deleteConfirmationMessage?: string;
         children?: Snippet;
@@ -22,6 +23,7 @@
 
     let {
         status,
+        statusTooltip,
         title,
         deleteConfirmationMessage,
         children,
@@ -50,13 +52,7 @@
     <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
             {#if status}
-                {#if error}
-                    <div class="tooltip tooltip-error flex" data-tip={error}>
-                        <StatusIndicator {status}/>
-                    </div>
-                {:else}
-                    <StatusIndicator {status}/>
-                {/if}
+                <StatusIndicator {status} tooltip={error ?? statusTooltip}/>
             {/if}
             {title}
         </div>

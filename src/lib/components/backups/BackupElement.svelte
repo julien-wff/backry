@@ -7,7 +7,7 @@
     import type { BackupResponse } from '$lib/schemas/api';
     import { addToast } from '$lib/stores/toasts.svelte';
     import { fetchApi } from '$lib/utils/api';
-    import { formatDuration, formatSize } from '$lib/utils/format.js';
+    import { formatDuration, formatSize, formatUtcDate } from '$lib/utils/format.js';
 
     interface Props {
         backup: Omit<Awaited<ReturnType<typeof backupsListFull>>[number], 'run'>;
@@ -17,6 +17,8 @@
     let status = $derived(((): typeof BACKUP_STATUS[number] => {
         if (backup.error) {
             return 'error';
+        } else if (backup.prunedAt) {
+            return 'pruned';
         } else if (backup.finishedAt) {
             return 'success';
         } else {
@@ -42,12 +44,12 @@
 
 
 {#snippet secondaryBtns()}
-    {#if !backup.error && backup.dumpSize && backup.dumpSize < 10e6}
+    {#if !backup.error && backup.dumpSize && backup.dumpSize < 10e6 && !backup.prunedAt}
         <a download href="/api/backups/{backup.id}/download" class="btn btn-sm btn-success btn-soft">
             <FileDown class="w-4 h-4"/>
             Download
         </a>
-    {:else if !backup.error && backup.dumpSize}
+    {:else if !backup.error && backup.dumpSize && !backup.prunedAt}
         <div class="tooltip tooltip-error" data-tip="Cannot download dumps larger than 10MB">
             <button class="btn btn-sm btn-success btn-soft w-full" disabled>
                 <FileDown class="w-4 h-4"/>
@@ -63,7 +65,8 @@
                  error={backup.error}
                  ondelete={handleDelete}
                  {secondaryBtns}
-                 status={status}
+                 {status}
+                 statusTooltip={backup.prunedAt ? formatUtcDate(backup.prunedAt) : undefined}
                  title={backup.jobDatabase.database.name}>
     <div class="flex items-center gap-1">
         <Clock class="w-4 h-4"/>

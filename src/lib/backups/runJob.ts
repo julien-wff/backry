@@ -1,10 +1,10 @@
 import type { backups } from '$lib/db/schema';
 import { ENGINES_METHODS } from '$lib/engines/enginesMethods';
-import { createBackup, updateBackup } from '$lib/queries/backups';
+import { createBackup, setBackupsToPruned, updateBackup } from '$lib/queries/backups';
 import { getJob } from '$lib/queries/jobs';
 import { createRun, updateRun } from '$lib/queries/runs';
 import { backupEmitter } from '$lib/shared/events';
-import { backupFromCommand } from '$lib/storages/restic';
+import { applyForgetPolicy, backupFromCommand } from '$lib/storages/restic';
 import type { EngineMethods } from '$lib/types/engine';
 import { logger } from '$lib/utils/logger';
 import { sql } from 'drizzle-orm';
@@ -129,6 +129,39 @@ async function jobDatabaseBackup(job: NonNullable<Awaited<ReturnType<typeof getJ
     if (res.isErr()) {
         logger.error(res.error, `Error running backup for job #${job.id} database #${jobIndex}`);
         return err(JSON.stringify(res.error));
+    }
+
+    // Apply prune policy by deleting snapshots, update them in database and update the client
+    if (job.deletePolicy) {
+        const forgetResult = await applyForgetPolicy(
+            job.storage.url,
+            job.storage.password!,
+            job.storage.env,
+            job.deletePolicy,
+            job.id,
+            jobDatabase.database.id,
+        );
+        if (forgetResult.isErr()) {
+            logger.error(forgetResult.error, `Error applying forget policy for job #${job.id}`);
+            return err(`Error applying forget policy: ${forgetResult.error.message}`);
+        }
+
+        const forgetStats = forgetResult.value[0][0];
+        logger.info(`Forget policy applied for job #${job.id} database #${jobIndex}: ${forgetStats.remove.length} snapshots removed, ${forgetStats.keep.length} kept`);
+        logger.debug({
+            snapshotKept: forgetStats.keep.map(s => ({
+                id: s.short_id,
+                matches: forgetStats.reasons.find(r => r.snapshot.short_id === s.short_id)?.matches,
+            })),
+            snapshotRemoved: forgetStats.remove.map(s => s.short_id),
+        }, 'Forget summary');
+
+        if (forgetStats.remove.length > 0) {
+            const updatedBackups = await setBackupsToPruned(forgetStats.remove.map(s => s.id));
+            for (const backup of updatedBackups) {
+                backupEmitter.emit('update', backup);
+            }
+        }
     }
 
     logger.info(`Backup for job #${job.id} database #${jobIndex} finished`);

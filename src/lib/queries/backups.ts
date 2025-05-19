@@ -1,6 +1,6 @@
 import { db } from '$lib/db';
 import { backups, jobDatabases, jobs, storages } from '$lib/db/schema';
-import { desc, eq, isNull } from 'drizzle-orm';
+import { desc, eq, inArray, isNull, sql } from 'drizzle-orm';
 
 export const backupsListFull = async () => db.query.backups.findMany({
     orderBy: [ desc(backups.startedAt) ],
@@ -94,3 +94,20 @@ export const setUnfinishedBackupsToError = async () => db
     .where(isNull(backups.finishedAt))
     .returning()
     .get();
+
+/**
+ * Set the prunedAt timestamp for backups, given snapshot IDs.
+ * @param snapshotIds Array of snapshot IDs
+ * @return Array of updated backups
+ */
+export const setBackupsToPruned = (snapshotIds: string[]) =>
+    db
+        .update(backups)
+        .set({
+            prunedAt: sql`(CURRENT_TIMESTAMP)`,
+        })
+        .where(
+            inArray(backups.snapshotId, snapshotIds),
+        )
+        .returning()
+        .execute();

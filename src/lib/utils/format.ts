@@ -1,9 +1,11 @@
 import dayjs from 'dayjs';
 import pluginDuration from 'dayjs/plugin/duration';
 import pluginRelativeTime from 'dayjs/plugin/relativeTime';
+import utc from 'dayjs/plugin/utc';
 
 dayjs.extend(pluginDuration);
 dayjs.extend(pluginRelativeTime);
+dayjs.extend(utc);
 
 /**
  * Format a duration into a human-readable string.
@@ -37,6 +39,15 @@ export const formatSize = (size: number) => {
         i++;
     }
     return `${size.toFixed(i === 0 ? 0 : 2)} ${sizes[i]}`;
+};
+
+/**
+ * Format a UTC date (from database) into a human-readable date from the browser's timezone.
+ * @param date Date to format
+ * @returns Formatted date string
+ */
+export const formatUtcDate = (date: string) => {
+    return dayjs.utc(date).local().format('YYYY-MM-DD HH:mm:ss');
 };
 
 /**

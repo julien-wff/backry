@@ -3,7 +3,7 @@ import { integer, real, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlit
 
 export const ELEMENT_STATUS = [ 'active', 'inactive', 'error' ] as const;
 export const DATABASE_ENGINES = [ 'postgresql', 'sqlite', 'mysql', 'mongodb' ] as const;
-export const BACKUP_STATUS = [ 'running', 'success', 'error' ] as const;
+export const BACKUP_STATUS = [ 'running', 'success', 'error', 'pruned' ] as const;
 export const RUN_ORIGIN = [ 'manual', 'scheduled' ] as const;
 
 export const databases = sqliteTable('databases', {
@@ -115,6 +115,7 @@ export const backups = sqliteTable('backups', {
     dumpSpaceAdded: integer('dump_space_added'),
     duration: real('duration'),
     snapshotId: text('snapshot_id'),
+    prunedAt: text('pruned_at'),
 });
 
 export const backupsRelations = relations(backups, ({ one }) => ({
