@@ -1,8 +1,6 @@
 <script lang="ts">
     import { invalidateAll } from '$app/navigation';
-    import Toast from '$lib/components/common/Toast.svelte';
     import Navbar from '$lib/components/navbar/Navbar.svelte';
-    import { removeToast, toasts } from '$lib/stores/toasts.svelte';
     import { onMount } from 'svelte';
     import type { LayoutProps } from './$types';
 
@@ -44,8 +42,6 @@
     </main>
 </div>
 
-<div class="toast">
-    {#each toasts.toasts as toast, index}
-        <Toast {toast} ondismiss={() => removeToast(index)}/>
-    {/each}
-</div>
+{#await import('$lib/components/common/Toasts.svelte') then Toasts}
+    <Toasts.default/>
+{/await}

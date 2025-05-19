@@ -3,6 +3,7 @@ export type ToastType = 'success' | 'error';
 export interface Toast {
     message: string;
     type: ToastType;
+    id: string;
 }
 
 export const toasts = $state({
@@ -15,17 +16,18 @@ export const toasts = $state({
 export function addToast(message: string, type: ToastType) {
     toasts.toasts = [
         ...toasts.toasts,
-        { message, type },
+        {
+            message,
+            type,
+            id: crypto.randomUUID(),
+        },
     ];
 }
 
 /**
  * Remove a toast popup from the bottom-right corner of the page
- * @param index Index in the toasts array to remove
+ * @param id The id of the toast to remove
  */
-export function removeToast(index: number) {
-    toasts.toasts = [
-        ...toasts.toasts.slice(0, index),
-        ...toasts.toasts.slice(index + 1),
-    ];
+export function removeToast(id: string) {
+    toasts.toasts = toasts.toasts.filter((toast) => toast.id !== id);
 }
