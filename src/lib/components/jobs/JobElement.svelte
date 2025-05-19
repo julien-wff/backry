@@ -5,6 +5,7 @@
     import { Clock, CloudUpload, Database, RefreshCw } from '$lib/components/icons';
     import type { jobsListFull } from '$lib/queries/jobs';
     import { type jobPatchRequest, type JobResponse, jobRunRequest } from '$lib/schemas/api';
+    import { addToast } from '$lib/stores/toasts.svelte';
     import { fetchApi } from '$lib/utils/api';
 
     interface Props {
@@ -51,6 +52,8 @@
 
         if (res.isOk()) {
             await invalidateAll();
+        } else {
+            addToast(`Failed to delete job #${job.id}: ${res.error}`, 'error');
         }
 
         loading = false;

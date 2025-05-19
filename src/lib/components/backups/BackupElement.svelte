@@ -5,6 +5,7 @@
     import type { BACKUP_STATUS } from '$lib/db/schema';
     import type { backupsListFull } from '$lib/queries/backups';
     import type { BackupResponse } from '$lib/schemas/api';
+    import { addToast } from '$lib/stores/toasts.svelte';
     import { fetchApi } from '$lib/utils/api';
     import { formatDuration, formatSize } from '$lib/utils/format.js';
 
@@ -27,8 +28,14 @@
 
     async function handleDelete() {
         loading = true;
-        await fetchApi<BackupResponse>('DELETE', `/api/backups/${backup.id}`, null);
-        await invalidateAll();
+        const res = await fetchApi<BackupResponse>('DELETE', `/api/backups/${backup.id}`, null);
+
+        if (res.isOk()) {
+            await invalidateAll();
+        } else {
+            addToast(`Failed to delete backup #${backup.id}: ${res.error}`, 'error');
+        }
+
         loading = false;
     }
 </script>

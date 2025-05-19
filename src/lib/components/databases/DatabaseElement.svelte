@@ -5,6 +5,7 @@
     import { EthernetPort } from '$lib/components/icons';
     import type { databases } from '$lib/db/schema';
     import type { DatabaseResponse } from '$lib/schemas/api';
+    import { addToast } from '$lib/stores/toasts.svelte';
     import { fetchApi } from '$lib/utils/api';
 
     interface Props {
@@ -21,6 +22,8 @@
 
         if (res.isOk()) {
             await invalidateAll();
+        } else {
+            addToast(`Failed to delete database #${database.id}: ${res.error}`, 'error');
         }
 
         loading = false;

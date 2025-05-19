@@ -4,6 +4,7 @@
     import { FolderHeart, HardDrive, Link } from '$lib/components/icons';
     import { type storages } from '$lib/db/schema';
     import type { StorageResponse } from '$lib/schemas/api';
+    import { addToast } from '$lib/stores/toasts.svelte';
     import { fetchApi } from '$lib/utils/api';
     import { formatSize } from '$lib/utils/format';
 
@@ -21,6 +22,8 @@
 
         if (res.isOk()) {
             await invalidateAll();
+        } else {
+            addToast(`Failed to delete storage #${storage.id}: ${res.error}`, 'error');
         }
 
         loading = false;
