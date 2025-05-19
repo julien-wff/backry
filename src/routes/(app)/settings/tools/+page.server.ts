@@ -13,14 +13,17 @@ export const load: PageServerLoad = async ({}) => {
         bun: {
             version: Bun.version_with_sha,
             error: null,
+            cmd: Bun.argv.join(' '),
         },
         svelteKit: {
             version: svelteKitVersion,
             error: null,
+            cmd: null,
         },
         restic: {
             version: resticVersion.isOk() ? resticVersion.value : null,
             error: resticVersion.isErr() ? resticVersion.error : null,
+            cmd: 'restic',
         },
         ...enginesVersions,
     };

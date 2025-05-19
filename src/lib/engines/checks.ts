@@ -69,7 +69,7 @@ export async function checkDatabase(database: typeof databases.$inferSelect) {
 export async function getAllEnginesVersionsOrError() {
     const result = {} as Record<
         `${typeof DATABASE_ENGINES[number]}:${'dump' | 'check'}`,
-        { version: string | null; error: string | null }
+        { version: string | null; error: string | null, cmd: string }
     >;
 
     for (const [ engineId ] of ENGINE_META_ENTRIES) {
@@ -77,19 +77,20 @@ export async function getAllEnginesVersionsOrError() {
 
         const dumpVersion = await engine.getDumpCmdVersion();
         if (dumpVersion.isOk()) {
-            result[`${engineId}:dump`] = { version: dumpVersion.value, error: null };
+            result[`${engineId}:dump`] = { version: dumpVersion.value, error: null, cmd: engine.dumpCommand };
         } else {
-            result[`${engineId}:dump`] = { version: null, error: dumpVersion.error };
+            result[`${engineId}:dump`] = { version: null, error: dumpVersion.error, cmd: engine.dumpCommand };
         }
 
-        const checkVersion = await engine.getCheckCmdVersion?.();
-        if (!checkVersion) {
+        if (!engine.checkCommand || !engine.getCheckCmdVersion) {
             continue;
         }
+
+        const checkVersion = await engine.getCheckCmdVersion();
         if (checkVersion.isOk()) {
-            result[`${engineId}:check`] = { version: checkVersion.value, error: null };
+            result[`${engineId}:check`] = { version: checkVersion.value, error: null, cmd: engine.checkCommand };
         } else {
-            result[`${engineId}:check`] = { version: null, error: checkVersion.error };
+            result[`${engineId}:check`] = { version: null, error: checkVersion.error, cmd: engine.checkCommand };
         }
     }
 
