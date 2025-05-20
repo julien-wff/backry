@@ -35,3 +35,35 @@ export const runsListFull = () => db.query.runs.findMany({
         },
     },
 });
+
+/**
+ * Get a run by its ID. Cnclude the associated backups and their relations.
+ * @param id The ID of the run to get.
+ * @return The run object, or undefined if not found.
+ */
+export const getRunFull = (id: number) => db.query.runs.findFirst({
+    where: eq(runs.id, id),
+    with: {
+        backups: {
+            with: {
+                jobDatabase: {
+                    with: {
+                        database: true,
+                        job: {
+                            with: {
+                                storage: true,
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    },
+});
+
+/**
+ * Delete a run by its ID. This will also delete all associated backups by the foreign key constraint.
+ * @param id The ID of the run to delete.
+ * @return The deleted run object.
+ */
+export const deleteRun = (id: number) => db.delete(runs).where(eq(runs.id, id)).returning().get();

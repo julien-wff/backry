@@ -1,0 +1,83 @@
+<script lang="ts">
+    import { invalidateAll } from '$app/navigation';
+    import BackupElement from '$lib/components/backups/BackupElement.svelte';
+    import Modal from '$lib/components/common/Modal.svelte';
+    import RunOriginIndicator from '$lib/components/common/RunOriginIndicator.svelte';
+    import { EllipsisVertical, Trash2 } from '$lib/components/icons.js';
+    import type { runsListFull } from '$lib/queries/runs';
+    import type { RunResponse } from '$lib/schemas/api';
+    import { addToast } from '$lib/stores/toasts.svelte';
+    import { fetchApi } from '$lib/utils/api';
+    import dayjs from 'dayjs';
+    import { fade } from 'svelte/transition';
+
+    interface Props {
+        run: Awaited<ReturnType<typeof runsListFull>>[number];
+    }
+
+    let { run }: Props = $props();
+
+    let deleteDialog = $state<HTMLDialogElement>();
+    let loading = $state(false);
+
+    function handleDeleteRun(ev: MouseEvent) {
+        if (ev.shiftKey) {
+            deleteRun();
+        } else {
+            deleteDialog?.showModal();
+        }
+    }
+
+    async function deleteRun() {
+        loading = true;
+
+        const res = await fetchApi<RunResponse>('DELETE', `/api/runs/${run.id}`, null);
+        if (res.isOk()) {
+            await invalidateAll();
+        } else {
+            addToast(`Failed to delete run #${run.id}: ${res.error}`, 'error');
+        }
+
+        loading = false;
+    }
+</script>
+
+<div class="grid grid-cols-1 gap-2 rounded-lg p-2 bg-base-200" transition:fade={{ duration: 300 }}>
+    <div class="flex justify-between items-center">
+        <div class="flex gap-2 text-sm align-center">
+            <RunOriginIndicator origin={run.origin}/>
+            Run #{run.id} - {run.backups[0].jobDatabase.job.name} - {dayjs.utc(run.createdAt).fromNow()}
+        </div>
+
+        <div class="dropdown dropdown-end">
+            <div class="btn btn-square btn-xs btn-soft" role="button" tabindex="0">
+                <EllipsisVertical class="w-4 h-4"/>
+            </div>
+            <div class="menu dropdown-content gap-2 bg-base-200 rounded-box z-1 w-48 p-2 shadow-sm">
+                <button class="btn btn-soft btn-sm btn-error" disabled={loading} onclick={handleDeleteRun}>
+                    <Trash2 class="w-4 h-4"/>
+                    Delete whole run
+                </button>
+            </div>
+        </div>
+    </div>
+
+    {#each run.backups as backup (backup.id)}
+        <div transition:fade={{ duration: 300 }}>
+            <BackupElement {backup}/>
+        </div>
+    {/each}
+
+    <Modal bind:modal={deleteDialog} title="Are you sure?">
+        <p class="mb-1">Are you sure to delete run #{run.id}?</p>
+        <p>
+            The {run.backups.length > 1 ? `${run.backups.length} backups` : 'backup'} and the associated
+            file{run.backups.length > 1 ? 's' : ''} stored in the Restic repository will be deleted as well.
+        </p>
+
+        <div class="modal-action">
+            <button class="btn">Cancel</button>
+            <button class="btn btn-error" onclick={deleteRun}>Delete</button>
+        </div>
+    </Modal>
+</div>

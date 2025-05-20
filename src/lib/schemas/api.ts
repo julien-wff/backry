@@ -1,4 +1,4 @@
-import { backups, DATABASE_ENGINES, databases, jobs, storages } from '$lib/db/schema';
+import { backups, DATABASE_ENGINES, databases, jobs, runs, storages } from '$lib/db/schema';
 import type { ResticError, ResticInit, ResticLock, ResticSnapshot } from '$lib/types/restic';
 import { validateCronExpression } from 'cron';
 import { z } from 'zod';
@@ -151,6 +151,11 @@ export const jobRunRequest = z.object({
 
 /** `DELETE /api/backups/[id]` */
 export type BackupResponse = typeof backups.$inferSelect;
+
+// RUNS
+
+/** `DELETE /api/runs/[id]` */
+export type RunResponse = typeof runs.$inferSelect;
 
 // DOCKER INTEGRATION
 
