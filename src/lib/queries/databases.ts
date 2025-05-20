@@ -1,12 +1,18 @@
 import { db } from '$lib/db';
-import { databases } from '$lib/db/schema';
-import { eq } from 'drizzle-orm';
+import { DATABASE_ENGINES, databases } from '$lib/db/schema';
+import { eq, inArray } from 'drizzle-orm';
 
 /**
  * Fetches a complete list of all databases with all fields.
  */
 export const databasesList = () =>
     db.select().from(databases).orderBy(databases.name);
+
+/**
+ * Fetches a complete list of all databases with all fields, according to filters
+ */
+export const databasesListFiltered = (engines: typeof DATABASE_ENGINES[number][]) =>
+    db.select().from(databases).orderBy(databases.name).where(inArray(databases.engine, engines));
 
 /**
  * Fetches a database by ID.

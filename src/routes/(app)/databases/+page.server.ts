@@ -1,8 +1,14 @@
-import { databasesList } from '$lib/queries/databases';
+import { DATABASE_ENGINES } from '$lib/db/schema';
+import { databasesListFiltered } from '$lib/queries/databases';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async () => {
-    const databases = await databasesList();
+export const load: PageServerLoad = async ({ url }) => {
+    const databases = await databasesListFiltered(
+        url.searchParams.get('engines')
+            ?.split(',')
+            ?.filter(engine => DATABASE_ENGINES.includes(engine as typeof DATABASE_ENGINES[number])) as typeof DATABASE_ENGINES[number][]
+        ?? DATABASE_ENGINES,
+    );
 
     return {
         databases,
