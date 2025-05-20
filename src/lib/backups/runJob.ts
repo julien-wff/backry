@@ -87,6 +87,8 @@ async function jobDatabaseBackup(job: NonNullable<Awaited<ReturnType<typeof getJ
     const backup = await createBackup(jobDatabase.id, fileName, runId);
     const startTime = Date.now();
 
+    backupEmitter.emit('update', backup);
+
     const res = await backupFromCommand(
         job.storage.url,
         job.storage.password!,
