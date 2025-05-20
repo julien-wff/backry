@@ -2,10 +2,10 @@
     import { page } from '$app/state';
     import Modal from '$lib/components/common/Modal.svelte';
     import { OctagonAlert, ShieldCheck, Trash2 } from '$lib/components/icons';
-    import { storageStaleSnapshotsDeleteRequest, type StorageStaleSnapshotsResponse } from '$lib/schemas/api';
+    import { fetchApi } from '$lib/helpers/fetch';
+    import { formatSize } from '$lib/helpers/format';
+    import { storageStaleSnapshotsDeleteRequest, type StorageStaleSnapshotsResponse } from '$lib/server/schemas/api';
     import type { ResticSnapshot } from '$lib/types/restic';
-    import { fetchApi } from '$lib/utils/api';
-    import { formatSize } from '$lib/utils/format';
     import { onMount } from 'svelte';
 
     let loading = $state(true);

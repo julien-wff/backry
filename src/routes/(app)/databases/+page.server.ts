@@ -1,5 +1,5 @@
-import { DATABASE_ENGINES } from '$lib/db/schema';
-import { databasesListFiltered } from '$lib/queries/databases';
+import { DATABASE_ENGINES } from '$lib/server/db/schema';
+import { databasesListFiltered } from '$lib/server/queries/databases';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ url }) => {

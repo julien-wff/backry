@@ -6,7 +6,7 @@
         type DeletePolicies,
         type DeletePolicyIDs,
         parsePolicyFlags,
-    } from '$lib/jobs/delete-policy-edit';
+    } from '$lib/editors/delete-policy-edit';
 
     interface Props {
         opened: boolean;

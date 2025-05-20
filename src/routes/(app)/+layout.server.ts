@@ -1,4 +1,4 @@
-import { getErrorCountPerType } from '$lib/queries/shared';
+import { getErrorCountPerType } from '$lib/server/queries/shared';
 import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = async () => {

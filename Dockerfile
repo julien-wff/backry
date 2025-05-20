@@ -47,7 +47,7 @@ COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile --production
 
 COPY drizzle.config.ts ./
-COPY ./src/lib/db/schema.ts ./src/lib/db/schema.ts
+COPY src/lib/server/db/schema.ts ./src/lib/server/db/schema.ts
 COPY --from=builder /app/build .
 
 # Database engines

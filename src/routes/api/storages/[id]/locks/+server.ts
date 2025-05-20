@@ -1,7 +1,7 @@
-import type { StorageLocksResponse } from '$lib/schemas/api';
-import { getStorageFromRequest } from '$lib/storages/api';
-import { getRepositoryLocks, unlockRepository } from '$lib/storages/restic';
-import { apiError, apiSuccess } from '$lib/utils/responses';
+import { apiError, apiSuccess } from '$lib/server/api/responses';
+import { getStorageFromRequest } from '$lib/server/api/storages';
+import type { StorageLocksResponse } from '$lib/server/schemas/api';
+import { getRepositoryLocks, unlockRepository } from '$lib/server/services/restic';
 import { type RequestHandler } from '@sveltejs/kit';
 
 /**

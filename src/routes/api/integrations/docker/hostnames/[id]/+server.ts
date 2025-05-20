@@ -1,7 +1,7 @@
-import { inspectContainer } from '$lib/integrations/docker';
-import type { DockerHostnamesCheckResponse } from '$lib/schemas/api';
-import { isPortReachable } from '$lib/utils/net';
-import { apiError, apiSuccess } from '$lib/utils/responses';
+import { apiError, apiSuccess } from '$lib/server/api/responses';
+import type { DockerHostnamesCheckResponse } from '$lib/server/schemas/api';
+import { inspectContainer } from '$lib/server/services/docker';
+import { isPortReachable } from '$lib/server/services/net';
 import type { RequestHandler } from '@sveltejs/kit';
 
 export const GET: RequestHandler = async ({ params }) => {

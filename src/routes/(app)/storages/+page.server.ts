@@ -1,4 +1,4 @@
-import { storagesList } from '$lib/queries/storages';
+import { storagesList } from '$lib/server/queries/storages';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async () => {

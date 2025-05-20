@@ -1,7 +1,7 @@
-import { getContainersByEngines, getImagesFromContainers } from '$lib/integrations/docker';
+import { getContainersByEngines, getImagesFromContainers } from '$lib/server/services/docker';
 import type { ContainerInspectInfo, ImageInspectInfo } from 'dockerode';
 
-export const load = async ({ locals }) => {
+export const load = async () => {
     const containersByEngine = await getContainersByEngines();
     if (containersByEngine.isErr()) {
         return {

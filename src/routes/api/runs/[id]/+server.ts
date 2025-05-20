@@ -1,7 +1,7 @@
-import { deleteRun, getRunFull } from '$lib/queries/runs';
-import type { RunResponse } from '$lib/schemas/api';
-import { deleteSnapshots } from '$lib/storages/restic';
-import { apiError, apiSuccess } from '$lib/utils/responses';
+import { apiError, apiSuccess } from '$lib/server/api/responses';
+import { deleteRun, getRunFull } from '$lib/server/queries/runs';
+import type { RunResponse } from '$lib/server/schemas/api';
+import { deleteSnapshots } from '$lib/server/services/restic';
 import { type RequestHandler } from '@sveltejs/kit';
 
 export const DELETE: RequestHandler = async ({ params }) => {

@@ -1,9 +1,9 @@
-import { getSnapshotsIdsByStorageId } from '$lib/queries/backups';
-import { parseRequestBody } from '$lib/schemas';
-import { storageStaleSnapshotsDeleteRequest, type StorageStaleSnapshotsResponse } from '$lib/schemas/api';
-import { getStorageFromRequest } from '$lib/storages/api';
-import { deleteSnapshots, getRepositorySnapshots } from '$lib/storages/restic';
-import { apiError, apiSuccess } from '$lib/utils/responses';
+import { apiError, apiSuccess } from '$lib/server/api/responses';
+import { getStorageFromRequest } from '$lib/server/api/storages';
+import { getSnapshotsIdsByStorageId } from '$lib/server/queries/backups';
+import { parseRequestBody } from '$lib/server/schemas';
+import { storageStaleSnapshotsDeleteRequest, type StorageStaleSnapshotsResponse } from '$lib/server/schemas/api';
+import { deleteSnapshots, getRepositorySnapshots } from '$lib/server/services/restic';
 import { type RequestHandler } from '@sveltejs/kit';
 
 /**

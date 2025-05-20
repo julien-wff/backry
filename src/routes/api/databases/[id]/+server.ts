@@ -1,7 +1,7 @@
-import { deleteDatabase, updateDatabase } from '$lib/queries/databases';
-import { parseRequestBody } from '$lib/schemas';
-import { databaseRequest, type DatabaseResponse } from '$lib/schemas/api';
-import { apiError, apiSuccess } from '$lib/utils/responses';
+import { apiError, apiSuccess } from '$lib/server/api/responses';
+import { deleteDatabase, updateDatabase } from '$lib/server/queries/databases';
+import { parseRequestBody } from '$lib/server/schemas';
+import { databaseRequest, type DatabaseResponse } from '$lib/server/schemas/api';
 import { type RequestHandler } from '@sveltejs/kit';
 
 

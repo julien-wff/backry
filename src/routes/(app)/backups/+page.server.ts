@@ -1,4 +1,4 @@
-import { runsListFull } from '$lib/queries/runs';
+import { runsListFull } from '$lib/server/queries/runs';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async () => {

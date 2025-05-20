@@ -3,10 +3,10 @@
     import BaseListElement from '$lib/components/common/BaseListElement.svelte';
     import EngineIndicator from '$lib/components/common/EngineIndicator.svelte';
     import { EthernetPort } from '$lib/components/icons';
-    import type { databases } from '$lib/db/schema';
-    import type { DatabaseResponse } from '$lib/schemas/api';
+    import { fetchApi } from '$lib/helpers/fetch';
+    import type { databases } from '$lib/server/db/schema';
+    import type { DatabaseResponse } from '$lib/server/schemas/api';
     import { addToast } from '$lib/stores/toasts.svelte';
-    import { fetchApi } from '$lib/utils/api';
 
     interface Props {
         database: typeof databases.$inferSelect;

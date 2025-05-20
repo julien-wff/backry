@@ -3,10 +3,10 @@
     import BaseListElement from '$lib/components/common/BaseListElement.svelte';
     import Modal from '$lib/components/common/Modal.svelte';
     import { Clock, CloudUpload, Database, RefreshCw } from '$lib/components/icons';
-    import type { jobsListFull } from '$lib/queries/jobs';
-    import { type jobPatchRequest, type JobResponse, jobRunRequest } from '$lib/schemas/api';
+    import { fetchApi } from '$lib/helpers/fetch';
+    import type { jobsListFull } from '$lib/server/queries/jobs';
+    import { type jobPatchRequest, type JobResponse, jobRunRequest } from '$lib/server/schemas/api';
     import { addToast } from '$lib/stores/toasts.svelte';
-    import { fetchApi } from '$lib/utils/api';
 
     interface Props {
         job: Awaited<ReturnType<typeof jobsListFull>>[number];

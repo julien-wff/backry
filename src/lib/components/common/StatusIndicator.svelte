@@ -1,6 +1,6 @@
 <script lang="ts">
     import { CircleCheck, CirclePlay, CircleX, OctagonAlert, Trash2 } from '$lib/components/icons';
-    import { type BACKUP_STATUS, type ELEMENT_STATUS } from '$lib/db/schema';
+    import { type BACKUP_STATUS, type ELEMENT_STATUS } from '$lib/server/db/schema';
 
     interface Props {
         status: typeof ELEMENT_STATUS[number] | typeof BACKUP_STATUS[number];

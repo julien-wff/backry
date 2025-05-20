@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Timer } from '$lib/components/icons';
-    import type { getDashboardStats } from '$lib/queries/shared';
+    import type { getDashboardStats } from '$lib/server/queries/shared';
     import dayjs from 'dayjs';
     import relativeTime from 'dayjs/plugin/relativeTime';
 

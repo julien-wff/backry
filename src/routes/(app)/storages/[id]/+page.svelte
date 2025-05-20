@@ -6,6 +6,7 @@
     import EnvVarInput from '$lib/components/forms/EnvVarInput.svelte';
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
     import { ArchiveRestore, CloudUpload, PackageOpen } from '$lib/components/icons';
+    import { fetchApi } from '$lib/helpers/fetch';
     import {
         storageInitRepositoryRequest,
         type storageRequest,
@@ -13,8 +14,7 @@
         storagesCheckRequest,
         type StoragesCheckResponse,
         type StoragesInitRepositoryResponse,
-    } from '$lib/schemas/api';
-    import { fetchApi } from '$lib/utils/api';
+    } from '$lib/server/schemas/api';
     import type { PageProps } from './$types';
 
     let { data }: PageProps = $props();

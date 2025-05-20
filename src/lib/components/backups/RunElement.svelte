@@ -4,10 +4,10 @@
     import Modal from '$lib/components/common/Modal.svelte';
     import RunOriginIndicator from '$lib/components/common/RunOriginIndicator.svelte';
     import { EllipsisVertical, ExternalLink, Trash2 } from '$lib/components/icons.js';
-    import type { runsListFull } from '$lib/queries/runs';
-    import type { RunResponse } from '$lib/schemas/api';
+    import { fetchApi } from '$lib/helpers/fetch';
+    import type { runsListFull } from '$lib/server/queries/runs';
+    import type { RunResponse } from '$lib/server/schemas/api';
     import { addToast } from '$lib/stores/toasts.svelte';
-    import { fetchApi } from '$lib/utils/api';
     import dayjs from 'dayjs';
     import { fade } from 'svelte/transition';
 

@@ -1,9 +1,9 @@
-import { runJob } from '$lib/backups/runJob';
-import { deleteJob, updateJob, updateJobStatus } from '$lib/queries/jobs';
-import { parseRequestBody } from '$lib/schemas';
-import { jobPatchRequest, jobRequest, type JobResponse } from '$lib/schemas/api';
-import { addOrUpdateCronJob, stopCronJob } from '$lib/shared/cron';
-import { apiError, apiSuccess } from '$lib/utils/responses';
+import { apiError, apiSuccess } from '$lib/server/api/responses';
+import { runBackupJob } from '$lib/server/backups/run-backup-job';
+import { deleteJob, updateJob, updateJobStatus } from '$lib/server/queries/jobs';
+import { parseRequestBody } from '$lib/server/schemas';
+import { jobPatchRequest, jobRequest, type JobResponse } from '$lib/server/schemas/api';
+import { addOrUpdateCronJob, stopCronJob } from '$lib/server/shared/cron';
 import { type RequestHandler } from '@sveltejs/kit';
 
 export const DELETE: RequestHandler = async ({ params }) => {
@@ -47,7 +47,7 @@ export const PUT: RequestHandler = async ({ params, request }) => {
         stopCronJob(`job:${jobId}`);
     } else {
         addOrUpdateCronJob(`job:${jobId}`, updatedJob.cron, () => {
-            runJob(jobId);
+            runBackupJob(jobId);
         });
     }
 
@@ -78,7 +78,7 @@ export const PATCH: RequestHandler = async ({ params, request }) => {
         stopCronJob(`job:${jobId}`);
     } else {
         addOrUpdateCronJob(`job:${jobId}`, updatedJob.cron, () => {
-            runJob(jobId);
+            runBackupJob(jobId);
         });
     }
 

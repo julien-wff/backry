@@ -4,8 +4,8 @@
     import Head from '$lib/components/common/Head.svelte';
     import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
     import { FileCheck } from '$lib/components/icons';
-    import type { BackupUpdateEventPayload } from '$lib/shared/events';
-    import { subscribeApi } from '$lib/utils/api';
+    import { subscribeApi } from '$lib/helpers/fetch';
+    import type { BackupUpdateEventPayload } from '$lib/server/shared/events';
     import dayjs from 'dayjs';
     import relativeTime from 'dayjs/plugin/relativeTime';
     import utc from 'dayjs/plugin/utc';

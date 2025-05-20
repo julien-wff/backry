@@ -1,7 +1,7 @@
-import { ENGINES_METHODS } from '$lib/engines/enginesMethods';
-import { parseRequestBody } from '$lib/schemas';
-import { databasesCheckRequest } from '$lib/schemas/api';
-import { apiError, apiSuccess } from '$lib/utils/responses';
+import { apiError, apiSuccess } from '$lib/server/api/responses';
+import { ENGINES_METHODS } from '$lib/server/databases/engines-methods';
+import { parseRequestBody } from '$lib/server/schemas';
+import { databasesCheckRequest } from '$lib/server/schemas/api';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request }) => {

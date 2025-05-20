@@ -1,4 +1,4 @@
-import type { databases } from '$lib/db/schema';
+import type { databases } from '$lib/server/db/schema';
 import type { ContainerInspectInfo } from 'dockerode';
 import { Result, type ResultAsync } from 'neverthrow';
 

@@ -2,12 +2,12 @@
     import { invalidateAll } from '$app/navigation';
     import BaseListElement from '$lib/components/common/BaseListElement.svelte';
     import { Clock, ExternalLink, FileChartPie, FileDown, HardDriveDownload, Timer } from '$lib/components/icons';
-    import type { BACKUP_STATUS } from '$lib/db/schema';
-    import type { backupsListFull } from '$lib/queries/backups';
-    import type { BackupResponse } from '$lib/schemas/api';
+    import type { BACKUP_STATUS } from '$lib/server/db/schema';
+    import type { backupsListFull } from '$lib/server/queries/backups';
+    import type { BackupResponse } from '$lib/server/schemas/api';
     import { addToast } from '$lib/stores/toasts.svelte';
-    import { fetchApi } from '$lib/utils/api';
-    import { formatDuration, formatSize, formatUtcDate } from '$lib/utils/format.js';
+    import { fetchApi } from '$lib/helpers/fetch';
+    import { formatDuration, formatSize, formatUtcDate } from '$lib/helpers/format.js';
 
     interface Props {
         backup: Omit<Awaited<ReturnType<typeof backupsListFull>>[number], 'run'>;

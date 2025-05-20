@@ -1,7 +1,7 @@
 <script lang="ts">
     import { FileCheck } from '$lib/components/icons';
-    import type { getDashboardStats } from '$lib/queries/shared';
-    import { formatDuration, formatSize } from '$lib/utils/format.js';
+    import { formatDuration, formatSize } from '$lib/helpers/format.js';
+    import type { getDashboardStats } from '$lib/server/queries/shared';
     import dayjs from 'dayjs';
     import relativeTime from 'dayjs/plugin/relativeTime';
     import utc from 'dayjs/plugin/utc';

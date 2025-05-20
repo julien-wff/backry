@@ -2,13 +2,13 @@
     import { goto } from '$app/navigation';
     import Modal from '$lib/components/common/Modal.svelte';
     import { CirclePlus, OctagonAlert } from '$lib/components/icons';
-    import type { DATABASE_ENGINES } from '$lib/db/schema';
+    import { fetchApi } from '$lib/helpers/fetch';
+    import type { DATABASE_ENGINES } from '$lib/server/db/schema';
     import {
         type dockerConnectionStringRequest,
         type DockerConnectionStringResponse,
         type DockerHostnamesCheckResponse,
-    } from '$lib/schemas/api';
-    import { fetchApi } from '$lib/utils/api';
+    } from '$lib/server/schemas/api';
     import type { ContainerInspectInfo, ImageInspectInfo } from 'dockerode';
 
     interface Props {

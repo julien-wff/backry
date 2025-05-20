@@ -14,8 +14,8 @@
         LayoutDashboard,
         Timer,
     } from '$lib/components/icons';
-    import { formatSize } from '$lib/utils/format';
-    import { formatDuration } from '$lib/utils/format.js';
+    import { formatSize } from '$lib/helpers/format';
+    import { formatDuration } from '$lib/helpers/format.js';
     import type { PageProps } from './$types';
 
     let { data }: PageProps = $props();

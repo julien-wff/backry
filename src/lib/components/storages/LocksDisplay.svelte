@@ -1,9 +1,9 @@
 <script lang="ts">
     import { page } from '$app/state';
     import { LockKeyholeOpen, OctagonAlert, ShieldCheck } from '$lib/components/icons';
-    import type { StorageLocksResponse } from '$lib/schemas/api';
+    import { fetchApi } from '$lib/helpers/fetch';
+    import type { StorageLocksResponse } from '$lib/server/schemas/api';
     import type { ResticLock } from '$lib/types/restic';
-    import { fetchApi } from '$lib/utils/api';
     import { onMount } from 'svelte';
 
     let loading = $state(true);

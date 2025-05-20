@@ -1,5 +1,5 @@
-import { getStorage } from '$lib/queries/storages';
-import { parseIdOrNewParam } from '$lib/utils/params';
+import { parseIdOrNewParam } from '$lib/server/api/params';
+import { getStorage } from '$lib/server/queries/storages';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 

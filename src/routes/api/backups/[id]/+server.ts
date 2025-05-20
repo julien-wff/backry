@@ -1,7 +1,7 @@
-import { deleteBackup, getBackup } from '$lib/queries/backups';
-import type { BackupResponse } from '$lib/schemas/api';
-import { deleteSnapshots } from '$lib/storages/restic';
-import { apiError, apiSuccess } from '$lib/utils/responses';
+import { apiError, apiSuccess } from '$lib/server/api/responses';
+import { deleteBackup, getBackup } from '$lib/server/queries/backups';
+import type { BackupResponse } from '$lib/server/schemas/api';
+import { deleteSnapshots } from '$lib/server/services/restic';
 import { type RequestHandler } from '@sveltejs/kit';
 
 export const DELETE: RequestHandler = async ({ params }) => {

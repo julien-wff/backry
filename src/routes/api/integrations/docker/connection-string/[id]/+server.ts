@@ -1,8 +1,8 @@
-import { ENGINES_METHODS } from '$lib/engines/enginesMethods';
-import { inspectContainer } from '$lib/integrations/docker';
-import { parseRequestBody } from '$lib/schemas';
-import { dockerConnectionStringRequest, type DockerConnectionStringResponse } from '$lib/schemas/api';
-import { apiError, apiSuccess } from '$lib/utils/responses';
+import { apiError, apiSuccess } from '$lib/server/api/responses';
+import { ENGINES_METHODS } from '$lib/server/databases/engines-methods';
+import { parseRequestBody } from '$lib/server/schemas';
+import { dockerConnectionStringRequest, type DockerConnectionStringResponse } from '$lib/server/schemas/api';
+import { inspectContainer } from '$lib/server/services/docker';
 import { type RequestHandler } from '@sveltejs/kit';
 
 /**

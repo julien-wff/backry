@@ -1,5 +1,5 @@
-import { getDashboardStats } from '$lib/queries/shared';
-import { getNextJobs } from '$lib/shared/cron';
+import { getDashboardStats } from '$lib/server/queries/shared';
+import { getNextJobs } from '$lib/server/shared/cron';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({}) => {

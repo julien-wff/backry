@@ -1,6 +1,6 @@
-import { getBackup } from '$lib/queries/backups';
-import { readFileContent } from '$lib/storages/restic';
-import { formatSize } from '$lib/utils/format';
+import { formatSize } from '$lib/helpers/format';
+import { getBackup } from '$lib/server/queries/backups';
+import { readFileContent } from '$lib/server/services/restic';
 import { error, type RequestHandler } from '@sveltejs/kit';
 
 export const GET: RequestHandler = async ({ params }) => {

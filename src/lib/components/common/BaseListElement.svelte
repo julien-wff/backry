@@ -2,7 +2,7 @@
     import ConfirmDeleteModal from '$lib/components/common/ConfirmDeleteModal.svelte';
     import StatusIndicator from '$lib/components/common/StatusIndicator.svelte';
     import { CopyPlus, EllipsisVertical, Pencil, Play, Power, PowerOff, Trash2 } from '$lib/components/icons';
-    import { type BACKUP_STATUS, type ELEMENT_STATUS } from '$lib/db/schema';
+    import { type BACKUP_STATUS, type ELEMENT_STATUS } from '$lib/server/db/schema';
     import type { Snippet } from 'svelte';
 
     interface Props {

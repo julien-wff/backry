@@ -6,11 +6,11 @@
     import ElementForm from '$lib/components/forms/ElementForm.svelte';
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
     import { Database } from '$lib/components/icons';
-    import type { DATABASE_ENGINES } from '$lib/db/schema';
-    import { ENGINE_META_ENTRIES, ENGINES_META } from '$lib/engines/enginesMeta';
-    import { type databaseRequest, type DatabaseResponse, type databasesCheckRequest } from '$lib/schemas/api';
-    import { fetchApi } from '$lib/utils/api';
-    import { slugify } from '$lib/utils/format';
+    import { fetchApi } from '$lib/helpers/fetch';
+    import { slugify } from '$lib/helpers/format';
+    import { ENGINE_META_ENTRIES, ENGINES_META } from '$lib/server/databases/engines-meta';
+    import type { DATABASE_ENGINES } from '$lib/server/db/schema';
+    import { type databaseRequest, type DatabaseResponse, type databasesCheckRequest } from '$lib/server/schemas/api';
     import type { PageProps } from './$types';
 
     let { data }: PageProps = $props();

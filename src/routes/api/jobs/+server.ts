@@ -1,9 +1,9 @@
-import { runJob } from '$lib/backups/runJob';
-import { createJob } from '$lib/queries/jobs';
-import { parseRequestBody } from '$lib/schemas';
-import { jobRequest, type JobResponse } from '$lib/schemas/api';
-import { addOrUpdateCronJob } from '$lib/shared/cron';
-import { apiError, apiSuccess } from '$lib/utils/responses';
+import { apiError, apiSuccess } from '$lib/server/api/responses';
+import { runBackupJob } from '$lib/server/backups/run-backup-job';
+import { createJob } from '$lib/server/queries/jobs';
+import { parseRequestBody } from '$lib/server/schemas';
+import { jobRequest, type JobResponse } from '$lib/server/schemas/api';
+import { addOrUpdateCronJob } from '$lib/server/shared/cron';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request }) => {
@@ -16,7 +16,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
     if (job.status === 'active')
         addOrUpdateCronJob(`job:${job.id}`, job.cron, () => {
-            runJob(job.id);
+            runBackupJob(job.id);
         });
 
     return apiSuccess<JobResponse>(job, 201);

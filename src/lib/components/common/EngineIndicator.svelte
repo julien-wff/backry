@@ -1,6 +1,6 @@
 <script lang="ts">
-    import type { DATABASE_ENGINES } from '$lib/db/schema';
-    import { ENGINES_META } from '$lib/engines/enginesMeta';
+    import { ENGINES_META } from '$lib/server/databases/engines-meta';
+    import type { DATABASE_ENGINES } from '$lib/server/db/schema';
 
     interface Props {
         engine: typeof DATABASE_ENGINES[number];

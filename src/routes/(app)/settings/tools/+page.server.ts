@@ -1,5 +1,5 @@
-import { getAllEnginesVersionsOrError } from '$lib/engines/checks';
-import { getResticVersion, RESTIC_CMD } from '$lib/storages/restic';
+import { getAllEnginesVersionsOrError } from '$lib/server/databases/checks';
+import { getResticVersion, RESTIC_CMD } from '$lib/server/services/restic';
 import { VERSION as svelteKitVersion } from '@sveltejs/kit';
 import path from 'path';
 import type { PageServerLoad } from './$types';

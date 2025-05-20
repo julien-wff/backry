@@ -1,7 +1,7 @@
 <script lang="ts">
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
     import { ArrowDown, ArrowUp, Power, PowerOff, Trash2 } from '$lib/components/icons';
-    import type { databases } from '$lib/db/schema';
+    import type { databases } from '$lib/server/db/schema';
 
     interface Props {
         selection: Array<{ id: number, enabled: boolean }>;

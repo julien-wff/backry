@@ -1,7 +1,7 @@
-import { createStorage } from '$lib/queries/storages';
-import { parseRequestBody } from '$lib/schemas';
-import { storageRequest, type StorageResponse } from '$lib/schemas/api';
-import { apiError, apiSuccess } from '$lib/utils/responses';
+import { apiError, apiSuccess } from '$lib/server/api/responses';
+import { createStorage } from '$lib/server/queries/storages';
+import { parseRequestBody } from '$lib/server/schemas';
+import { storageRequest, type StorageResponse } from '$lib/server/schemas/api';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request }) => {

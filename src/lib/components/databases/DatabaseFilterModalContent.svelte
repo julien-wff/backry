@@ -2,7 +2,7 @@
     import { goto } from '$app/navigation';
     import { page } from '$app/state';
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
-    import { ENGINE_META_ENTRIES } from '$lib/engines/enginesMeta';
+    import { ENGINE_META_ENTRIES } from '$lib/server/databases/engines-meta';
 
     let enginesFilter = $state(page.url.searchParams.get('engines')?.split(',') ?? []);
     let areAllEnginesSelected = $derived(enginesFilter.length === 0 || enginesFilter.length === ENGINE_META_ENTRIES.length);

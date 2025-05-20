@@ -1,4 +1,4 @@
-import { backupEmitter } from '$lib/shared/events';
+import { backupEmitter } from '$lib/server/shared/events';
 import type { RequestHandler } from '@sveltejs/kit';
 
 export const GET: RequestHandler = async ({ request }) => {

@@ -1,9 +1,9 @@
-import { parseRequestBody } from '$lib/schemas';
-import { storagesCheckRequest, type StoragesCheckResponse } from '$lib/schemas/api';
-import { type CheckPathError, checkPathForCreate, type CheckPathResult } from '$lib/storages/checks';
-import { getRepositoryStats } from '$lib/storages/restic';
+import { apiError, apiSuccess } from '$lib/server/api/responses';
+import { parseRequestBody } from '$lib/server/schemas';
+import { storagesCheckRequest, type StoragesCheckResponse } from '$lib/server/schemas/api';
+import { getRepositoryStats } from '$lib/server/services/restic';
+import { type CheckPathError, checkPathForCreate, type CheckPathResult } from '$lib/server/storages/checks';
 import type { ResticError } from '$lib/types/restic';
-import { apiError, apiSuccess } from '$lib/utils/responses';
 import { Result } from 'neverthrow';
 import type { RequestHandler } from './$types';
 

@@ -1,5 +1,5 @@
-import { getDatabase } from '$lib/queries/databases';
-import { parseIdOrNewParam } from '$lib/utils/params';
+import { parseIdOrNewParam } from '$lib/server/api/params';
+import { getDatabase } from '$lib/server/queries/databases';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 

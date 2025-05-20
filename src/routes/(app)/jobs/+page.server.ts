@@ -1,4 +1,4 @@
-import { jobsListFull } from '$lib/queries/jobs';
+import { jobsListFull } from '$lib/server/queries/jobs';
 import { sendAt, validateCronExpression } from 'cron';
 import type { PageServerLoad } from './$types';
 
