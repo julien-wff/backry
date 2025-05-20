@@ -67,17 +67,18 @@
             <BackupElement {backup}/>
         </div>
     {/each}
-
-    <Modal bind:modal={deleteDialog} title="Are you sure?">
-        <p class="mb-1">Are you sure to delete run #{run.id}?</p>
-        <p>
-            The {run.backups.length > 1 ? `${run.backups.length} backups` : 'backup'} and the associated
-            file{run.backups.length > 1 ? 's' : ''} stored in the Restic repository will be deleted as well.
-        </p>
-
-        <div class="modal-action">
-            <button class="btn">Cancel</button>
-            <button class="btn btn-error" onclick={deleteRun}>Delete</button>
-        </div>
-    </Modal>
 </div>
+
+
+<Modal bind:modal={deleteDialog} title="Are you sure?">
+    <p class="mb-1">Are you sure to delete run #{run.id}?</p>
+    <p>
+        The {run.backups.length > 1 ? `${run.backups.length} backups` : 'backup'} and the associated
+        file{run.backups.length > 1 ? 's' : ''} stored in the Restic repository will be deleted as well.
+    </p>
+
+    <div class="modal-action">
+        <button class="btn">Cancel</button>
+        <button class="btn btn-error" onclick={deleteRun}>Delete</button>
+    </div>
+</Modal>
