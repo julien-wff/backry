@@ -74,6 +74,18 @@
 </script>
 
 
+<!-- Format the full list of databases by putting a line through the inactive or error ones -->
+{#snippet databaseListFormatted()}
+    <div>
+        {#each job.jobsDatabases as { database, status: jobStatus }, index (database.id)}
+            <span class:line-through={jobStatus !== 'active'}>
+                {database.name}
+            </span>{index < job.jobsDatabases.length - 1 ? ', ' : ''}
+        {/each}
+    </div>
+{/snippet}
+
+
 <BaseListElement deleteConfirmationMessage={`The job "${job.name}" will be deleted.`}
                  disabled={loading}
                  editHref={`/jobs/${job.id}`}
@@ -82,24 +94,39 @@
                  onstatuschange={changeJobStatus}
                  status={status}
                  title={job.name}>
-    <div class="flex items-center gap-1">
-        <Clock class="w-4 h-4"/>
+    <div class="flex items-center gap-1 whitespace-nowrap">
+        <Clock class="h-4 w-4"/>
         Cron: {job.cron}
     </div>
 
-    <div class="flex items-center gap-1">
-        <CloudUpload class="w-4 h-4"/>
+    <div class="flex items-center gap-1 whitespace-nowrap">
+        <CloudUpload class="h-4 w-4"/>
         Storage backend: {job.storage.name}
     </div>
 
-    <div class="flex items-center gap-1">
-        <Database class="w-4 h-4"/>
-        Databases: {job.jobsDatabases.map((db) => db.database.name).join(', ')}
+    <div class="flex items-center gap-1 whitespace-nowrap">
+        <Database class="h-4 w-4"/>
+        Databases:
+        {#if job.jobsDatabases.length <= 2}
+            {@render databaseListFormatted()}
+        {:else}
+            <div class="tooltip">
+                <div class="tooltip-content">
+                    {@render databaseListFormatted()}
+                </div>
+                <div>
+                    <span class:line-through={job.jobsDatabases[0].status !== 'active'}>
+                        {job.jobsDatabases[0].database.name}
+                    </span>
+                    + {job.jobsDatabases.length - 1} more
+                </div>
+            </div>
+        {/if}
     </div>
 
     {#if nextExecution && status === 'active'}
-        <div class="flex flex-1 items-center justify-end gap-1">
-            <RefreshCw class="w-4 h-4"/>
+        <div class="flex flex-1 items-center justify-end gap-1 whitespace-nowrap">
+            <RefreshCw class="h-4 w-4"/>
             Next execution: {nextExecution.toLocaleString()}
         </div>
     {/if}
@@ -110,7 +137,7 @@
     <div>Select databases to backup:</div>
     <div class="mt-1 flex flex-col gap-1">
         {#each job.jobsDatabases as db}
-            <label class="flex items-center gap-1 select-none">
+            <label class="flex select-none items-center gap-1">
                 <input type="checkbox"
                        class="checkbox checkbox-primary checkbox-xs"
                        value="{db.database.id}"

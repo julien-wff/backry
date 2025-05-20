@@ -48,7 +48,7 @@
     }
 </script>
 
-<div class="bg-base-100 p-2 flex flex-col gap-2 rounded-box shadow-base-100">
+<div class="flex flex-col gap-2 p-2 bg-base-100 rounded-box shadow-base-100">
     <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
             {#if status}
@@ -61,7 +61,7 @@
             {#if editHref}
                 <a href={disabled ? null : editHref}>
                     <button {disabled} class="btn btn-sm btn-primary">
-                        <Pencil class="w-4 h-4"/>
+                        <Pencil class="h-4 w-4"/>
                         Edit
                     </button>
                 </a>
@@ -70,10 +70,10 @@
             {#if onstatuschange}
                 <button {disabled} class="btn btn-sm btn-warning" onclick={onstatuschange}>
                     {#if status === 'inactive'}
-                        <Power class="w-4 h-4"/>
+                        <Power class="h-4 w-4"/>
                         Enable
                     {:else}
-                        <PowerOff class="w-4 h-4"/>
+                        <PowerOff class="h-4 w-4"/>
                         Disable
                     {/if}
                 </button>
@@ -81,7 +81,7 @@
 
             {#if onrun}
                 <button {disabled} class="btn btn-sm btn-success" onclick={onrun}>
-                    <Play class="w-4 h-4"/>
+                    <Play class="h-4 w-4"/>
                     Run now
                 </button>
             {/if}
@@ -89,18 +89,18 @@
             {#if onduplicate || ondelete || secondaryBtns}
                 <div class="dropdown dropdown-end">
                     <div class="btn btn-square btn-sm btn-soft" role="button" tabindex="0">
-                        <EllipsisVertical class="w-4 h-4"/>
+                        <EllipsisVertical class="h-4 w-4"/>
                     </div>
-                    <div class="menu dropdown-content gap-2 bg-base-200 rounded-box z-1 w-48 p-2 shadow-sm">
+                    <div class="w-48 gap-2 p-2 shadow-sm menu dropdown-content bg-base-200 rounded-box z-1">
                         {#if onduplicate}
                             <button {disabled} class="btn btn-soft btn-sm btn-primary" onclick={onduplicate}>
-                                <CopyPlus class="w-4 h-4"/>
+                                <CopyPlus class="h-4 w-4"/>
                                 Duplicate and edit
                             </button>
                         {/if}
                         {#if ondelete}
                             <button {disabled} class="btn btn-soft btn-sm btn-error" onclick={handleDelete}>
-                                <Trash2 class="w-4 h-4"/>
+                                <Trash2 class="h-4 w-4"/>
                                 Delete
                             </button>
                         {/if}
@@ -112,7 +112,7 @@
     </div>
 
     {#if children}
-        <div class="flex gap-4 opacity-75 text-sm filter grayscale">
+        <div class="flex flex-nowrap gap-4 text-sm opacity-75 grayscale filter">
             {@render children()}
         </div>
     {/if}
