@@ -15,6 +15,7 @@ import CopyPlus from '@lucide/svelte/icons/copy-plus';
 import Database from '@lucide/svelte/icons/database';
 import EllipsisVertical from '@lucide/svelte/icons/ellipsis-vertical';
 import EthernetPort from '@lucide/svelte/icons/ethernet-port';
+import ExternalLink from '@lucide/svelte/icons/external-link';
 import FileChartPie from '@lucide/svelte/icons/file-chart-pie';
 import FileCheck from '@lucide/svelte/icons/file-check';
 import FileDown from '@lucide/svelte/icons/file-down';
@@ -59,6 +60,7 @@ export {
     Database,
     EllipsisVertical,
     EthernetPort,
+    ExternalLink,
     FileChartPie,
     FileCheck,
     FileDown,

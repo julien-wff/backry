@@ -1,7 +1,7 @@
 <script lang="ts">
     import { invalidateAll } from '$app/navigation';
     import BaseListElement from '$lib/components/common/BaseListElement.svelte';
-    import { Clock, FileChartPie, FileDown, HardDriveDownload, Timer } from '$lib/components/icons';
+    import { Clock, ExternalLink, FileChartPie, FileDown, HardDriveDownload, Timer } from '$lib/components/icons';
     import type { BACKUP_STATUS } from '$lib/db/schema';
     import type { backupsListFull } from '$lib/queries/backups';
     import type { BackupResponse } from '$lib/schemas/api';
@@ -57,6 +57,12 @@
             </button>
         </div>
     {/if}
+
+    <a class="btn btn-soft btn-sm btn-primary"
+       href="/databases/{backup.jobDatabase.database.id}">
+        <ExternalLink class="w-4 h-4"/>
+        View database
+    </a>
 {/snippet}
 
 

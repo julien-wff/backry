@@ -3,7 +3,7 @@
     import BackupElement from '$lib/components/backups/BackupElement.svelte';
     import Modal from '$lib/components/common/Modal.svelte';
     import RunOriginIndicator from '$lib/components/common/RunOriginIndicator.svelte';
-    import { EllipsisVertical, Trash2 } from '$lib/components/icons.js';
+    import { EllipsisVertical, ExternalLink, Trash2 } from '$lib/components/icons.js';
     import type { runsListFull } from '$lib/queries/runs';
     import type { RunResponse } from '$lib/schemas/api';
     import { addToast } from '$lib/stores/toasts.svelte';
@@ -58,6 +58,11 @@
                     <Trash2 class="w-4 h-4"/>
                     Delete whole run
                 </button>
+                <a class="btn btn-soft btn-sm btn-primary"
+                   href="/jobs/{run.backups[0].jobDatabase.job.id}">
+                    <ExternalLink class="w-4 h-4"/>
+                    View job
+                </a>
             </div>
         </div>
     </div>
