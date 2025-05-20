@@ -97,7 +97,7 @@
         Databases: {job.jobsDatabases.map((db) => db.database.name).join(', ')}
     </div>
 
-    {#if nextExecution}
+    {#if nextExecution && status === 'active'}
         <div class="flex flex-1 items-center justify-end gap-1">
             <RefreshCw class="w-4 h-4"/>
             Next execution: {nextExecution.toLocaleString()}
