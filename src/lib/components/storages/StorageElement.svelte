@@ -13,7 +13,6 @@
     }
 
     let { storage }: Props = $props();
-    let status = $state(storage.status);
     let loading = $state(false);
 
     async function deleteStorage() {
@@ -46,7 +45,7 @@
         error={storage.error}
         ondelete={deleteStorage}
         secondaryBtns={secondaryButtons}
-        status={status}
+        status={storage.status}
         title={storage.name}>
     <div class="flex items-center gap-1">
         <HardDrive class="w-4 h-4"/>

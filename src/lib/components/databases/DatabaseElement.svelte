@@ -13,7 +13,6 @@
     }
 
     let { database }: Props = $props();
-    let status = $state(database.status);
     let loading = $state(false);
 
     async function deleteDatabase() {
@@ -36,7 +35,7 @@
                  editHref={`/databases/${database.id}`}
                  error={database.error}
                  ondelete={deleteDatabase}
-                 status={status}
+                 status={database.status}
                  title={database.name}>
     <EngineIndicator engine={database.engine}/>
     <div class="flex items-center gap-1">

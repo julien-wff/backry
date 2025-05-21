@@ -14,7 +14,6 @@
     }
 
     let { job, nextExecution }: Props = $props();
-    let status = $state(job.status);
     let loading = $state(false);
 
     let jobRunPopup = $state<HTMLDialogElement | null>(null);
@@ -62,11 +61,11 @@
     async function changeJobStatus() {
         loading = true;
         const res = await fetchApi<JobResponse, typeof jobPatchRequest>('PATCH', `/api/jobs/${job.id}`, {
-            status: status === 'inactive' ? 'active' : 'inactive',
+            status: job.status === 'inactive' ? 'active' : 'inactive',
         });
 
         if (res.isOk()) {
-            status = res.value.status;
+            await invalidateAll();
         }
 
         loading = false;
@@ -85,14 +84,13 @@
     </div>
 {/snippet}
 
-
 <BaseListElement deleteConfirmationMessage={`The job "${job.name}" will be deleted.`}
                  disabled={loading}
                  editHref={`/jobs/${job.id}`}
                  ondelete={deleteJob}
                  onrun={handleRunJobPopup}
                  onstatuschange={changeJobStatus}
-                 status={status}
+                 status={job.status}
                  title={job.name}>
     <div class="flex items-center gap-1 whitespace-nowrap">
         <Clock class="h-4 w-4"/>
@@ -124,7 +122,7 @@
         {/if}
     </div>
 
-    {#if nextExecution && status === 'active'}
+    {#if nextExecution && job.status === 'active'}
         <div class="flex flex-1 items-center justify-end gap-1 whitespace-nowrap">
             <RefreshCw class="h-4 w-4"/>
             Next execution: {nextExecution.toLocaleString()}
@@ -140,7 +138,7 @@
             <label class="flex select-none items-center gap-1">
                 <input type="checkbox"
                        class="checkbox checkbox-primary checkbox-xs"
-                       value="{db.database.id}"
+                       value={db.database.id}
                        checked={jobRunDatabases.includes(db.database.id)}
                        onchange={handleRunJobDatabaseChange}/>
                 {db.database.name}
