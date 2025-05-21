@@ -4,7 +4,7 @@
     import ElementForm from '$lib/components/forms/ElementForm.svelte';
     import { Blocks, OctagonAlert } from '$lib/components/icons';
     import DetectedContainer from '$lib/components/integrations/docker/DetectedContainer.svelte';
-    import { ENGINES_META } from '$lib/server/databases/engines-meta';
+    import { ENGINES_META } from '$lib/common/engines-meta';
     import type { PageProps } from './$types';
 
     let { data }: PageProps = $props();

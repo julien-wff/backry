@@ -1,6 +1,5 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
-    import { page } from '$app/state';
     import Head from '$lib/components/common/Head.svelte';
     import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
     import ElementForm from '$lib/components/forms/ElementForm.svelte';
@@ -10,8 +9,7 @@
     import JobDeletePolicyField from '$lib/components/jobs/JobDeletePolicyField.svelte';
     import { fetchApi } from '$lib/helpers/fetch';
     import { slugify } from '$lib/helpers/format';
-    import { parseIdOrNewParam } from '$lib/server/api/params';
-    import { jobRequest, type JobResponse } from '$lib/server/schemas/api';
+    import { type jobRequest, type JobResponse } from '$lib/server/schemas/api';
     import { sendAt, validateCronExpression } from 'cron';
     import type { PageData } from './$types';
 
@@ -20,7 +18,6 @@
     }
 
     let { data }: Props = $props();
-    const { id, isNew } = parseIdOrNewParam(page.params.id);
 
     let error = $state<string | null>();
     let isLoading = $state(false);
@@ -55,8 +52,8 @@
         isLoading = true;
 
         const res = await fetchApi<JobResponse, typeof jobRequest>(
-            isNew ? 'POST' : 'PUT',
-            isNew ? `/api/jobs` : `/api/jobs/${id}`, {
+            data.isNew ? 'POST' : 'PUT',
+            data.isNew ? `/api/jobs` : `/api/jobs/${data.id}`, {
                 name: jobName,
                 slug,
                 storageId: storageBackend,

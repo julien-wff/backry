@@ -32,6 +32,8 @@ export const load: PageServerLoad = async ({ params }) => {
         databases,
         storages,
         job,
+        id,
+        isNew,
         serverTimeZone: dayjs.tz.guess(),
     };
 };

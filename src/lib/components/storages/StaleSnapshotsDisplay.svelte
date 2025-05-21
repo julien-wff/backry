@@ -4,7 +4,10 @@
     import { OctagonAlert, ShieldCheck, Trash2 } from '$lib/components/icons';
     import { fetchApi } from '$lib/helpers/fetch';
     import { formatSize } from '$lib/helpers/format';
-    import { storageStaleSnapshotsDeleteRequest, type StorageStaleSnapshotsResponse } from '$lib/server/schemas/api';
+    import {
+        type storageStaleSnapshotsDeleteRequest,
+        type StorageStaleSnapshotsResponse,
+    } from '$lib/server/schemas/api';
     import type { ResticSnapshot } from '$lib/types/restic';
     import { onMount } from 'svelte';
 

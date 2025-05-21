@@ -8,10 +8,10 @@
     import { ArchiveRestore, CloudUpload, PackageOpen } from '$lib/components/icons';
     import { fetchApi } from '$lib/helpers/fetch';
     import {
-        storageInitRepositoryRequest,
+        type storageInitRepositoryRequest,
         type storageRequest,
         type StorageResponse,
-        storagesCheckRequest,
+        type storagesCheckRequest,
         type StoragesCheckResponse,
         type StoragesInitRepositoryResponse,
     } from '$lib/server/schemas/api';

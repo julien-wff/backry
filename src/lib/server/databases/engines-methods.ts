@@ -1,4 +1,4 @@
-import type { ENGINES_META } from '$lib/server/databases/engines-meta';
+import type { ENGINES_META } from '$lib/common/engines-meta';
 import { mongodbMethods } from '$lib/server/databases/methods/mongodb';
 import { mysqlMethods } from '$lib/server/databases/methods/mysql';
 import { postgresqlMethods } from '$lib/server/databases/methods/postgresql';

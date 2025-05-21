@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { ENGINES_META } from '$lib/server/databases/engines-meta';
+    import { ENGINES_META } from '$lib/common/engines-meta';
     import type { DATABASE_ENGINES } from '$lib/server/db/schema';
 
     interface Props {

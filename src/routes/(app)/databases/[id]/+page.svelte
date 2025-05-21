@@ -1,6 +1,7 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
     import { page } from '$app/state';
+    import { ENGINE_META_ENTRIES, ENGINES_META } from '$lib/common/engines-meta';
     import Head from '$lib/components/common/Head.svelte';
     import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
     import ElementForm from '$lib/components/forms/ElementForm.svelte';
@@ -8,7 +9,6 @@
     import { Database } from '$lib/components/icons';
     import { fetchApi } from '$lib/helpers/fetch';
     import { slugify } from '$lib/helpers/format';
-    import { ENGINE_META_ENTRIES, ENGINES_META } from '$lib/server/databases/engines-meta';
     import type { DATABASE_ENGINES } from '$lib/server/db/schema';
     import { type databaseRequest, type DatabaseResponse, type databasesCheckRequest } from '$lib/server/schemas/api';
     import type { PageProps } from './$types';

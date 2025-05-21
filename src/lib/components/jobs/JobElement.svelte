@@ -5,7 +5,7 @@
     import { Clock, CloudUpload, Database, RefreshCw } from '$lib/components/icons';
     import { fetchApi } from '$lib/helpers/fetch';
     import type { jobsListFull } from '$lib/server/queries/jobs';
-    import { type jobPatchRequest, type JobResponse, jobRunRequest } from '$lib/server/schemas/api';
+    import { type jobPatchRequest, type JobResponse, type jobRunRequest } from '$lib/server/schemas/api';
     import { addToast } from '$lib/stores/toasts.svelte';
 
     interface Props {

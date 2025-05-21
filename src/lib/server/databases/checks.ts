@@ -1,4 +1,4 @@
-import { ENGINE_META_ENTRIES } from '$lib/server/databases/engines-meta';
+import { ENGINE_META_ENTRIES } from '$lib/common/engines-meta';
 import { ENGINES_METHODS } from '$lib/server/databases/engines-methods';
 import { db } from '$lib/server/db';
 import { DATABASE_ENGINES, databases } from '$lib/server/db/schema';
