@@ -3,10 +3,10 @@ import type { backups } from '$lib/server/db/schema';
 import { createBackup, setBackupsToPruned, updateBackup } from '$lib/server/queries/backups';
 import { getJob } from '$lib/server/queries/jobs';
 import { createRun, updateRun } from '$lib/server/queries/runs';
+import { logger } from '$lib/server/services/logger';
 import { applyForgetPolicy, backupFromCommand } from '$lib/server/services/restic';
 import { backupEmitter } from '$lib/server/shared/events';
 import type { EngineMethods } from '$lib/types/engine';
-import { logger } from '$lib/server/services/logger';
 import { sql } from 'drizzle-orm';
 import { err, ok, type ResultAsync } from 'neverthrow';
 
