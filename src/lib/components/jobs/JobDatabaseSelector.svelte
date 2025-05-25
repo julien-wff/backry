@@ -2,21 +2,22 @@
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
     import { ArrowDown, ArrowUp, Power, PowerOff, Trash2 } from '$lib/components/icons';
     import type { databases } from '$lib/server/db/schema';
+    import { flip } from 'svelte/animate';
 
     interface Props {
-        selection: Array<{ id: number, enabled: boolean }>;
+        selection: Array<{ databaseId: number, enabled: boolean, selectionId: string }>;
         availableDatabases: Array<typeof databases.$inferSelect>;
     }
 
     let { selection = $bindable(), availableDatabases }: Props = $props();
 
     let canAddDatabases = $derived(selection.length < availableDatabases.length);
-    let selectedDatabasesIds = $derived(selection.map(db => db.id));
+    let selectedDatabasesIds = $derived(selection.map(db => db.databaseId));
 
     function handleAddDatabase() {
         selection = [
             ...selection,
-            { id: -1, enabled: true },
+            { databaseId: -1, enabled: true, selectionId: crypto.randomUUID() },
         ];
     }
 
@@ -25,21 +26,22 @@
     }
 
     function handleInvertDatabasesPositions(index1: number, index2: number) {
-        const db = selection[index1];
+        const temp = selection[index1];
         selection[index1] = selection[index2];
-        selection[index2] = db;
+        selection[index2] = temp;
     }
 </script>
 
 
 <InputContainer label="Databases">
-    {#each selection as selectedDb, i}
+    {#each selection as selectedDb, i (selectedDb.selectionId)}
         <!-- Can only select (non-selected in other databases) and (currently selected on) -->
         {@const localAvailableDbs = availableDatabases
-            .filter(db => !selectedDatabasesIds.includes(db.id) || selectedDb.id === db.id)
+            .filter(db => !selectedDatabasesIds.includes(db.id) || selectedDb.databaseId === db.id)
         }
 
-        <fieldset class="relative fieldset bg-base-100 border border-base-300 p-4 rounded-box">
+        <fieldset class="relative fieldset bg-base-100 border border-base-300 p-4 rounded-box"
+                  animate:flip={{duration: 300}}>
             <legend class="fieldset-legend">Database #{i + 1}</legend>
 
             <div class="absolute right-4 -top-6 flex gap-2">
@@ -75,7 +77,7 @@
                 </button>
             </div>
 
-            <select class="select select-sm w-full" bind:value={selection[i].id} id="database-{i}" required>
+            <select class="select select-sm w-full" bind:value={selection[i].databaseId} id="database-{i}" required>
                 {#each localAvailableDbs as availableDb (availableDb.id)}
                     <option value={availableDb.id} disabled={availableDb.status !== 'active'}>
                         {availableDb.name}

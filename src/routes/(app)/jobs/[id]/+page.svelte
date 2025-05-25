@@ -28,8 +28,9 @@
     let cron = $state(data.job?.cron ?? '');
     let prunePolicy = $state(data.job?.prunePolicy ?? '');
     let selectedDatabases = $state(data.job?.jobsDatabases.map(jd => ({
-        id: jd.databaseId,
+        databaseId: jd.databaseId,
         enabled: jd.status === 'active',
+        selectionId: crypto.randomUUID(),
     })) ?? []);
 
     const clientTimeZone = new Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -49,7 +50,10 @@
                 storageId: storageBackend,
                 cron,
                 prunePolicy,
-                databases: selectedDatabases,
+                databases: selectedDatabases.map(db => ({
+                    id: db.databaseId,
+                    enabled: db.enabled,
+                })),
             },
         );
 
