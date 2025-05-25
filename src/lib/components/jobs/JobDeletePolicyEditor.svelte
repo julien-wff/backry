@@ -48,16 +48,22 @@
 </script>
 
 <div class="mb-4">
-    <span class="font-bold">Policies definition:</span> keep-last will keep the last n backups. The others will keep
-    the most recent backup for each period over the last n periods.
-    <br/>
-    For more information, see the
-    <a class="link link-primary"
-       href="https://restic.readthedocs.io/en/stable/060_forget.html#removing-snapshots-according-to-a-policy"
-       rel="noopener noreferrer"
-       target="_blank">
-        Restic docs
-    </a>.
+    <p class="mb-1">
+        <span class="font-bold">Policies definition:</span> keep-last will keep the last n backups. The others will keep
+        the most recent backup for each period over the last n periods.
+    </p>
+    <p class="mb-1">
+        This policy is applied on a per-database basis, so their backups might not all be pruned during the same run.
+    </p>
+    <p>
+        For more information, see the
+        <a class="link link-primary"
+           href="https://restic.readthedocs.io/en/stable/060_forget.html#removing-snapshots-according-to-a-policy"
+           rel="noopener noreferrer"
+           target="_blank">
+            Restic docs
+        </a>.
+    </p>
 </div>
 
 {#if deletePolicies.length === 0}
