@@ -6,9 +6,9 @@
     import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
     import ElementForm from '$lib/components/forms/ElementForm.svelte';
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
+    import SlugInput from '$lib/components/forms/SlugInput.svelte';
     import { Database } from '$lib/components/icons';
     import { fetchApi } from '$lib/helpers/fetch';
-    import { slugify } from '$lib/helpers/format';
     import type { DATABASE_ENGINES } from '$lib/server/db/schema';
     import { type databaseRequest, type DatabaseResponse, type databasesCheckRequest } from '$lib/server/schemas/api';
     import type { PageProps } from './$types';
@@ -23,21 +23,12 @@
     let selectedEngine = $state<typeof DATABASE_ENGINES[number] | null>(data.database?.engine ?? urlEngine ?? null);
 
     let dbName = $state(data.database?.name ?? searchParams.get('name') ?? '');
-    let oldDbName = $state('');
     let slug = $state(data.database?.slug ?? '');
-    $effect(() => updateSlug(dbName));
 
     let connectionString = $state(data.database?.connectionString ?? searchParams.get('connectionString') ?? '');
     let connectionStringPlaceholder = $derived(
         (selectedEngine && ENGINES_META[selectedEngine].connectionStringPlaceholder) || '',
     );
-
-    function updateSlug(_: string) {
-        if (slugify(oldDbName) === slug) {
-            slug = slugify(dbName);
-        }
-        oldDbName = dbName;
-    }
 
     let isConnectionTesting = $state(false);
     let databaseConnectionStatus = $state<'untested' | 'success' | 'error'>('untested');
@@ -143,10 +134,7 @@
         <input bind:value={dbName} class="input w-full" id="db-name" minlength="2" name="name" required>
     </InputContainer>
 
-    <InputContainer for="slug" label="Slug">
-        <input bind:value={slug} class="input w-full" id="slug" minlength="2" name="slug" pattern="^[a-z0-9\-]+$"
-               required>
-    </InputContainer>
+    <SlugInput baseValue={dbName} bind:slug/>
 
     <InputContainer for="connection-string" label="Connection string">
         <input bind:value={connectionString}

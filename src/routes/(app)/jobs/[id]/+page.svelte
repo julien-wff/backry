@@ -4,11 +4,11 @@
     import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
     import ElementForm from '$lib/components/forms/ElementForm.svelte';
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
+    import SlugInput from '$lib/components/forms/SlugInput.svelte';
     import { Timer } from '$lib/components/icons';
     import JobDatabaseSelector from '$lib/components/jobs/JobDatabaseSelector.svelte';
     import JobPrunePolicyField from '$lib/components/jobs/JobPrunePolicyField.svelte';
     import { fetchApi } from '$lib/helpers/fetch';
-    import { slugify } from '$lib/helpers/format';
     import { type jobRequest, type JobResponse } from '$lib/server/schemas/api';
     import { sendAt, validateCronExpression } from 'cron';
     import type { PageData } from './$types';
@@ -31,16 +31,6 @@
         id: jd.databaseId,
         enabled: jd.status === 'active',
     })) ?? []);
-
-    let oldJobName = $state('');
-    $effect(() => updateSlug(jobName));
-
-    function updateSlug(_: string) {
-        if (slugify(oldJobName) === slug) {
-            slug = slugify(jobName);
-        }
-        oldJobName = jobName;
-    }
 
     const clientTimeZone = new Intl.DateTimeFormat().resolvedOptions().timeZone;
     const cronMessage = $derived(validateCronExpression(cron).valid
@@ -110,9 +100,8 @@
         <input bind:value={jobName} class="w-full input" id="job-name" required>
     </InputContainer>
 
-    <InputContainer for="slug" label="Slug">
-        <input bind:value={slug} class="w-full input" id="slug" pattern="^[a-z0-9\-]+$" required>
-    </InputContainer>
+
+    <SlugInput baseValue={jobName} bind:slug/>
 
     <InputContainer for="backend" label="Storage backend">
         <select bind:value={storageBackend} class="w-full select" id="backend" required>
