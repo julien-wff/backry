@@ -110,7 +110,6 @@ export const updateJob = async (id: number, job: JobRequest) => {
         .update(jobs)
         .set({
             name: job.name,
-            slug: job.slug,
             storageId: job.storageId,
             cron: job.cron,
             prunePolicy: job.prunePolicy,

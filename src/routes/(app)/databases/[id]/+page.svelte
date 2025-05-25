@@ -134,7 +134,7 @@
         <input bind:value={dbName} class="input w-full" id="db-name" minlength="2" name="name" required>
     </InputContainer>
 
-    <SlugInput baseValue={dbName} bind:slug/>
+    <SlugInput baseValue={dbName} bind:slug disabled={!!data.database} source="database"/>
 
     <InputContainer for="connection-string" label="Connection string">
         <input bind:value={connectionString}

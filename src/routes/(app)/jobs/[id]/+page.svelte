@@ -101,7 +101,7 @@
     </InputContainer>
 
 
-    <SlugInput baseValue={jobName} bind:slug/>
+    <SlugInput baseValue={jobName} bind:slug disabled={!!data.job} source="job"/>
 
     <InputContainer for="backend" label="Storage backend">
         <select bind:value={storageBackend} class="w-full select" id="backend" required>
