@@ -50,4 +50,9 @@ export const sqliteMethods = {
     getCredentialsFromContainer(container: ContainerInspectInfo): ConnectionStringParams {
         return {};
     },
+
+    hidePasswordInConnectionString(connectionString: string): string {
+        // SQLite does not use credentials in the connection string
+        return connectionString;
+    },
 } satisfies EngineMethods;

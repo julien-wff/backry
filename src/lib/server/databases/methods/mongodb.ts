@@ -74,4 +74,12 @@ export const mongodbMethods = {
 
         return infos;
     },
+
+    hidePasswordInConnectionString(connectionString: string): string {
+        const url = new URL(connectionString);
+        if (url.password) {
+            url.password = '***';
+        }
+        return url.toString();
+    },
 } satisfies EngineMethods;

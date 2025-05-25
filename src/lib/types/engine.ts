@@ -97,4 +97,11 @@ export interface EngineMethods {
      * @return Partially-filled connection string parameters.
      */
     getCredentialsFromContainer(container: ContainerInspectInfo): ConnectionStringParams;
+
+    /**
+     * Hide the password in the connection string.
+     * @param connectionString Full connection string to the database.
+     * @return Connection string with the password hidden.
+     */
+    hidePasswordInConnectionString(connectionString: string): string;
 }
