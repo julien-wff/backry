@@ -1,5 +1,5 @@
 import { ENGINES_METHODS } from '$lib/server/databases/engines-methods';
-import type { backups } from '$lib/server/db/schema';
+import { type backups, type storages } from '$lib/server/db/schema';
 import { createBackup, setBackupsToPruned, updateBackup } from '$lib/server/queries/backups';
 import { getJob } from '$lib/server/queries/jobs';
 import { createRun, updateRun } from '$lib/server/queries/runs';
@@ -60,7 +60,7 @@ export async function runBackupJob(jobId: number, forcedDatabases: number[] | nu
 
 
 /**
- * Run a backup for a specific database in a job.
+ * Run a backup for a specific database in a job. Also apply the delete policy if it exists.
  * @param job The job to run the backup for.
  * @param jobIndex The index of the database in the job to run the backup for.
  * @param runId The run ID to use to link backups together.
@@ -136,43 +136,74 @@ async function jobDatabaseBackup(job: NonNullable<Awaited<ReturnType<typeof getJ
 
     // Apply prune policy by deleting snapshots, update them in database and update the client
     if (job.deletePolicy) {
-        const forgetResult = await applyForgetPolicy(
-            job.storage.url,
-            job.storage.password!,
-            job.storage.env,
+        const deletePolicyResult = await applyDeletePolicy(
+            job.storage,
             job.deletePolicy,
             job.id,
             jobDatabase.database.id,
+            path.sep + fileName,
         );
-        if (forgetResult.isErr()) {
-            logger.error(forgetResult.error, `Error applying forget policy for job #${job.id}`);
-            return err(`Error applying forget policy: ${forgetResult.error.message}`);
-        }
-
-        // There are multiple forget results, one for each database somehow (despite the tags filter)
-        const forgetStats = forgetResult.value[0].find(s => s.paths[0].endsWith(path.sep + fileName));
-        if (!forgetStats) {
-            logger.error(`No forget stats found for job #${job.id} database #${jobIndex} while applying forget policy (path ${path.sep + fileName} no found)`);
-            return err('No forget stats found for the backup file');
-        }
-
-        logger.info(`Forget policy applied for job #${job.id} database #${jobIndex}: ${forgetStats.remove?.length ?? 0} snapshots removed, ${forgetStats.keep?.length ?? 0} kept`);
-        logger.debug({
-            snapshotKept: forgetStats.keep?.map(s => ({
-                id: s.short_id,
-                matches: forgetStats.reasons?.find(r => r.snapshot.short_id === s.short_id)?.matches,
-            })),
-            snapshotRemoved: forgetStats.remove?.map(s => s.short_id),
-        }, 'Forget summary');
-
-        if (forgetStats.remove && forgetStats.remove.length > 0) {
-            const updatedBackups = await setBackupsToPruned(forgetStats.remove.map(s => s.id));
-            for (const backup of updatedBackups) {
-                backupEmitter.emit('update', backup);
-            }
+        if (deletePolicyResult.isErr()) {
+            return err(deletePolicyResult.error);
         }
     }
 
     logger.info(`Backup for job #${job.id} database #${jobIndex} finished`);
     return ok(updatedBackup);
+}
+
+
+/**
+ * Apply the delete policy to a backup file by deleting snapshots, updating them in the database, and update to the client.
+ * @param storage The storage configuration to use for the backup.
+ * @param deletePolicy Delete policy to apply (flags for restic forget command).
+ * @param jobId The job ID to which the backup belongs.
+ * @param databaseId The database ID to which the backup belongs.
+ * @param filePath The filepath of the backup file to apply the delete policy to. Used to find the correct forget stats.
+ * @return If error, the error message. If success, void.
+ */
+async function applyDeletePolicy(
+    storage: typeof storages.$inferSelect,
+    deletePolicy: string,
+    jobId: number,
+    databaseId: number,
+    filePath: string,
+): Promise<ResultAsync<void, string>> {
+    const forgetResult = await applyForgetPolicy(
+        storage.url,
+        storage.password!,
+        storage.env,
+        deletePolicy,
+        jobId,
+        databaseId,
+    );
+    if (forgetResult.isErr()) {
+        logger.error(forgetResult.error, `Error applying forget policy for job #${jobId}`);
+        return err(`Error applying forget policy: ${forgetResult.error.message}`);
+    }
+
+    // There are multiple forget results, one for each database somehow (despite the tags filter)
+    const forgetStats = forgetResult.value[0].find(s => s.paths[0].endsWith(filePath));
+    if (!forgetStats) {
+        logger.error(`No forget stats found for job #${jobId} database #${databaseId} while applying forget policy (path ${filePath} no found)`);
+        return err('No forget stats found for the backup file');
+    }
+
+    logger.info(`Forget policy applied for job #${jobId} database #${databaseId}: ${forgetStats.remove?.length ?? 0} snapshots removed, ${forgetStats.keep?.length ?? 0} kept`);
+    logger.debug({
+        snapshotKept: forgetStats.keep?.map(s => ({
+            id: s.short_id,
+            matches: forgetStats.reasons?.find(r => r.snapshot.short_id === s.short_id)?.matches,
+        })),
+        snapshotRemoved: forgetStats.remove?.map(s => s.short_id),
+    }, 'Forget summary');
+
+    if (forgetStats.remove && forgetStats.remove.length > 0) {
+        const updatedBackups = await setBackupsToPruned(forgetStats.remove.map(s => s.id));
+        for (const backup of updatedBackups) {
+            backupEmitter.emit('update', backup);
+        }
+    }
+
+    return ok();
 }
