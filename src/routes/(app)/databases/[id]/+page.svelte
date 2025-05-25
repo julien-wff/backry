@@ -40,8 +40,15 @@
     }
 
     let isConnectionTesting = $state(false);
-    let databaseConnectionStatus = $state<boolean | null>(null);
+    let databaseConnectionStatus = $state<'untested' | 'success' | 'error'>('untested');
     let isFormSubmitting = $state(false);
+
+    // Reset connection status when the connection string changes
+    $effect(() => {
+        if (connectionString) {
+            databaseConnectionStatus = 'untested';
+        }
+    });
 
     async function testDbConnection() {
         if (!selectedEngine) {
@@ -65,10 +72,10 @@
 
         if (res.isErr()) {
             error = res.error;
-            databaseConnectionStatus = false;
+            databaseConnectionStatus = 'error';
         } else {
             error = null;
-            databaseConnectionStatus = true;
+            databaseConnectionStatus = 'success';
         }
     }
 
@@ -153,16 +160,16 @@
 
     <div class="flex gap-2">
         <button class="btn flex-1"
-                class:btn-error={databaseConnectionStatus === false}
-                class:btn-info={databaseConnectionStatus === null}
-                class:btn-success={databaseConnectionStatus === true}
+                class:btn-error={databaseConnectionStatus === 'error'}
+                class:btn-info={databaseConnectionStatus === 'untested'}
+                class:btn-success={databaseConnectionStatus === 'success'}
                 disabled={isConnectionTesting}
                 onclick={testDbConnection}
                 type="button">
             Test connection
-            {#if databaseConnectionStatus === false}
+            {#if databaseConnectionStatus === 'error'}
                 (fail)
-            {:else if databaseConnectionStatus === true}
+            {:else if databaseConnectionStatus === 'success'}
                 (success)
             {/if}
         </button>
