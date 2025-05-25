@@ -101,6 +101,21 @@ export const storageStaleSnapshotsDeleteRequest = z.object({
     snapshots: z.array(z.string()),
 });
 
+/** `GET /api/storages/[id]/prune-desync` */
+export interface StoragePruneDesyncResponse {
+    backups: Array<{
+        id: number;
+        name: string;
+        startedAt: string;
+        snapshotShortId: string;
+    }>;
+}
+
+/** `POST /api/storages/[id]/prune-desync` */
+export const storagePruneDesyncUpdateRequest = z.object({
+    backups: z.array(z.number().positive()),
+});
+
 // JOBS
 
 /**

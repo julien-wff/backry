@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db';
-import { backups, jobDatabases, jobs, storages } from '$lib/server/db/schema';
-import { desc, eq, inArray, isNull, sql } from 'drizzle-orm';
+import { backups, databases, jobDatabases, jobs, storages } from '$lib/server/db/schema';
+import { and, desc, eq, inArray, isNotNull, isNull, sql } from 'drizzle-orm';
 
 export const backupsListFull = async () => db.query.backups.findMany({
     orderBy: [ desc(backups.startedAt) ],
@@ -56,6 +56,35 @@ export const getSnapshotsIdsByStorageId = (storageId: number) =>
         .filter((snapshotId): snapshotId is string => snapshotId !== null);
 
 
+/**
+ * Get selected information for backups that are not pruned and have no error (so the snapshot should still exist).
+ * @param storageId Storage ID
+ * @return Array of snapshot IDs with some backup information
+ */
+export const getUnprunedSnapshotByStorageId = (storageId: number) =>
+    db
+        .select({
+            id: backups.id,
+            snapshotId: backups.snapshotId,
+            jobName: jobs.name,
+            databaseName: databases.name,
+            startedAt: backups.startedAt,
+        })
+        .from(backups)
+        .where(and(
+            isNotNull(backups.snapshotId),
+            isNull(backups.prunedAt),
+            isNull(backups.error),
+            eq(storages.id, storageId),
+        ))
+        .leftJoin(jobDatabases, eq(jobDatabases.id, backups.jobDatabaseId))
+        .leftJoin(databases, eq(databases.id, jobDatabases.databaseId))
+        .leftJoin(jobs, eq(jobs.id, jobDatabases.jobId))
+        .leftJoin(storages, eq(storages.id, jobs.storageId))
+        .orderBy(desc(backups.startedAt))
+        .all();
+
+
 export const deleteBackup = async (id: number) =>
     db
         .delete(backups)
@@ -108,6 +137,23 @@ export const setBackupsToPruned = (snapshotIds: string[]) =>
         })
         .where(
             inArray(backups.snapshotId, snapshotIds),
+        )
+        .returning()
+        .execute();
+
+/**
+ * Set the prunedAt timestamp for backups, given backup IDs.
+ * @param backupIds Array of backup IDs
+ * @return Array of updated backups
+ */
+export const setBackupsToPrunedById = (backupIds: number[]) =>
+    db
+        .update(backups)
+        .set({
+            prunedAt: sql`(CURRENT_TIMESTAMP)`,
+        })
+        .where(
+            inArray(backups.id, backupIds),
         )
         .returning()
         .execute();

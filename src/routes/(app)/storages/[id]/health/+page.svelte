@@ -5,6 +5,7 @@
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
     import { FolderHeart } from '$lib/components/icons';
     import LocksDisplay from '$lib/components/storages/LocksDisplay.svelte';
+    import PruneDesyncDisplay from '$lib/components/storages/PruneDesyncDisplay.svelte';
     import StaleSnapshotsDisplay from '$lib/components/storages/StaleSnapshotsDisplay.svelte';
     import type { PageProps } from './$types';
 
@@ -24,5 +25,9 @@
 
     <InputContainer label="Stale snapshots">
         <StaleSnapshotsDisplay/>
+    </InputContainer>
+
+    <InputContainer label="Pruned backups desynchronization">
+        <PruneDesyncDisplay/>
     </InputContainer>
 </ElementForm>
