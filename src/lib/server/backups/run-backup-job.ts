@@ -9,6 +9,7 @@ import { backupEmitter } from '$lib/server/shared/events';
 import type { EngineMethods } from '$lib/types/engine';
 import { sql } from 'drizzle-orm';
 import { err, ok, type ResultAsync } from 'neverthrow';
+import path from 'node:path';
 
 /**
  * Start a backup job, by running each database backup in the job one after the other.
@@ -148,7 +149,13 @@ async function jobDatabaseBackup(job: NonNullable<Awaited<ReturnType<typeof getJ
             return err(`Error applying forget policy: ${forgetResult.error.message}`);
         }
 
-        const forgetStats = forgetResult.value[0][0];
+        // There are multiple forget results, one for each database somehow (despite the tags filter)
+        const forgetStats = forgetResult.value[0].find(s => s.paths[0].endsWith(path.sep + fileName));
+        if (!forgetStats) {
+            logger.error(`No forget stats found for job #${job.id} database #${jobIndex} while applying forget policy (path ${path.sep + fileName} no found)`);
+            return err('No forget stats found for the backup file');
+        }
+
         logger.info(`Forget policy applied for job #${job.id} database #${jobIndex}: ${forgetStats.remove?.length ?? 0} snapshots removed, ${forgetStats.keep?.length ?? 0} kept`);
         logger.debug({
             snapshotKept: forgetStats.keep?.map(s => ({
