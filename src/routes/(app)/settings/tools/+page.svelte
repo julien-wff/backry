@@ -1,11 +1,18 @@
 <script lang="ts">
+    import { invalidateAll } from '$app/navigation';
     import Head from '$lib/components/common/Head.svelte';
     import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
     import { Settings } from '$lib/components/icons';
     import ToolVersion from '$lib/components/settings/ToolVersion.svelte';
+    import { onMount } from 'svelte';
     import type { PageProps } from './$types';
 
     let { data }: PageProps = $props();
+
+    onMount(() => {
+        // Fetch the latest update for tools validity in the layout, because +page.server.ts updates it
+        invalidateAll();
+    });
 </script>
 
 <Head title="Settings - Tools info"/>

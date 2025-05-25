@@ -1,5 +1,6 @@
 import { getAllEnginesVersionsOrError } from '$lib/server/databases/checks';
 import { getResticVersion, RESTIC_CMD } from '$lib/server/services/restic';
+import { setToolChecksSuccess } from '$lib/server/shared/tool-checks';
 import { VERSION as svelteKitVersion } from '@sveltejs/kit';
 import path from 'path';
 import type { PageServerLoad } from './$types';
@@ -9,6 +10,9 @@ export const load: PageServerLoad = async ({}) => {
         getResticVersion(),
         getAllEnginesVersionsOrError(),
     ]);
+
+    // Warning: this will not update errors.tools in +layout.server.ts right away, data needs to be invalidated client-side
+    setToolChecksSuccess(resticVersion.isOk() && Object.values(enginesVersions).every(engine => !engine.error));
 
     return {
         bun: {

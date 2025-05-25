@@ -4,6 +4,9 @@
     import FullScreenSelectorCard from '$lib/components/common/selector/FullScreenSelectorCard.svelte';
     import FullScreenSelectorContainer from '$lib/components/common/selector/FullScreenSelectorContainer.svelte';
     import { Settings, Wrench } from '$lib/components/icons';
+    import type { PageProps } from './$types';
+
+    let { data }: PageProps = $props();
 </script>
 
 <Head title="Settings"/>
@@ -13,7 +16,7 @@
 </PageContentHeader>
 
 <FullScreenSelectorContainer gridClass="grid-cols-1">
-    <FullScreenSelectorCard href="tools" icon={Wrench}>
+    <FullScreenSelectorCard error={data.errors.tools} href="tools" icon={Wrench}>
         Tools info
     </FullScreenSelectorCard>
 </FullScreenSelectorContainer>

@@ -1,4 +1,5 @@
 import { getErrorCountPerType } from '$lib/server/queries/shared';
+import { areToolChecksSuccessful } from '$lib/server/shared/tool-checks';
 import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = async () => {
@@ -9,6 +10,7 @@ export const load: LayoutServerLoad = async () => {
             databases: errors.databases,
             storages: errors.storages,
             backups: errors.backups,
+            tools: !areToolChecksSuccessful(),
         },
     };
 };

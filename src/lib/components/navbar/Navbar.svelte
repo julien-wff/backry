@@ -7,6 +7,7 @@
             databases: number;
             storages: number;
             backups: number;
+            tools: boolean;
         };
     }
 
@@ -29,7 +30,7 @@
 
         <div class="flex flex-1 flex-col gap-4 justify-end">
             <NavbarElement href="/integrations/docker" icon={Blocks} label="Integrations"/>
-            <NavbarElement href="/settings" icon={Settings} label="Settings"/>
+            <NavbarElement hasError={errors.tools} href="/settings" icon={Settings} label="Settings"/>
         </div>
     </nav>
 </aside>
