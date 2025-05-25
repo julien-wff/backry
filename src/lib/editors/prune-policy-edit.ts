@@ -1,4 +1,4 @@
-export const AVAILABLE_DELETE_POLICIES = {
+export const AVAILABLE_PRUNE_POLICIES = {
     'keep-last': 'Keey last n',
     'keep-hourly': 'Keep first of hour for last n hours',
     'keep-daily': 'Keep first of day for last n days',
@@ -7,24 +7,24 @@ export const AVAILABLE_DELETE_POLICIES = {
     'keep-yearly': 'Keep first of year for last n years',
 } as const;
 
-export type DeletePolicyIDs = keyof typeof AVAILABLE_DELETE_POLICIES;
-export type DeletePolicies = Array<[ DeletePolicyIDs, number ]>;
+export type PrunePolicyIDs = keyof typeof AVAILABLE_PRUNE_POLICIES;
+export type PrunePolicies = Array<[ PrunePolicyIDs, number ]>;
 
 /**
- * Parse the flags from the command line into a DeletePolicies array.
+ * Parse the flags from the command line into a PrunePolicies array.
  * @param flags CLI arguments
  * @returns The parsed policies and the flags that could not be parsed
  */
 export function parsePolicyFlags(flags: string) {
     const flagsSplit = flags.split(/[= ]+/g).filter(Boolean);
-    const policies: DeletePolicies = [];
+    const policies: PrunePolicies = [];
     let remainingFlags: string[] = [];
 
     let flagParsing: string | null = null;
     for (const flagFromSplit of flagsSplit) {
         // If the flag is a policy flag, keep it for next iteration with its value
         const flagFromSplitWithoutPrefix = flagFromSplit.slice(2);
-        if (Object.keys(AVAILABLE_DELETE_POLICIES).includes(flagFromSplitWithoutPrefix)) {
+        if (Object.keys(AVAILABLE_PRUNE_POLICIES).includes(flagFromSplitWithoutPrefix)) {
             flagParsing = flagFromSplitWithoutPrefix;
             continue;
         }
@@ -38,7 +38,7 @@ export function parsePolicyFlags(flags: string) {
             if (index !== -1) {
                 policies[index][1] = value;
             } else {
-                policies.push([ flagParsing as DeletePolicyIDs, value ]);
+                policies.push([ flagParsing as PrunePolicyIDs, value ]);
             }
         } else {
             if (flagParsing) {
@@ -59,7 +59,7 @@ export function parsePolicyFlags(flags: string) {
  * @param additionalFlags Additional flags to add to the command line
  * @returns The compiled flags as a string
  */
-export function compilePolicyToFlags(policies: DeletePolicies, additionalFlags: string[] = []) {
+export function compilePolicyToFlags(policies: PrunePolicies, additionalFlags: string[] = []) {
     const flags: string[] = [];
 
     for (const [ key, value ] of policies) {

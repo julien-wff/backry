@@ -135,16 +135,16 @@ async function jobDatabaseBackup(job: NonNullable<Awaited<ReturnType<typeof getJ
     }
 
     // Apply prune policy by deleting snapshots, update them in database and update the client
-    if (job.deletePolicy) {
-        const deletePolicyResult = await applyDeletePolicy(
+    if (job.prunePolicy) {
+        const prunePolicyResult = await applyPrunePolicyOnJobDatabase(
             job.storage,
-            job.deletePolicy,
+            job.prunePolicy,
             job.id,
             jobDatabase.database.id,
             path.sep + fileName,
         );
-        if (deletePolicyResult.isErr()) {
-            return err(deletePolicyResult.error);
+        if (prunePolicyResult.isErr()) {
+            return err(prunePolicyResult.error);
         }
     }
 
@@ -156,15 +156,15 @@ async function jobDatabaseBackup(job: NonNullable<Awaited<ReturnType<typeof getJ
 /**
  * Apply the delete policy to a backup file by deleting snapshots, updating them in the database, and update to the client.
  * @param storage The storage configuration to use for the backup.
- * @param deletePolicy Delete policy to apply (flags for restic forget command).
+ * @param prunePolicy Prune policy to apply (flags for restic forget command).
  * @param jobId The job ID to which the backup belongs.
  * @param databaseId The database ID to which the backup belongs.
  * @param filePath The filepath of the backup file to apply the delete policy to. Used to find the correct forget stats.
  * @return If error, the error message. If success, void.
  */
-async function applyDeletePolicy(
+async function applyPrunePolicyOnJobDatabase(
     storage: typeof storages.$inferSelect,
-    deletePolicy: string,
+    prunePolicy: string,
     jobId: number,
     databaseId: number,
     filePath: string,
@@ -173,7 +173,7 @@ async function applyDeletePolicy(
         storage.url,
         storage.password!,
         storage.env,
-        deletePolicy,
+        prunePolicy,
         jobId,
         databaseId,
     );

@@ -127,7 +127,7 @@ export const jobRequest = z.object({
     slug: z.string().min(3),
     storageId: z.number().positive(),
     cron: z.string().min(2).refine(val => validateCronExpression(val).valid, 'Invalid cron expression'),
-    deletePolicy: z.string().optional(),
+    prunePolicy: z.string().optional(),
     databases: z.array(
         z.object({
             id: z.number().positive(),

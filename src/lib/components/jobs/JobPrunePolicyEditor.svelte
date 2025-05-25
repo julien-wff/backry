@@ -1,12 +1,12 @@
 <script lang="ts">
     import { CircleHelp, Trash2 } from '$lib/components/icons';
     import {
-        AVAILABLE_DELETE_POLICIES,
+        AVAILABLE_PRUNE_POLICIES,
         compilePolicyToFlags,
-        type DeletePolicies,
-        type DeletePolicyIDs,
+        type PrunePolicies,
+        type PrunePolicyIDs,
         parsePolicyFlags,
-    } from '$lib/editors/delete-policy-edit';
+    } from '$lib/editors/prune-policy-edit';
 
     interface Props {
         opened: boolean;
@@ -17,33 +17,33 @@
 
     let { opened, inputFieldArguments = $bindable(), cron, isCronValid }: Props = $props();
 
-    let deletePolicies = $state<DeletePolicies>([]);
-    let policyKeys = $derived(deletePolicies.map(([policyKey]) => policyKey));
+    let prunePolicies = $state<PrunePolicies>([]);
+    let policyKeys = $derived(prunePolicies.map(([policyKey]) => policyKey));
     let remainingFlags = $state<string[]>([]);
     let canUpdate = $state(false);
 
     $effect(() => {
         if (opened) {
             const parseResult = parsePolicyFlags(inputFieldArguments);
-            deletePolicies = parseResult.policies;
+            prunePolicies = parseResult.policies;
             remainingFlags = parseResult.remainingFlags;
             canUpdate = true;
         } else if (canUpdate) {
-            inputFieldArguments = compilePolicyToFlags(deletePolicies, remainingFlags);
+            inputFieldArguments = compilePolicyToFlags(prunePolicies, remainingFlags);
             canUpdate = false;
         }
     });
 
     function handlePolicyRemove(index: number) {
-        deletePolicies = deletePolicies.filter((_, i) => i !== index);
+        prunePolicies = prunePolicies.filter((_, i) => i !== index);
     }
 
     function handlePolicyAdd() {
         const unassignedPolicy = Object
-            .keys(AVAILABLE_DELETE_POLICIES)
-            .find((policyId) => !policyKeys.includes(policyId as DeletePolicyIDs)) as DeletePolicyIDs;
+            .keys(AVAILABLE_PRUNE_POLICIES)
+            .find((policyId) => !policyKeys.includes(policyId as PrunePolicyIDs)) as PrunePolicyIDs;
 
-        deletePolicies.push([unassignedPolicy, 10]);
+        prunePolicies.push([unassignedPolicy, 10]);
     }
 </script>
 
@@ -66,20 +66,20 @@
     </p>
 </div>
 
-{#if deletePolicies.length === 0}
+{#if prunePolicies.length === 0}
     <div role="alert" class="alert  alert-soft mb-2">
         <CircleHelp size="16"/>
         <span>No policy, backups will not be deleted.</span>
     </div>
 {/if}
 
-{#each deletePolicies as [policyId], i (policyId)}
+{#each prunePolicies as [policyId], i (policyId)}
     <div class="mb-2 flex items-center gap-1">
         <div class="grid flex-1 grid-cols-4 gap-1">
-            <select class="col-span-3 select" bind:value={deletePolicies[i][0]}>
-                {#each Object.entries(AVAILABLE_DELETE_POLICIES) as [availablePolicyId, availablePolicyName] (availablePolicyId)}
+            <select class="col-span-3 select" bind:value={prunePolicies[i][0]}>
+                {#each Object.entries(AVAILABLE_PRUNE_POLICIES) as [availablePolicyId, availablePolicyName] (availablePolicyId)}
                     <option value={availablePolicyId}
-                            disabled={availablePolicyId !== policyId && policyKeys.includes(availablePolicyId as DeletePolicyIDs)}>
+                            disabled={availablePolicyId !== policyId && policyKeys.includes(availablePolicyId as PrunePolicyIDs)}>
                         {availablePolicyName}
                     </option>
                 {/each}
@@ -89,7 +89,7 @@
                    placeholder="n"
                    type="number"
                    min="1"
-                   bind:value={deletePolicies[i][1]}>
+                   bind:value={prunePolicies[i][1]}>
         </div>
 
         <button class="btn btn-error btn-soft btn-square" type="button" onclick={() => handlePolicyRemove(i)}>
@@ -99,7 +99,7 @@
 {/each}
 
 <button class="w-full btn btn-primary btn-soft btn-sm"
-        disabled={deletePolicies.length >= Object.keys(AVAILABLE_DELETE_POLICIES).length}
+        disabled={prunePolicies.length >= Object.keys(AVAILABLE_PRUNE_POLICIES).length}
         onclick={handlePolicyAdd}
         type="button">
     Add policy

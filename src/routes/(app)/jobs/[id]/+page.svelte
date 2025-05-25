@@ -6,7 +6,7 @@
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
     import { Timer } from '$lib/components/icons';
     import JobDatabaseSelector from '$lib/components/jobs/JobDatabaseSelector.svelte';
-    import JobDeletePolicyField from '$lib/components/jobs/JobDeletePolicyField.svelte';
+    import JobPrunePolicyField from '$lib/components/jobs/JobPrunePolicyField.svelte';
     import { fetchApi } from '$lib/helpers/fetch';
     import { slugify } from '$lib/helpers/format';
     import { type jobRequest, type JobResponse } from '$lib/server/schemas/api';
@@ -26,7 +26,7 @@
     let slug = $state(data.job?.slug ?? '');
     let storageBackend = $state<number>(data.job?.storageId ?? -1);
     let cron = $state(data.job?.cron ?? '');
-    let deletePolicy = $state(data.job?.deletePolicy ?? '');
+    let prunePolicy = $state(data.job?.prunePolicy ?? '');
     let selectedDatabases = $state(data.job?.jobsDatabases.map(jd => ({
         id: jd.databaseId,
         enabled: jd.status === 'active',
@@ -58,7 +58,7 @@
                 slug,
                 storageId: storageBackend,
                 cron,
-                deletePolicy,
+                prunePolicy,
                 databases: selectedDatabases,
             },
         );
@@ -128,7 +128,7 @@
         <input bind:value={cron} class="w-full input" id="cron" placeholder="0 0 */2 * *" required>
     </InputContainer>
 
-    <JobDeletePolicyField bind:deletePolicy {cron} isCronValid={validateCronExpression(cron).valid}/>
+    <JobPrunePolicyField bind:prunePolicy {cron} isCronValid={validateCronExpression(cron).valid}/>
 
     <JobDatabaseSelector availableDatabases={data.databases} bind:selection={selectedDatabases}/>
 
