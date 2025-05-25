@@ -82,6 +82,7 @@ export const mysqlMethods = {
         const res = await runCommandSync(
             this.checkCommand!,
             [
+                '--connect-timeout=3',
                 ...connectionStringToOptions(connectionString),
                 '--execute=SELECT 1',
             ],
