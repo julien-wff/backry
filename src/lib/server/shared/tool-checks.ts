@@ -1,6 +1,7 @@
 import { getAllEnginesVersionsOrError } from '$lib/server/databases/checks';
 import { logger } from '$lib/server/services/logger';
 import { getResticVersion } from '$lib/server/services/restic';
+import { getShoutrrrVersion } from '$lib/server/services/shoutrrr';
 
 let _areToolChecksSuccessful = false;
 
@@ -25,12 +26,15 @@ export function areToolChecksSuccessful() {
  * If any of them is not available or has an error, it sets the tool checks as unsuccessful.
  */
 export async function computeToolChecksSuccess() {
-    const [ resticVersion, enginesVersions ] = await Promise.all([
+    const [ resticVersion, enginesVersions, shoutrrrVersion ] = await Promise.all([
         getResticVersion(),
         getAllEnginesVersionsOrError(),
+        getShoutrrrVersion(),
     ]);
 
-    const areChecksSuccessful = resticVersion.isOk() && Object.values(enginesVersions).every(engine => !engine.error);
+    const areChecksSuccessful = resticVersion.isOk()
+        && shoutrrrVersion.isOk()
+        && Object.values(enginesVersions).every(engine => !engine.error);
     if (!areChecksSuccessful) {
         logger.warn('One or more CLI tools are not available or not working correctly, please check /settings/tools.');
     } else {

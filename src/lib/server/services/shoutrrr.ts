@@ -22,3 +22,23 @@ export async function sendShoutrrrNotification(url: string, body: string): Promi
 
     return ok();
 }
+
+
+/**
+ * Gets the version of Shoutrrr.
+ * @returns The version of Shoutrrr, or an error if it could not be determined.
+ * @see https://nicholas-fedor.github.io/shoutrrr/
+ */
+export async function getShoutrrrVersion(): Promise<ResultAsync<string, string>> {
+    const res = await runCommandSync(
+        SHOUTRRR_CMD,
+        [ '--version' ],
+    );
+
+    if (res.isErr()) {
+        return err(res.error.stderr.toString().trim());
+    }
+
+    const version = res.value.stdout.toString().trim();
+    return ok(version);
+}

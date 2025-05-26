@@ -30,6 +30,7 @@
     <ToolVersion {...data.bun} name="Bun"/>
     <ToolVersion {...data.svelteKit} name="SvelteKit"/>
     <ToolVersion {...data.restic} name="Restic"/>
+    <ToolVersion {...data.shoutrrr} name="Shoutrrr"/>
     <ToolVersion {...data['postgresql:dump']} name="PGDump"/>
     <ToolVersion {...data['mysql:check']} name="MySQL"/>
     <ToolVersion {...data['mysql:dump']} name="MySQL Dump"/>
