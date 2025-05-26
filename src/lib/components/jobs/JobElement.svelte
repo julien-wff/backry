@@ -2,7 +2,7 @@
     import { goto, invalidateAll } from '$app/navigation';
     import BaseListElement from '$lib/components/common/BaseListElement.svelte';
     import Modal from '$lib/components/common/Modal.svelte';
-    import { Clock, CloudUpload, Database, RefreshCw } from '$lib/components/icons';
+    import { Clock, CloudUpload, Database, FileCheck, RefreshCw } from '$lib/components/icons';
     import { fetchApi } from '$lib/helpers/fetch';
     import type { jobsListFull } from '$lib/server/queries/jobs';
     import { type jobPatchRequest, type JobResponse, type jobRunRequest } from '$lib/server/schemas/api';
@@ -73,6 +73,14 @@
 </script>
 
 
+{#snippet secondaryButtons()}
+    <a class="btn btn-success btn-sm btn-soft" href="/backups?job={job.id}">
+        <FileCheck class="w-4 h-4"/>
+        View backups
+    </a>
+{/snippet}
+
+
 <!-- Format the full list of databases by putting a line through the inactive or error ones -->
 {#snippet databaseListFormatted()}
     <div>
@@ -90,6 +98,7 @@
                  ondelete={deleteJob}
                  onrun={handleRunJobPopup}
                  onstatuschange={changeJobStatus}
+                 secondaryBtns={secondaryButtons}
                  status={job.status}
                  title={job.name}>
     <div class="flex items-center gap-1 whitespace-nowrap">
