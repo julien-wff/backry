@@ -1,4 +1,13 @@
-import { backups, DATABASE_ENGINES, databases, jobs, runs, storages } from '$lib/server/db/schema';
+import {
+    backups,
+    DATABASE_ENGINES,
+    databases,
+    jobs,
+    NOTIFICATION_TRIGGER,
+    notifications,
+    runs,
+    storages,
+} from '$lib/server/db/schema';
 import type { ResticError, ResticInit, ResticLock, ResticSnapshot } from '$lib/types/restic';
 import { validateCronExpression } from 'cron';
 import { z } from 'zod';
@@ -194,3 +203,20 @@ export interface DockerHostnamesCheckResponse {
         reachable: boolean;
     }[];
 }
+
+// SETTINGS
+
+/** `POST /api/settings/notifications/test` */
+export const notificationTestRequest = z.object({
+    url: z.string().url().nonempty(),
+    body: z.string().nonempty(),
+});
+
+/** `POST /api/settings/notifications` */
+export const notificationRequest = notificationTestRequest.extend({
+    name: z.string().min(2),
+    trigger: z.enum(NOTIFICATION_TRIGGER),
+});
+
+/** `POST /api/settings/notifications` */
+export type NotificationResponse = typeof notifications.$inferSelect;

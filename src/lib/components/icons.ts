@@ -2,6 +2,7 @@ import type { Icon as IconType } from '@lucide/svelte';
 import ArchiveRestore from '@lucide/svelte/icons/archive-restore';
 import ArrowDown from '@lucide/svelte/icons/arrow-down';
 import ArrowUp from '@lucide/svelte/icons/arrow-up';
+import Bell from '@lucide/svelte/icons/bell';
 import Blocks from '@lucide/svelte/icons/blocks';
 import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 import CircleCheck from '@lucide/svelte/icons/circle-check';
@@ -41,12 +42,14 @@ import ShieldCheck from '@lucide/svelte/icons/shield-check';
 import Timer from '@lucide/svelte/icons/timer';
 import Trash2 from '@lucide/svelte/icons/trash-2';
 import Wrench from '@lucide/svelte/icons/wrench';
+import Zap from '@lucide/svelte/icons/zap';
 
 export {
     type IconType,
     ArchiveRestore,
     ArrowDown,
     ArrowUp,
+    Bell,
     Blocks,
     ChevronLeft,
     CircleCheck,
@@ -86,4 +89,5 @@ export {
     Timer,
     Trash2,
     Wrench,
+    Zap,
 };

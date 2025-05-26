@@ -5,6 +5,7 @@ export const ELEMENT_STATUS = [ 'active', 'inactive', 'error' ] as const;
 export const DATABASE_ENGINES = [ 'postgresql', 'sqlite', 'mysql', 'mongodb' ] as const;
 export const BACKUP_STATUS = [ 'running', 'success', 'error', 'pruned' ] as const;
 export const RUN_ORIGIN = [ 'manual', 'scheduled' ] as const;
+export const NOTIFICATION_TRIGGER = [ 'run_finished', 'run_error', 'cron' ] as const;
 
 export const databases = sqliteTable('databases', {
     id: integer('id').primaryKey({ autoIncrement: true }),
@@ -128,3 +129,16 @@ export const backupsRelations = relations(backups, ({ one }) => ({
         references: [ runs.id ],
     }),
 }));
+
+export const notifications = sqliteTable('notifications', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    name: text('name').notNull(),
+    trigger: text('trigger', { enum: NOTIFICATION_TRIGGER }).notNull(),
+    status: text('status', { enum: ELEMENT_STATUS }).notNull().default('active'),
+    error: text('error'),
+    createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`),
+    updatedAt: text('updated_at').default(sql`(CURRENT_TIMESTAMP)`).$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
+    firedAt: text('fired_at'),
+    url: text('url').notNull(),
+    body: text('body').notNull(),
+});
