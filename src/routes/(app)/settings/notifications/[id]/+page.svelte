@@ -45,7 +45,7 @@
         isSubmitting = true;
 
         const res = await fetchApi<NotificationResponse, typeof notificationRequest>(
-            'POST',
+            data.notification ? 'PUT' : 'POST',
             data.notification ? `/api/settings/notifications/${data.notification.id}` : '/api/settings/notifications',
             {
                 name: notificationName,
@@ -109,7 +109,7 @@
             Test notification
         </button>
 
-        <button class="btn btn-primary flex-1" disabled={isNotificationTesting}>
+        <button class="btn btn-primary flex-1" disabled={isNotificationTesting || isSubmitting}>
             Save
         </button>
     </div>

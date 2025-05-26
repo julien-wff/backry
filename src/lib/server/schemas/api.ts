@@ -2,6 +2,7 @@ import {
     backups,
     DATABASE_ENGINES,
     databases,
+    ELEMENT_STATUS,
     jobs,
     NOTIFICATION_TRIGGER,
     notifications,
@@ -212,11 +213,25 @@ export const notificationTestRequest = z.object({
     body: z.string().nonempty(),
 });
 
-/** `POST /api/settings/notifications` */
+/**
+ * `POST /api/settings/notifications`
+ * `PUT /api/settings/notifications/[id]`
+ * `DELETE /api/settings/notifications/[id]`
+ */
 export const notificationRequest = notificationTestRequest.extend({
     name: z.string().min(2),
     trigger: z.enum(NOTIFICATION_TRIGGER),
 });
 
-/** `POST /api/settings/notifications` */
+/** `PATCH /api/settings/notifications/[id]` */
+export const notificationPatchRequest = notificationRequest.partial().extend({
+    status: z.enum(ELEMENT_STATUS).optional(),
+});
+
+/**
+ * `POST /api/settings/notifications`
+ * `PUT /api/settings/notifications/[id]`
+ * `PATCH /api/settings/notifications/[id]`
+ * `DELETE /api/settings/notifications/[id]`
+ */
 export type NotificationResponse = typeof notifications.$inferSelect;
