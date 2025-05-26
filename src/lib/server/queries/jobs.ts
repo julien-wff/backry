@@ -24,6 +24,19 @@ export const jobsListFull = async () => db
 
 
 /**
+ * Get all jobs with limited info (ID, name and status)
+ */
+export const jobListLimited = () => db.query.jobs.findMany({
+    orderBy: (jobs, { asc }) => asc(jobs.name),
+    columns: {
+        id: true,
+        name: true,
+        status: true,
+    },
+});
+
+
+/**
  * Get all active and errored jobs to create CRON jobs.
  * Errors are included so they can be retried.
  */
