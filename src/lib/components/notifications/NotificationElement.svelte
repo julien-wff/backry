@@ -1,8 +1,9 @@
 <script lang="ts">
     import { invalidateAll } from '$app/navigation';
     import BaseListElement from '$lib/components/common/BaseListElement.svelte';
-    import { EthernetPort, Zap } from '$lib/components/icons';
+    import { Clock, EthernetPort, Zap } from '$lib/components/icons';
     import { fetchApi } from '$lib/helpers/fetch';
+    import { formatUtcDate } from '$lib/helpers/format.js';
     import type { notifications } from '$lib/server/db/schema';
     import type { notificationPatchRequest, NotificationResponse } from '$lib/server/schemas/api';
     import { addToast } from '$lib/stores/toasts.svelte';
@@ -80,8 +81,18 @@
         {/if}
     </div>
 
-    <div class="flex items-center gap-1">
+    <div class="flex flex-1 items-center gap-1">
         <EthernetPort class="w-4 h-4"/>
         {anonymizedUrl}
     </div>
+
+    {#if notification.firedAt && notification.status !== 'error'}
+        <div class="flex items-center gap-1">
+            <Clock class="w-4 h-4"/>
+            <span>
+                Last fired:
+                {formatUtcDate(notification.firedAt)}
+            </span>
+        </div>
+    {/if}
 </BaseListElement>

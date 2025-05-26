@@ -1,4 +1,5 @@
 import { runCommandSync } from '$lib/server/services/cmd';
+import { logger } from '$lib/server/services/logger';
 import { err, ok, type ResultAsync } from 'neverthrow';
 
 
@@ -17,7 +18,9 @@ export async function sendShoutrrrNotification(url: string, body: string): Promi
     );
 
     if (res.isErr()) {
-        return err(res.error.stderr.toString().trim());
+        const error = res.error.stderr.toString().trim();
+        logger.error(`Failed to send Shoutrrr notification: ${error}`);
+        return err(error);
     }
 
     return ok();
@@ -36,7 +39,9 @@ export async function getShoutrrrVersion(): Promise<ResultAsync<string, string>>
     );
 
     if (res.isErr()) {
-        return err(res.error.stderr.toString().trim());
+        const error = res.error.stderr.toString().trim();
+        logger.error(`Failed to get Shoutrrr version: ${error}`);
+        return err(error);
     }
 
     const version = res.value.stdout.toString().trim();

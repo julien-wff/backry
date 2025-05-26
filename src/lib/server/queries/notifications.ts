@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db';
-import { notifications } from '$lib/server/db/schema';
-import { eq } from 'drizzle-orm';
+import { NOTIFICATION_TRIGGER, notifications } from '$lib/server/db/schema';
+import { and, eq, inArray, sql } from 'drizzle-orm';
 
 /**
  * Get all notifications from the database.
@@ -17,6 +17,18 @@ export const getNotification = (id: number) =>
         where: eq(notifications.id, id),
     });
 
+
+/**
+ * Get all active, non-errored notifications for a specific trigger.
+ * @param trigger The notification trigger to filter by
+ */
+export const getActiveNotificationsForTrigger = (trigger: typeof NOTIFICATION_TRIGGER[number]) =>
+    db.query.notifications.findMany({
+        where: and(
+            eq(notifications.trigger, trigger),
+            eq(notifications.status, 'active'),
+        ),
+    });
 
 /**
  * Create a new notification in the database.
@@ -36,6 +48,18 @@ export const updateNotification = (id: number, notification: Partial<typeof noti
         .where(eq(notifications.id, id))
         .returning()
         .get();
+
+
+/**
+ * Set the `firedAt` timestamp to the current time for a list of notification IDs.
+ * @param ids Array of notification IDs to update
+ */
+export const setNotificationsFiredAt = (ids: number[]) =>
+    db.update(notifications)
+        .set({ firedAt: sql`(CURRENT_TIMESTAMP)` })
+        .where(inArray(notifications.id, ids))
+        .returning()
+        .execute();
 
 
 /**

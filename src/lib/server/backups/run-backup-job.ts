@@ -5,6 +5,7 @@ import { getJob } from '$lib/server/queries/jobs';
 import { createRun, updateRun } from '$lib/server/queries/runs';
 import { logger } from '$lib/server/services/logger';
 import { applyForgetPolicy, backupFromCommand } from '$lib/server/services/restic';
+import { fireNotificationsForTrigger } from '$lib/server/settings/notifications';
 import { backupEmitter } from '$lib/server/shared/events';
 import type { EngineMethods } from '$lib/types/engine';
 import { sql } from 'drizzle-orm';
@@ -53,6 +54,12 @@ export async function runBackupJob(jobId: number, forcedDatabases: number[] | nu
         totalBackupsCount: totalDatabases,
         successfulBackupsCount: successfulDatabases,
     });
+
+    logger.debug(`Firing notifications for job #${jobId}`);
+    if (totalDatabases !== successfulDatabases) {
+        await fireNotificationsForTrigger('run_error');
+    }
+    await fireNotificationsForTrigger('run_finished');
 
     logger.info(`Backup for job #${jobId} finished`);
     return ok();
