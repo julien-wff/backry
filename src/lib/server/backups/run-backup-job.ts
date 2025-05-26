@@ -28,8 +28,9 @@ export async function runBackupJob(jobId: number, forcedDatabases: number[] | nu
     }
 
     const run = createRun(forcedDatabases ? 'manual' : 'scheduled');
-    let totalDatabases = 0;
-    let successfulDatabases = 0;
+    let totalBackupsCount = 0;
+    let successfulBackupsCount = 0;
+    let prunedSnapshotsCount = 0;
 
     for (let i = 0; i < job.jobsDatabases.length; i++) {
         if (forcedDatabases && !forcedDatabases.includes(job.jobsDatabases[i].database.id)) {
@@ -39,9 +40,10 @@ export async function runBackupJob(jobId: number, forcedDatabases: number[] | nu
 
         const res = await jobDatabaseBackup(job, i, run.id, forcedDatabases !== null);
 
-        totalDatabases++;
+        totalBackupsCount++;
         if (res.isOk()) {
-            successfulDatabases++;
+            successfulBackupsCount++;
+            prunedSnapshotsCount += res.value[1];
         }
 
         // 1s delay between each database backup
@@ -51,12 +53,13 @@ export async function runBackupJob(jobId: number, forcedDatabases: number[] | nu
     updateRun(run.id, {
         // @ts-expect-error only accepts string, sql is not supported in type definition (but is for drizzle)
         finishedAt: sql`(CURRENT_TIMESTAMP)`,
-        totalBackupsCount: totalDatabases,
-        successfulBackupsCount: successfulDatabases,
+        totalBackupsCount,
+        successfulBackupsCount,
+        prunedSnapshotsCount,
     });
 
     logger.debug(`Firing notifications for job #${jobId}`);
-    if (totalDatabases !== successfulDatabases) {
+    if (totalBackupsCount !== successfulBackupsCount) {
         await fireNotificationsForTrigger('run_error');
     }
     await fireNotificationsForTrigger('run_finished');
@@ -72,9 +75,15 @@ export async function runBackupJob(jobId: number, forcedDatabases: number[] | nu
  * @param jobIndex The index of the database in the job to run the backup for.
  * @param runId The run ID to use to link backups together.
  * @param force If true, the backup will be run even if the database is inactive.
- * @returns If error, the error message. If success, void.
+ * @returns If error, the error message.
+ *          If success, the backup object (or null if skipped) and the number of snapshots removed by the prune policy.
  */
-async function jobDatabaseBackup(job: NonNullable<Awaited<ReturnType<typeof getJob>>>, jobIndex: number, runId: number, force = false): Promise<ResultAsync<typeof backups.$inferSelect | null, string>> {
+async function jobDatabaseBackup(
+    job: NonNullable<Awaited<ReturnType<typeof getJob>>>,
+    jobIndex: number,
+    runId: number,
+    force = false,
+): Promise<ResultAsync<[ typeof backups.$inferSelect | null, number ], string>> {
     logger.info(`Starting backup for job #${job.id} database #${jobIndex}`);
 
     const jobDatabase = job.jobsDatabases[jobIndex];
@@ -85,7 +94,7 @@ async function jobDatabaseBackup(job: NonNullable<Awaited<ReturnType<typeof getJ
 
     if (!force && jobDatabase.status === 'inactive') {
         logger.info(`Database #${jobIndex} is inactive, skipping`);
-        return ok(null);
+        return ok([ null, 0 ]);
     }
 
     const engine: EngineMethods = ENGINES_METHODS[jobDatabase.database.engine];
@@ -142,6 +151,7 @@ async function jobDatabaseBackup(job: NonNullable<Awaited<ReturnType<typeof getJ
     }
 
     // Apply prune policy by deleting snapshots, update them in database and update the client
+    let prunedSnapshotsCount = 0;
     if (job.prunePolicy) {
         const prunePolicyResult = await applyPrunePolicyOnJobDatabase(
             job.storage,
@@ -153,10 +163,11 @@ async function jobDatabaseBackup(job: NonNullable<Awaited<ReturnType<typeof getJ
         if (prunePolicyResult.isErr()) {
             return err(prunePolicyResult.error);
         }
+        prunedSnapshotsCount = prunePolicyResult.value;
     }
 
     logger.info(`Backup for job #${job.id} database #${jobIndex} finished`);
-    return ok(updatedBackup);
+    return ok([ updatedBackup, prunedSnapshotsCount ]);
 }
 
 
@@ -167,7 +178,7 @@ async function jobDatabaseBackup(job: NonNullable<Awaited<ReturnType<typeof getJ
  * @param jobId The job ID to which the backup belongs.
  * @param databaseId The database ID to which the backup belongs.
  * @param filePath The filepath of the backup file to apply the delete policy to. Used to find the correct forget stats.
- * @return If error, the error message. If success, void.
+ * @return If error, the error message. If success, number of snapshots removed.
  */
 async function applyPrunePolicyOnJobDatabase(
     storage: typeof storages.$inferSelect,
@@ -175,7 +186,7 @@ async function applyPrunePolicyOnJobDatabase(
     jobId: number,
     databaseId: number,
     filePath: string,
-): Promise<ResultAsync<void, string>> {
+): Promise<ResultAsync<number, string>> {
     const forgetResult = await applyForgetPolicy(
         storage.url,
         storage.password!,
@@ -212,5 +223,5 @@ async function applyPrunePolicyOnJobDatabase(
         }
     }
 
-    return ok();
+    return ok(forgetStats.remove?.length ?? 0);
 }

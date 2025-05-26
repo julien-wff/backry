@@ -97,6 +97,7 @@ export const runs = sqliteTable('runs', {
     finishedAt: text('finished_at'),
     totalBackupsCount: integer('total_backups_count'),
     successfulBackupsCount: integer('successful_backups_count'),
+    prunedSnapshotsCount: integer('pruned_snapshots_count'),
 });
 
 export const runsRelations = relations(runs, ({ many }) => ({
