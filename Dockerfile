@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=oven/bun:1.2.13-alpine
+ARG BASE_IMAGE=oven/bun:1.2.14-alpine
 
 FROM ${BASE_IMAGE} AS binaries
 
