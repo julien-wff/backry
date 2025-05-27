@@ -63,7 +63,7 @@ export function compilePolicyToFlags(policies: PrunePolicies, additionalFlags: s
     const flags: string[] = [];
 
     for (const [ key, value ] of policies) {
-        if (value > 1) {
+        if (value > 0) {
             flags.push(`--${key} ${value}`);
         }
     }
