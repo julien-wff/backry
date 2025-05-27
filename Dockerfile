@@ -83,4 +83,9 @@ ENV NODE_ENV="production"
 EXPOSE 3000
 VOLUME ["/app/db"]
 
+# Healthcheck
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=3s --retries=3 \
+    CMD sh -c "wget -qO- http://$HOSTNAME:3000/api/healthcheck || exit 1"
+
 CMD ["sh", "-c", "bun run db:push --force && bun ."]
