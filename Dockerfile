@@ -39,7 +39,12 @@ RUN apk add --no-cache \
     wget https://github.com/restic/restic/releases/download/v0.18.0/restic_0.18.0_linux_amd64.bz2 && \
     bzip2 -d restic_0.18.0_linux_amd64.bz2 && \
     mv restic_0.18.0_linux_amd64 /usr/local/bin/restic && \
-    chmod +x /usr/local/bin/restic
+    chmod +x /usr/local/bin/restic && \
+    # Shoutrrr 0.8.9 (fork maintained by nicholas-fedor)
+    wget https://github.com/nicholas-fedor/shoutrrr/releases/download/v0.8.9/shoutrrr_linux_amd64_0.8.9.tar.gz && \
+    tar -xzf shoutrrr_linux_amd64_0.8.9.tar.gz && \
+    mv shoutrrr/shoutrrr /usr/local/bin/shoutrrr && \
+    chmod +x /usr/local/bin/shoutrrr
 
 # Install app
 
