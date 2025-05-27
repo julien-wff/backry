@@ -1,4 +1,32 @@
-FROM oven/bun:1.2.13-alpine AS builder
+ARG BASE_IMAGE=oven/bun:1.2.13-alpine
+
+FROM ${BASE_IMAGE} AS binaries
+
+ARG RESTIC_URL=https://github.com/restic/restic/releases/download/v0.18.0/restic_0.18.0_linux_amd64.bz2
+ARG SHOUTRRR_URL=https://github.com/nicholas-fedor/shoutrrr/releases/download/v0.8.9/shoutrrr_linux_amd64_0.8.9.tar.gz
+
+WORKDIR /app
+
+RUN apk add --no-cache \
+    mariadb-client \
+    mongodb-tools && \
+    # Make bin folders to copy them all in "runtime" stage
+    mkdir /app/bin && \
+    # Copy binaries from packages
+    cp /usr/bin/mysqldump /usr/bin/mysql /usr/bin/mongodump ./bin && \
+    # Restic 0.18.0
+    wget ${RESTIC_URL} -O restic.bz2 && \
+    bzip2 -d restic.bz2 && \
+    mv restic ./bin/restic && \
+    chmod +x ./bin/restic && \
+    # Shoutrrr 0.8.9 (fork maintained by nicholas-fedor)
+    wget ${SHOUTRRR_URL} -O shoutrrr.tar.gz && \
+    tar -xzf shoutrrr.tar.gz && \
+    mv shoutrrr/shoutrrr ./bin/shoutrrr && \
+    chmod +x ./bin/shoutrrr
+
+
+FROM ${BASE_IMAGE} AS builder
 
 WORKDIR /app
 
@@ -11,40 +39,25 @@ COPY . .
 RUN bun -c run build
 
 
-FROM oven/bun:1.2.13-alpine AS runtime
+FROM ${BASE_IMAGE} AS runtime
 
 WORKDIR /app
 
 # Install tools
 
 # Some packages have lots of heavy binaries (e.g. mariadb-client, mongodb-tools) that we don't need.
-# Make sure their dependencies are kept, copy the binaries we need, and remove the packages.
+# Make sure their dependencies are installed, then we copy the binaries from the "binaries" stage.
 RUN apk add --no-cache \
-        # MongoDB tools \
+        # For MongoDB tools
         krb5-libs \
-        mariadb-client \
+        # For MariaDB client
         mariadb-connector-c \
-        mongodb-tools \
-        # MongoDB tools \
+        # For MongoDB tools
         musl \
         postgresql16-client \
-        sqlite && \
-    # Copy binaries \
-    cp /usr/bin/mysqldump /usr/bin/mysql /usr/bin/mongodump /usr/local/bin && \
-    # Uninstall packages to remove unnecessary binaries \
-    apk del --no-cache \
-        mariadb-client \
-        mongodb-tools && \
-    # Restic 0.18.0
-    wget https://github.com/restic/restic/releases/download/v0.18.0/restic_0.18.0_linux_amd64.bz2 && \
-    bzip2 -d restic_0.18.0_linux_amd64.bz2 && \
-    mv restic_0.18.0_linux_amd64 /usr/local/bin/restic && \
-    chmod +x /usr/local/bin/restic && \
-    # Shoutrrr 0.8.9 (fork maintained by nicholas-fedor)
-    wget https://github.com/nicholas-fedor/shoutrrr/releases/download/v0.8.9/shoutrrr_linux_amd64_0.8.9.tar.gz && \
-    tar -xzf shoutrrr_linux_amd64_0.8.9.tar.gz && \
-    mv shoutrrr/shoutrrr /usr/local/bin/shoutrrr && \
-    chmod +x /usr/local/bin/shoutrrr
+        sqlite
+
+COPY --from=binaries /app/bin /usr/local/bin/
 
 # Install app
 
