@@ -10,11 +10,17 @@
         value?: string;
     }
 
-    let { value = $bindable() }: Props = $props();
+    let { value = $bindable('') }: Props = $props();
 
     let isDarkMode = $state(browser && window.matchMedia('(prefers-color-scheme: dark)').matches);
     let editor = $state<PrismEditor<{ theme: EditorTheme }> | null>(null);
     let editorDiv = $state<HTMLDivElement | null>(null);
+
+    $effect(() => {
+        if (editor && editor?.value !== value) {
+            editor.setOptions({ value });
+        }
+    });
 
     function handleThemeChange(e: MediaQueryListEvent) {
         isDarkMode = e.matches;
