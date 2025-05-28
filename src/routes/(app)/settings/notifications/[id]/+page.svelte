@@ -1,5 +1,6 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
+    import CodeEditor from '$lib/components/common/CodeEditor.svelte';
     import Head from '$lib/components/common/Head.svelte';
     import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
     import ElementForm from '$lib/components/forms/ElementForm.svelte';
@@ -93,12 +94,8 @@
                required>
     </InputContainer>
 
-    <InputContainer for="notification-body" label="Notification body">
-        <textarea bind:value={body}
-                  class="w-full textarea"
-                  id="notification-body"
-                  required>
-        </textarea>
+    <InputContainer label="Notification body">
+        <CodeEditor bind:value={body}/>
     </InputContainer>
 
     <div class="flex gap-2">
