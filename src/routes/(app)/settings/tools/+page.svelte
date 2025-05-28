@@ -3,7 +3,7 @@
     import Head from '$lib/components/common/Head.svelte';
     import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
     import { Settings } from '$lib/components/icons';
-    import ToolVersion from '$lib/components/settings/ToolVersion.svelte';
+    import ToolVersion from '$lib/components/settings/tools/ToolVersion.svelte';
     import { onMount } from 'svelte';
     import type { PageProps } from './$types';
 
