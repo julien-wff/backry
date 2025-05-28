@@ -3,7 +3,7 @@ ARG BASE_IMAGE=oven/bun:1.2.14-alpine
 FROM ${BASE_IMAGE} AS binaries
 
 ARG RESTIC_URL=https://github.com/restic/restic/releases/download/v0.18.0/restic_0.18.0_linux_amd64.bz2
-ARG SHOUTRRR_URL=https://github.com/nicholas-fedor/shoutrrr/releases/download/v0.8.9/shoutrrr_linux_amd64_0.8.9.tar.gz
+ARG SHOUTRRR_URL=https://github.com/nicholas-fedor/shoutrrr/releases/download/v0.8.11/shoutrrr_linux_amd64_0.8.11.tar.gz
 
 WORKDIR /app
 
