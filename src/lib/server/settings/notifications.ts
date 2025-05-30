@@ -1,5 +1,5 @@
 import { renderNotificationTemplate } from '$lib/editors/notification-template';
-import { formatDuration } from '$lib/helpers/format';
+import { formatDuration, formatSize } from '$lib/helpers/format';
 import { type NOTIFICATION_TRIGGER, notifications } from '$lib/server/db/schema';
 import {
     getActiveNotificationsForTrigger,
@@ -67,9 +67,11 @@ async function constructRunPayload(runId: number): Promise<ResultAsync<Notificat
         startedAt: run.createdAt!,
         finishedAt: run.finishedAt,
         totalDuration: formatDuration(dayjs.utc(run.createdAt).diff(dayjs.utc(run.finishedAt), 'seconds')),
+        totalDumpSize: formatSize(run.backups.reduce((acc, backup) => acc + (backup.dumpSize ?? 0), 0)),
+        totalDumpSpaceAdded: formatSize(run.backups.reduce((acc, backup) => acc + (backup.dumpSpaceAdded ?? 0), 0)),
         totalBackupCount: run.totalBackupsCount ?? 0,
         successfulBackupCount: run.successfulBackupsCount ?? 0,
-        prunedSnapshotsCount: run.prunedSnapshotsCount ?? 0,
+        prunedSnapshotCount: run.prunedSnapshotsCount ?? 0,
         backups: run.backups.map(backup => ({
             databaseName: backup.jobDatabase.database.name,
             filename: backup.fileName,

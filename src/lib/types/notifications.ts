@@ -6,9 +6,11 @@ export interface NotificationRunPayload {
     startedAt: string;
     finishedAt: string | null;
     totalDuration: string | null;
+    totalDumpSize: string | null;
+    totalDumpSpaceAdded: string | null;
     totalBackupCount: number;
     successfulBackupCount: number;
-    prunedSnapshotsCount: number;
+    prunedSnapshotCount: number;
     backups: NotificationBackupPayload[];
 }
 

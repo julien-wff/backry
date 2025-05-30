@@ -12,9 +12,11 @@ export const NOTIFICATION_PAYLOAD_EXAMPLE = {
     startedAt: `${dayjs().format('YYYY-MM-DD')} 12:00:00`,
     finishedAt: `${dayjs().format('YYYY-MM-DD')} 12:01:02`,
     totalDuration: formatDuration(34 * 60 + 56.76982),
+    totalDumpSize: formatSize(123456 + 654321),
+    totalDumpSpaceAdded: formatSize(789 + 321),
     totalBackupCount: 2,
     successfulBackupCount: 2,
-    prunedSnapshotsCount: 2,
+    prunedSnapshotCount: 2,
     backups: [
         {
             databaseName: 'Test database',
