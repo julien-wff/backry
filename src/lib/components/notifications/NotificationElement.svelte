@@ -86,7 +86,7 @@
         {anonymizedUrl}
     </div>
 
-    {#if notification.firedAt && notification.status !== 'error'}
+    {#if notification.firedAt}
         <div class="flex items-center gap-1">
             <Clock class="w-4 h-4"/>
             <span>
