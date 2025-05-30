@@ -10,7 +10,7 @@ export const POST: RequestHandler = async ({ request }) => {
         return apiError(body.error);
     }
 
-    const result = await sendShoutrrrNotification(body.value.url, body.value.body);
+    const result = await sendShoutrrrNotification(body.value.url, body.value.body, body.value.title ?? null);
     if (result.isErr()) {
         return apiError(result.error);
     }

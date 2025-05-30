@@ -11,7 +11,7 @@ export async function fireNotificationsForTrigger(trigger: typeof NOTIFICATION_T
     let successfulNotificationsIDs: number[] = [];
 
     for (const notification of notifications) {
-        const res = await sendShoutrrrNotification(notification.url, notification.body);
+        const res = await sendShoutrrrNotification(notification.url, notification.body, notification.title);
         if (res.isErr()) {
             updateNotification(notification.id, {
                 error: res.error,

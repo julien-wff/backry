@@ -211,6 +211,7 @@ export interface DockerHostnamesCheckResponse {
 export const notificationTestRequest = z.object({
     url: z.string().url().nonempty().trim(),
     body: z.string().nonempty().trim(),
+    title: z.string().min(2).trim().optional().nullable(),
 });
 
 /**

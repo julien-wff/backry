@@ -9,12 +9,13 @@ export const SHOUTRRR_CMD = process.env.BACKRY_SHOUTRRR_CMD || 'shoutrrr';
  * Sends a notification using Shoutrrr.
  * @param url Shoutrrr URL to send the notification to.
  * @param body The message body to send.
+ * @param title Optional title for the notification (if supported by the service).
  * @see https://nicholas-fedor.github.io/shoutrrr/
  */
-export async function sendShoutrrrNotification(url: string, body: string): Promise<ResultAsync<void, string>> {
+export async function sendShoutrrrNotification(url: string, body: string, title: string | null): Promise<ResultAsync<void, string>> {
     const res = await runCommandSync(
         SHOUTRRR_CMD,
-        [ 'send', url, '-m', body ],
+        [ 'send', url, '-m', body, '-t', title ?? 'Backry' ],
     );
 
     if (res.isErr()) {

@@ -9,9 +9,16 @@ import { err, ok, Result } from 'neverthrow';
  */
 export function validateNotificationTemplates(notification: Partial<typeof notificationRequest._type>): Result<void, string> {
     if (notification.body) {
-        const bodyTemplateResult = renderNotificationTemplate(notification.body, NOTIFICATION_PAYLOAD_EXAMPLE);
-        if (bodyTemplateResult.isErr()) {
-            return err(`Error with body template: ${bodyTemplateResult.error}`);
+        const templateResult = renderNotificationTemplate(notification.body, NOTIFICATION_PAYLOAD_EXAMPLE);
+        if (templateResult.isErr()) {
+            return err(`Error with body template: ${templateResult.error}`);
+        }
+    }
+
+    if (notification.title) {
+        const templateResult = renderNotificationTemplate(notification.title, NOTIFICATION_PAYLOAD_EXAMPLE);
+        if (templateResult.isErr()) {
+            return err(`Error with title template: ${templateResult.error}`);
         }
     }
 

@@ -141,5 +141,6 @@ export const notifications = sqliteTable('notifications', {
     updatedAt: text('updated_at').default(sql`(CURRENT_TIMESTAMP)`).$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
     firedAt: text('fired_at'),
     url: text('url').notNull(),
+    title: text('title'),
     body: text('body').notNull(),
 });

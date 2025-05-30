@@ -6,7 +6,7 @@
     import ElementForm from '$lib/components/forms/ElementForm.svelte';
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
     import { Bell } from '$lib/components/icons';
-    import NotificationBodyEditor from '$lib/components/settings/notifications/NotificationBodyEditor.svelte';
+    import NotificationTemplateEditor from '$lib/components/settings/notifications/NotificationTemplateEditor.svelte';
     import { fetchApi } from '$lib/helpers/fetch';
     import type { NOTIFICATION_TRIGGER } from '$lib/server/db/schema';
     import type { notificationRequest, NotificationResponse, notificationTestRequest } from '$lib/server/schemas/api';
@@ -26,6 +26,7 @@
     let trigger = $state<typeof NOTIFICATION_TRIGGER[number] | null>(data.notification?.trigger ?? null);
     let shoutrrrUrl = $state(data.notification?.url ?? '');
     let body = $state(data.notification?.body ?? '');
+    let title = $state(data.notification?.title ?? '');
 
     async function testNotification() {
         isNotificationTesting = true;
@@ -34,6 +35,7 @@
         const res = await fetchApi<{}, typeof notificationTestRequest>('POST', '/api/settings/notifications/test', {
             url: shoutrrrUrl,
             body,
+            title: title || null,
         });
         isNotificationTesting = false;
 
@@ -54,6 +56,7 @@
                 trigger: trigger!,
                 url: shoutrrrUrl,
                 body,
+                title: title || null,
             },
         );
 
@@ -73,8 +76,12 @@
     {data.notification ? 'Edit' : 'Add'} notification
 </PageContentHeader>
 
+{#snippet titleEditorContent({ opened }: { opened: boolean })}
+    <NotificationTemplateEditor {opened} bind:inputFieldArguments={title} fieldName="Title"/>
+{/snippet}
+
 {#snippet bodyEditorContent({ opened }: { opened: boolean })}
-    <NotificationBodyEditor {opened} bind:inputFieldArguments={body}/>
+    <NotificationTemplateEditor {opened} bind:inputFieldArguments={body} fieldName="Body"/>
 {/snippet}
 
 <ElementForm bind:error onsubmit={handleSubmit} title="{data.notification ? 'Edit' : 'Add'} notification">
@@ -96,6 +103,13 @@
                id="shoutrrr-url"
                placeholder="smtp://username:password@host:port/?from=fromAddress&to=recipient"
                required>
+    </InputContainer>
+
+    <InputContainer editorContent={titleEditorContent}
+                    editorModalWidth="large"
+                    editorTitle="Notification title editor"
+                    label="Notification title (if supported)">
+        <CodeEditor bind:value={title} language="ejs"/>
     </InputContainer>
 
     <InputContainer editorContent={bodyEditorContent} editorModalWidth="large" label="Notification body">
