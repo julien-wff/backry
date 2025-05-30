@@ -60,9 +60,9 @@ export async function runBackupJob(jobId: number, forcedDatabases: number[] | nu
 
     logger.debug(`Firing notifications for job #${jobId}`);
     if (totalBackupsCount !== successfulBackupsCount) {
-        await fireNotificationsForTrigger('run_error');
+        await fireNotificationsForTrigger('run_error', run.id);
     }
-    await fireNotificationsForTrigger('run_finished');
+    await fireNotificationsForTrigger('run_finished', run.id);
 
     logger.info(`Backup for job #${jobId} finished`);
     return ok();
