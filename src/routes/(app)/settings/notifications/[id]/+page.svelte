@@ -87,7 +87,6 @@
             <option disabled value={null}></option>
             <option value="run_finished">On job finished (with or without failed backups)</option>
             <option value="run_error">On job failed (one or more failed backups)</option>
-            <option value="cron">On cron schedule (data from all runs since last trigger)</option>
         </select>
     </InputContainer>
 

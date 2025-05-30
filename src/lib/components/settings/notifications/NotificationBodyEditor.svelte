@@ -1,7 +1,7 @@
 <script lang="ts">
     import CodeEditor from '$lib/components/common/CodeEditor.svelte';
     import { OctagonAlert } from '$lib/components/icons';
-    import { NOTIFICATION_JOB_FINISHED_EXAMPLE, renderNotificationTemplate } from '$lib/editors/notification-template';
+    import { NOTIFICATION_PAYLOAD_EXAMPLE, renderNotificationTemplate } from '$lib/editors/notification-template';
 
     interface Props {
         opened: boolean;
@@ -22,9 +22,9 @@
         }
     });
 
-    let exampleValue = $state(JSON.stringify(NOTIFICATION_JOB_FINISHED_EXAMPLE, null, 2));
+    let exampleValue = $state(JSON.stringify(NOTIFICATION_PAYLOAD_EXAMPLE, null, 2));
     let jsonError = $state<string | null>(null);
-    let parsedExampleValue = $state<any>(NOTIFICATION_JOB_FINISHED_EXAMPLE);
+    let parsedExampleValue = $state<any>(NOTIFICATION_PAYLOAD_EXAMPLE);
     $effect((() => {
         try {
             jsonError = null;
@@ -35,7 +35,7 @@
     }));
 
     function resetExemplaryValue() {
-        exampleValue = JSON.stringify(NOTIFICATION_JOB_FINISHED_EXAMPLE, null, 2);
+        exampleValue = JSON.stringify(NOTIFICATION_PAYLOAD_EXAMPLE, null, 2);
     }
 
     let editorCompiledResult = $derived(renderNotificationTemplate(editorValue, parsedExampleValue));
@@ -49,13 +49,13 @@
 </p>
 
 <p class="mb-4">
-    You have access to an example of what will be passed as context to the EJS template.
+    You have access to an example payload of what will be passed to the EJS template.
     You can modify it to test how the notification body will look with different values.
 </p>
 
 <div class="collapse border-base-300 border mb-2">
     <input type="checkbox"/>
-    <div class="collapse-title font-semibold">Exemple value passed as context</div>
+    <div class="collapse-title font-semibold">Exemple payload passed to the template</div>
     <div class="collapse-content">
         <CodeEditor bind:value={exampleValue} interactive={opened} language="json"/>
         {#if jsonError}

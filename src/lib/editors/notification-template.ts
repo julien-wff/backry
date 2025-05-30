@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import { render } from 'ejs';
 import { fromThrowable, Result } from 'neverthrow';
 
-export const NOTIFICATION_JOB_FINISHED_EXAMPLE = {
+export const NOTIFICATION_PAYLOAD_EXAMPLE = {
     runId: 0,
     jobName: 'Test job',
     storageName: 'Test storage',

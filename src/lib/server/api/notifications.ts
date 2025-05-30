@@ -1,4 +1,4 @@
-import { NOTIFICATION_JOB_FINISHED_EXAMPLE, renderNotificationTemplate } from '$lib/editors/notification-template';
+import { NOTIFICATION_PAYLOAD_EXAMPLE, renderNotificationTemplate } from '$lib/editors/notification-template';
 import type { notificationRequest } from '$lib/server/schemas/api';
 import { err, ok, Result } from 'neverthrow';
 
@@ -9,7 +9,7 @@ import { err, ok, Result } from 'neverthrow';
  */
 export function validateNotificationTemplates(notification: Partial<typeof notificationRequest._type>): Result<void, string> {
     if (notification.body) {
-        const bodyTemplateResult = renderNotificationTemplate(notification.body, NOTIFICATION_JOB_FINISHED_EXAMPLE);
+        const bodyTemplateResult = renderNotificationTemplate(notification.body, NOTIFICATION_PAYLOAD_EXAMPLE);
         if (bodyTemplateResult.isErr()) {
             return err(`Error with body template: ${bodyTemplateResult.error}`);
         }
