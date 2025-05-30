@@ -1,9 +1,9 @@
-ARG BASE_IMAGE=oven/bun:1.2.14-alpine
+ARG BASE_IMAGE=oven/bun:1.2.15-alpine
 
 FROM ${BASE_IMAGE} AS binaries
 
 ARG RESTIC_URL=https://github.com/restic/restic/releases/download/v0.18.0/restic_0.18.0_linux_amd64.bz2
-ARG SHOUTRRR_URL=https://github.com/nicholas-fedor/shoutrrr/releases/download/v0.8.11/shoutrrr_linux_amd64_0.8.11.tar.gz
+ARG SHOUTRRR_URL=https://github.com/nicholas-fedor/shoutrrr/releases/download/v0.8.13/shoutrrr_linux_amd64_0.8.13.tar.gz
 
 WORKDIR /app
 
@@ -14,12 +14,12 @@ RUN apk add --no-cache \
     mkdir /app/bin && \
     # Copy binaries from packages
     cp /usr/bin/mysqldump /usr/bin/mysql /usr/bin/mongodump ./bin && \
-    # Restic 0.18.0
+    # Restic
     wget ${RESTIC_URL} -O restic.bz2 && \
     bzip2 -d restic.bz2 && \
     mv restic ./bin/restic && \
     chmod +x ./bin/restic && \
-    # Shoutrrr 0.8.9 (fork maintained by nicholas-fedor)
+    # Shoutrrr (fork maintained by nicholas-fedor)
     wget ${SHOUTRRR_URL} -O shoutrrr.tar.gz && \
     tar -xzf shoutrrr.tar.gz && \
     mv shoutrrr/shoutrrr ./bin/shoutrrr && \
