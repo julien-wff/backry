@@ -10,6 +10,7 @@ export const load: LayoutServerLoad = async () => {
             databases: errors.databases,
             storages: errors.storages,
             backups: errors.backups,
+            notifications: errors.notifications,
             tools: !areToolChecksSuccessful(),
         },
     };

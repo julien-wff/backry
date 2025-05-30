@@ -7,6 +7,7 @@
             databases: number;
             storages: number;
             backups: number;
+            notifications: number;
             tools: boolean;
         };
     }
@@ -30,7 +31,10 @@
 
         <div class="flex flex-1 flex-col gap-4 justify-end">
             <NavbarElement href="/integrations/docker" icon={Blocks} label="Integrations"/>
-            <NavbarElement hasError={errors.tools} href="/settings" icon={Settings} label="Settings"/>
+            <NavbarElement hasError={errors.tools || errors.notifications > 0}
+                           href="/settings"
+                           icon={Settings}
+                           label="Settings"/>
         </div>
     </nav>
 </aside>

@@ -19,7 +19,7 @@
     <FullScreenSelectorCard error={data.errors.tools} href="tools" icon={Wrench}>
         Tools info
     </FullScreenSelectorCard>
-    <FullScreenSelectorCard href="notifications" icon={Bell}>
+    <FullScreenSelectorCard error={data.errors.notifications > 0} href="notifications" icon={Bell}>
         Notifications
     </FullScreenSelectorCard>
 </FullScreenSelectorContainer>

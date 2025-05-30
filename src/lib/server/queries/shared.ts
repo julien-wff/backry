@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db';
-import { backups, databases, jobs, storages } from '$lib/server/db/schema';
+import { backups, databases, jobs, notifications, storages } from '$lib/server/db/schema';
 import type { getNextJobs } from '$lib/server/shared/cron';
 import { avg, count, desc, eq, inArray, isNotNull, sum } from 'drizzle-orm';
 
@@ -8,16 +8,18 @@ import { avg, count, desc, eq, inArray, isNotNull, sum } from 'drizzle-orm';
  * @returns Error count per type.
  */
 export async function getErrorCountPerType() {
-    const [ errorDbs, errorStorages, errorBackups ] = await Promise.all([
+    const [ errorDbs, errorStorages, errorBackups, errorNotifications ] = await Promise.all([
         db.select({ id: databases.id }).from(databases).where(eq(databases.status, 'error')),
         db.select({ id: storages.id }).from(storages).where(eq(storages.status, 'error')),
         db.select({ id: backups.id }).from(backups).where(isNotNull(backups.error)),
+        db.select({ id: notifications.id }).from(notifications).where(eq(notifications.status, 'error')),
     ]);
 
     return {
         databases: errorDbs.length,
         storages: errorStorages.length,
         backups: errorBackups.length,
+        notifications: errorNotifications.length,
     };
 }
 
