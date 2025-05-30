@@ -9,7 +9,7 @@ import {
 import { getRunFull } from '$lib/server/queries/runs';
 import { logger } from '$lib/server/services/logger';
 import { sendShoutrrrNotification } from '$lib/server/services/shoutrrr';
-import type { NotificationRunContext } from '$lib/types/notifications';
+import type { NotificationRunPayload } from '$lib/types/notifications';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { err, ok, type ResultAsync } from 'neverthrow';
@@ -51,9 +51,9 @@ export async function fireNotificationsForTrigger(trigger: typeof NOTIFICATION_T
 /**
  * Create the payload for the notification based on the run ID.
  * @param runId The ID of the run to construct the payload for.
- * @return A ResultAsync containing the notification context or an error message.
+ * @return A ResultAsync containing the notification payload or an error message.
  */
-async function constructRunPayload(runId: number): Promise<ResultAsync<NotificationRunContext, string>> {
+async function constructRunPayload(runId: number): Promise<ResultAsync<NotificationRunPayload, string>> {
     const run = await getRunFull(runId);
     if (!run) {
         return err(`Run with ID ${runId} not found`);
@@ -88,10 +88,10 @@ async function constructRunPayload(runId: number): Promise<ResultAsync<Notificat
  * Sends a notification using the Shoutrrr service.
  * It renders the title and body templates, then sends the notification.
  * @param notification The notification object to send.
- * @param payload The context for the notification to compile the templates.
+ * @param payload The payload for the notification to compile the templates.
  * @returns A ResultAsync indicating success or failure.
  */
-async function sendNotification(notification: typeof notifications.$inferSelect, payload: NotificationRunContext): Promise<ResultAsync<void, string>> {
+async function sendNotification(notification: typeof notifications.$inferSelect, payload: NotificationRunPayload): Promise<ResultAsync<void, string>> {
     logger.debug(payload, `Sending notification #${notification.id} for trigger ${notification.trigger}`);
     const notificationTitle = renderNotificationTemplate(notification.title || 'Backry', payload);
     if (notificationTitle.isErr()) {

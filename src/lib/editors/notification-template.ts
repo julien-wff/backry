@@ -1,5 +1,5 @@
 import { formatDuration, formatSize } from '$lib/helpers/format';
-import type { NotificationRunContext } from '$lib/types/notifications';
+import type { NotificationRunPayload } from '$lib/types/notifications';
 import dayjs from 'dayjs';
 import { render } from 'ejs';
 import { fromThrowable, Result } from 'neverthrow';
@@ -37,7 +37,7 @@ export const NOTIFICATION_PAYLOAD_EXAMPLE = {
             duration: formatDuration(31.23018),
         },
     ],
-} satisfies NotificationRunContext;
+} satisfies NotificationRunPayload;
 
 export function renderNotificationTemplate(
     template: string,

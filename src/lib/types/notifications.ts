@@ -1,4 +1,4 @@
-export interface NotificationRunContext {
+export interface NotificationRunPayload {
     runId: number;
     jobName: string;
     storageName: string;
@@ -9,10 +9,10 @@ export interface NotificationRunContext {
     totalBackupCount: number;
     successfulBackupCount: number;
     prunedSnapshotsCount: number;
-    backups: NotificationBackupContext[];
+    backups: NotificationBackupPayload[];
 }
 
-export interface NotificationBackupContext {
+export interface NotificationBackupPayload {
     databaseName: string;
     filename: string;
     error: string | null;
