@@ -14,11 +14,12 @@ dayjs.extend(utc);
  * @returns Formatted duration string
  */
 export const formatDuration = (duration: number) => {
-    duration = Math.round(duration * 1000) / 1000; // round to millisecond
     const durationObj = dayjs.duration(duration, 'seconds');
 
-    if (durationObj.asSeconds() < 60) {
-        return durationObj.format('s[s] SSS[ms]');
+    if (durationObj.asMilliseconds() < 1000) {
+        return `${durationObj.milliseconds().toFixed(0)}ms`;
+    } else if (durationObj.asSeconds() < 60) {
+        return `${durationObj.seconds()}s ${durationObj.milliseconds().toFixed(0).padStart(3, '0')}ms`;
     } else if (durationObj.asMinutes() < 60) {
         return durationObj.format('m[m] s[s]');
     } else {
