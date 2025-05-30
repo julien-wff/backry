@@ -6,9 +6,10 @@
         children: Snippet;
         onclose?: () => void;
         title?: string;
+        width?: 'normal' | 'large';
     }
 
-    let { modal = $bindable(), children, onclose, title }: Props = $props();
+    let { modal = $bindable(), children, onclose, title, width }: Props = $props();
 
     let loaded = $state(false);
 
@@ -32,7 +33,9 @@
 
 {#if loaded}
     <dialog class="modal" bind:this={modal} {onclose}>
-        <form class="modal-box" method="dialog">
+        <form class="modal-box"
+              class:max-w-2xl={width === 'large'}
+              method="dialog">
             {#if title}
                 <h3 class="font-bold text-lg mb-4">{title}</h3>
             {/if}

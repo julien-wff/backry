@@ -5,12 +5,16 @@
     import type { EditorTheme } from 'prism-code-editor/themes';
     import { onMount } from 'svelte';
     import 'prism-code-editor/prism/languages/ejs';
+    import 'prism-code-editor/prism/languages/json';
 
     interface Props {
         value?: string;
+        language: 'ejs' | 'json';
+        readonly?: boolean;
+        interactive?: boolean;
     }
 
-    let { value = $bindable('') }: Props = $props();
+    let { value = $bindable(''), language, readonly, interactive = true }: Props = $props();
 
     let isDarkMode = $state(browser && window.matchMedia('(prefers-color-scheme: dark)').matches);
     let editor = $state<PrismEditor<{ theme: EditorTheme }> | null>(null);
@@ -19,6 +23,14 @@
     $effect(() => {
         if (editor && editor?.value !== value) {
             editor.setOptions({ value });
+        }
+    });
+
+    $effect(() => {
+        if (editor && interactive) {
+            editor.textarea.style.pointerEvents = 'auto';
+        } else if (editor) {
+            editor.textarea.style.pointerEvents = 'inherit';
         }
     });
 
@@ -31,10 +43,12 @@
 
     onMount(() => {
         editor = basicEditor(editorDiv!, {
-            language: 'ejs',
+            language,
             theme: !isDarkMode ? 'github-light' : 'github-dark',
             onUpdate: v => (value = v),
             value,
+            readOnly: readonly,
+            wordWrap: true,
         });
 
         const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');

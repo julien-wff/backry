@@ -209,8 +209,8 @@ export interface DockerHostnamesCheckResponse {
 
 /** `POST /api/settings/notifications/test` */
 export const notificationTestRequest = z.object({
-    url: z.string().url().nonempty(),
-    body: z.string().nonempty(),
+    url: z.string().url().nonempty().trim(),
+    body: z.string().nonempty().trim(),
 });
 
 /**
@@ -219,7 +219,7 @@ export const notificationTestRequest = z.object({
  * `DELETE /api/settings/notifications/[id]`
  */
 export const notificationRequest = notificationTestRequest.extend({
-    name: z.string().min(2),
+    name: z.string().min(2).trim(),
     trigger: z.enum(NOTIFICATION_TRIGGER),
 });
 

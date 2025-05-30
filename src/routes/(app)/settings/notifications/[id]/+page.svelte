@@ -6,6 +6,7 @@
     import ElementForm from '$lib/components/forms/ElementForm.svelte';
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
     import { Bell } from '$lib/components/icons';
+    import NotificationBodyEditor from '$lib/components/settings/notifications/NotificationBodyEditor.svelte';
     import { fetchApi } from '$lib/helpers/fetch';
     import type { NOTIFICATION_TRIGGER } from '$lib/server/db/schema';
     import type { notificationRequest, NotificationResponse, notificationTestRequest } from '$lib/server/schemas/api';
@@ -72,6 +73,10 @@
     {data.notification ? 'Edit' : 'Add'} notification
 </PageContentHeader>
 
+{#snippet bodyEditorContent({ opened }: { opened: boolean })}
+    <NotificationBodyEditor {opened} bind:inputFieldArguments={body}/>
+{/snippet}
+
 <ElementForm bind:error onsubmit={handleSubmit} title="{data.notification ? 'Edit' : 'Add'} notification">
     <InputContainer for="notification-name" label="Name">
         <input bind:value={notificationName} class="w-full input" id="notification-name" required>
@@ -94,8 +99,8 @@
                required>
     </InputContainer>
 
-    <InputContainer label="Notification body">
-        <CodeEditor bind:value={body}/>
+    <InputContainer editorContent={bodyEditorContent} editorModalWidth="large" label="Notification body">
+        <CodeEditor bind:value={body} language="ejs"/>
     </InputContainer>
 
     <div class="flex gap-2">

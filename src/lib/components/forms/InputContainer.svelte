@@ -10,9 +10,10 @@
         subtitle?: string;
         helpContent?: Snippet;
         editorContent?: Snippet<[ { opened: boolean } ]>;
+        editorModalWidth?: 'normal' | 'large';
     }
 
-    let { children, label, for: labelFor, subtitle, helpContent, editorContent }: Props = $props();
+    let { children, label, for: labelFor, subtitle, helpContent, editorContent, editorModalWidth }: Props = $props();
 
     let helpModal = $state<HTMLDialogElement | undefined>();
     let editorModal = $state<HTMLDialogElement | undefined>();
@@ -73,7 +74,10 @@
 
 
 {#if editorContent}
-    <Modal bind:modal={editorModal} onclose={() => (editorModalOpened = false)} title="{label} editor">
+    <Modal bind:modal={editorModal}
+           onclose={() => (editorModalOpened = false)}
+           title="{label} editor"
+           width={editorModalWidth}>
         {@render editorContent({ opened: editorModalOpened })}
 
         <div class="modal-action">
