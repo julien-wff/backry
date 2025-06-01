@@ -21,6 +21,13 @@ export interface EngineMeta {
     displayName: string;
     icon: string;
     connectionStringPlaceholder: string;
+
+    /**
+     * For automatic detection of the engine from the connection string.
+     * @param url Connection string or URL to check.
+     * @return True if the URL is from the engine, false otherwise.
+     */
+    isUrlFromEngine?: (url: string) => boolean;
 }
 
 /**

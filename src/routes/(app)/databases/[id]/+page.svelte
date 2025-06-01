@@ -41,6 +41,17 @@
         }
     });
 
+    // Automatically select the engine based on the connection string if not already selected
+    $effect(() => {
+        if (!selectedEngine && connectionString) {
+            const engine = ENGINE_META_ENTRIES.find(([ _, engineMeta ]) => engineMeta.isUrlFromEngine?.(connectionString))?.[0];
+
+            if (engine) {
+                selectedEngine = engine;
+            }
+        }
+    });
+
     async function testDbConnection() {
         if (!selectedEngine) {
             error = 'Please select a database engine';
