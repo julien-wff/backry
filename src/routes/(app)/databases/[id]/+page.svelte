@@ -9,6 +9,7 @@
     import SlugInput from '$lib/components/forms/SlugInput.svelte';
     import { Database } from '$lib/components/icons';
     import { fetchApi } from '$lib/helpers/fetch';
+    import { slugify } from '$lib/helpers/format';
     import type { DATABASE_ENGINES } from '$lib/server/db/schema';
     import { type databaseRequest, type DatabaseResponse, type databasesCheckRequest } from '$lib/server/schemas/api';
     import type { PageProps } from './$types';
@@ -23,7 +24,8 @@
     let selectedEngine = $state<typeof DATABASE_ENGINES[number] | null>(data.database?.engine ?? urlEngine ?? null);
 
     let dbName = $state(data.database?.name ?? searchParams.get('name') ?? '');
-    let slug = $state(data.database?.slug ?? '');
+    // svelte-ignore state_referenced_locally We want to grab the initial value of dbName, it's ok
+    let slug = $state(data.database?.slug ?? slugify(dbName));
 
     let connectionString = $state(data.database?.connectionString ?? searchParams.get('connectionString') ?? '');
     let connectionStringPlaceholder = $derived(
