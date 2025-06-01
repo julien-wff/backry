@@ -33,6 +33,13 @@ WORKDIR /app
 COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile && mkdir db && touch db/backry.db
 
+ARG BUILD_DATE
+ARG VCS_REF
+ARG VERSION
+
+ENV PUBLIC_BUILD_DATE=${BUILD_DATE}
+ENV PUBLIC_VCS_REF=${VCS_REF}
+ENV PUBLIC_VERSION=${VERSION}
 ENV DATABASE_URL="/app/db/backry.db"
 
 COPY . .
@@ -74,6 +81,20 @@ ENV BACKRY_MYSQL_CHECK_CMD="/usr/local/bin/mysql"
 ENV BACKRY_MONGODB_DUMP_CMD="/usr/local/bin/mongodump"
 
 # Metadata
+
+ARG BUILD_DATE
+ARG VCS_REF
+ARG VCS_URL
+ARG VERSION
+
+LABEL org.opencontainers.image.version=$VERSION \
+      org.opencontainers.image.title="Backry" \
+      org.opencontainers.image.description="An easy-to-use, fast, and efficient database backup solution based on Restic." \
+      org.opencontainers.image.authors="Julien W <cefadrom1@gmail.com>" \
+      org.opencontainers.image.url=$VCS_URL \
+      org.opencontainers.image.source=$VCS_URL \
+      org.opencontainers.image.revision=$VCS_REF \
+      org.opencontainers.image.created=$BUILD_DATE
 
 ENV DATABASE_URL="/app/db/backry.db"
 ENV NODE_ENV="production"
