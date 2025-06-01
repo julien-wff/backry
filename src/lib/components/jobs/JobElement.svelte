@@ -1,6 +1,7 @@
 <script lang="ts">
     import { goto, invalidateAll } from '$app/navigation';
     import BaseListElement from '$lib/components/common/BaseListElement.svelte';
+    import CollapsableElementList from '$lib/components/common/CollapsableElementList.svelte';
     import Modal from '$lib/components/common/Modal.svelte';
     import { Clock, CloudUpload, Database, FileCheck, RefreshCw } from '$lib/components/icons';
     import { fetchApi } from '$lib/helpers/fetch';
@@ -18,6 +19,12 @@
 
     let jobRunPopup = $state<HTMLDialogElement | null>(null);
     let jobRunDatabases = $state<number[]>([]);
+
+    let databaseListFormatted = $derived(job.jobsDatabases.map(db => ({
+        id: db.database.id,
+        name: db.database.name,
+        disabled: db.status === 'inactive',
+    })));
 
     function handleRunJobDatabaseChange(ev: Event & { currentTarget: EventTarget & HTMLInputElement }) {
         if (ev.currentTarget.checked) {
@@ -81,17 +88,6 @@
 {/snippet}
 
 
-<!-- Format the full list of databases by putting a line through the inactive or error ones -->
-{#snippet databaseListFormatted()}
-    <div>
-        {#each job.jobsDatabases as { database, status: jobStatus }, index (database.id)}
-            <span class:line-through={jobStatus !== 'active'}>
-                {database.name}
-            </span>{index < job.jobsDatabases.length - 1 ? ', ' : ''}
-        {/each}
-    </div>
-{/snippet}
-
 <BaseListElement deleteConfirmationMessage={`The job "${job.name}" will be deleted.`}
                  disabled={loading}
                  editHref={`/jobs/${job.id}`}
@@ -114,21 +110,7 @@
     <div class="flex items-center gap-1 whitespace-nowrap">
         <Database class="h-4 w-4"/>
         Databases:
-        {#if job.jobsDatabases.length <= 2}
-            {@render databaseListFormatted()}
-        {:else}
-            <div class="tooltip">
-                <div class="tooltip-content">
-                    {@render databaseListFormatted()}
-                </div>
-                <div>
-                    <span class:line-through={job.jobsDatabases[0].status !== 'active'}>
-                        {job.jobsDatabases[0].database.name}
-                    </span>
-                    + {job.jobsDatabases.length - 1} more
-                </div>
-            </div>
-        {/if}
+        <CollapsableElementList elements={databaseListFormatted}/>
     </div>
 
     {#if nextExecution && job.status === 'active'}
