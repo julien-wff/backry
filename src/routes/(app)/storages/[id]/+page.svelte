@@ -6,6 +6,7 @@
     import EnvVarInput from '$lib/components/forms/EnvVarInput.svelte';
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
     import { ArchiveRestore, CloudUpload, PackageOpen } from '$lib/components/icons';
+    import ExistingRepoModal from '$lib/components/storages/edit/ExistingRepoModal.svelte';
     import { fetchApi } from '$lib/helpers/fetch';
     import {
         type storageInitRepositoryRequest,
@@ -35,6 +36,23 @@
         acc[key] = value;
         return acc;
     }, {} as Record<string, string>));
+
+    let repoModeSwitchModal = $state<HTMLDialogElement | null>(null);
+
+    function handleRepoModeSwitch(existing: boolean) {
+        if (existing === isExistingRepository) {
+            return;
+        }
+
+        arePreChecksValid = false;
+        error = null;
+
+        if (existing) {
+            repoModeSwitchModal?.showModal();
+        } else {
+            isExistingRepository = false;
+        }
+    }
 
     async function handleFormSubmit() {
         isLoading = true;
@@ -143,7 +161,7 @@
                 <button class="flex-1 gap-2 px-4 py-2 flex flex-col items-center bg-base-300 justify-center rounded-lg cursor-pointer border-2 text-center"
                         class:border-primary={!isExistingRepository}
                         class:border-transparent={isExistingRepository}
-                        onclick={() => (isExistingRepository = false)}
+                        onclick={() => handleRepoModeSwitch(false)}
                         type="button">
                     <PackageOpen size={24}/>
                     New repository
@@ -151,7 +169,7 @@
                 <button class="flex-1 gap-2 px-4 py-2 flex flex-col items-center bg-base-300 justify-center rounded-lg cursor-pointer border-2 text-center"
                         class:border-primary={isExistingRepository}
                         class:border-transparent={!isExistingRepository}
-                        onclick={() => (isExistingRepository = true)}
+                        onclick={() => handleRepoModeSwitch(true)}
                         type="button">
                     <ArchiveRestore size={24}/>
                     Existing repository
@@ -184,3 +202,6 @@
         </button>
     {/if}
 </ElementForm>
+
+
+<ExistingRepoModal bind:modal={repoModeSwitchModal} oncontinue={() => (isExistingRepository = true)}/>
