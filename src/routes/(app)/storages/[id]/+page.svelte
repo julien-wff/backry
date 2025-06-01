@@ -16,6 +16,7 @@
         type StoragesCheckResponse,
         type StoragesInitRepositoryResponse,
     } from '$lib/server/schemas/api';
+    import { tick } from 'svelte';
     import type { PageProps } from './$types';
 
     let { data }: PageProps = $props();
@@ -37,20 +38,32 @@
         return acc;
     }, {} as Record<string, string>));
 
+    // Reset pre-checks if any of the fields change
+    $effect(() => {
+        if (repoUrl + password + envVars.map(v => `${v.key}=${v.value}`).join('')) {
+            arePreChecksValid = false;
+        }
+    });
+
     let repoModeSwitchModal = $state<HTMLDialogElement | null>(null);
 
-    function handleRepoModeSwitch(existing: boolean) {
+    /**
+     * Switches the repository mode between existing and new. If existing is true, it will prompt the user with
+     * a warning.
+     * @param existing Whether to switch to existing repository mode or not.
+     * @param force If true, it will switch to existing repository mode without prompting the user.
+     */
+    function handleRepoModeSwitch(existing: boolean, force = false) {
         if (existing === isExistingRepository) {
             return;
         }
 
-        arePreChecksValid = false;
-        error = null;
-
-        if (existing) {
+        if (existing && !force) {
             repoModeSwitchModal?.showModal();
         } else {
-            isExistingRepository = false;
+            arePreChecksValid = false;
+            error = null;
+            isExistingRepository = existing;
         }
     }
 
@@ -102,6 +115,7 @@
             return;
         }
 
+        await tick(); // Avoid batching with pre-checks reset, that would cause the value to be set back to false immediately
         arePreChecksValid = true;
     }
 
@@ -233,4 +247,4 @@
 </ElementForm>
 
 
-<ExistingRepoModal bind:modal={repoModeSwitchModal} oncontinue={() => (isExistingRepository = true)}/>
+<ExistingRepoModal bind:modal={repoModeSwitchModal} oncontinue={() => handleRepoModeSwitch(true, true)}/>
