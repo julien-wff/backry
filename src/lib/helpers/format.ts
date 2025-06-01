@@ -11,15 +11,20 @@ dayjs.extend(utc);
  * Format a duration into a human-readable string.
  * Dynamically adjusts the units.
  * @param duration Duration in seconds
+ * @param showMs Whether to show milliseconds in the output
  * @returns Formatted duration string
  */
-export const formatDuration = (duration: number) => {
+export const formatDuration = (duration: number, showMs = true) => {
     const durationObj = dayjs.duration(duration, 'seconds');
 
-    if (durationObj.asMilliseconds() < 1000) {
+    if (durationObj.asMilliseconds() < 1000 && showMs) {
         return `${durationObj.milliseconds().toFixed(0)}ms`;
     } else if (durationObj.asSeconds() < 60) {
-        return `${durationObj.seconds()}s ${durationObj.milliseconds().toFixed(0).padStart(3, '0')}ms`;
+        let result = `${durationObj.seconds()}s`;
+        if (showMs) {
+            result += ` ${durationObj.milliseconds().toFixed(0).padStart(3, '0')}ms`;
+        }
+        return result;
     } else if (durationObj.asMinutes() < 60) {
         return durationObj.format('m[m] s[s]');
     } else {
