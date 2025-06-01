@@ -9,10 +9,24 @@ export const databasesList = () =>
     db.select().from(databases).orderBy(databases.name);
 
 /**
- * Fetches a complete list of all databases with all fields, according to filters
+ * Fetches a complete list of all databases with all fields, according to filters.
+ * Also grabs associated jobs.
  */
-export const databasesListFiltered = (engines: typeof DATABASE_ENGINES[number][]) =>
-    db.select().from(databases).orderBy(databases.name).where(inArray(databases.engine, engines));
+export const databasesListExtendedFiltered = (engines: typeof DATABASE_ENGINES[number][]) =>
+    db.query.databases.findMany({
+        orderBy: (databases, { asc }) => asc(databases.name),
+        where: inArray(databases.engine, engines),
+        with: {
+            jobsDatabases: {
+                columns: { id: true },
+                with: {
+                    job: {
+                        columns: { id: true, name: true, status: true },
+                    },
+                },
+            },
+        },
+    });
 
 /**
  * Fetches a database by ID.
