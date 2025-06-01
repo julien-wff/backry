@@ -17,7 +17,7 @@
 
 <aside class="sticky top-0 flex h-screen flex-col gap-8 overflow-y-auto p-2 shadow-md bg-base-100 rounded-r-box">
     <a class="flex flex-col items-center gap-2" href="/">
-        <span class="text-3xl">🍰</span>
+        <img alt="Backry Logo" class="w-10 h-10" height="128" src="/favicon.png" width="128"/>
         <span class="text-xl font-bold">Backry</span>
     </a>
 
