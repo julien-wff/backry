@@ -89,6 +89,13 @@ the idea for Backry.
 Finally, Backry's interface takes some elements from [StarFleetCPTN/GoMFT](https://github.com/StarFleetCPTN/GoMFT)'s
 design, even though GoMFT remains prettier (someday I'll do a graphic overhaul).
 
+## About the icon
+
+The backry icon is, for now, an emoji taken from the MIT licensed
+[microsoft/fluentui-emoji](https://github.com/microsoft/fluentui-emoji/tree/main/assets/Shortcake)
+icon set. Icon design is not my strong suit, so if anyone wants to contribute a better one, feel free to
+do so!
+
 ## Was it vibecoded?
 
 Nope, I only use GitHub Copilot's auto-complete feature (which is not that great with Svelte 5, btw).
