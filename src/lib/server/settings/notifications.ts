@@ -66,7 +66,7 @@ async function constructRunPayload(runId: number): Promise<ResultAsync<Notificat
         isRunSuccessful: run.backups.every(backup => backup.error === null),
         startedAt: run.createdAt!,
         finishedAt: run.finishedAt,
-        totalDuration: formatDuration(dayjs.utc(run.createdAt).diff(dayjs.utc(run.finishedAt), 'seconds')),
+        totalDuration: formatDuration(dayjs.utc(run.finishedAt).diff(dayjs.utc(run.createdAt), 'seconds')),
         totalDumpSize: formatSize(run.backups.reduce((acc, backup) => acc + (backup.dumpSize ?? 0), 0)),
         totalDumpSpaceAdded: formatSize(run.backups.reduce((acc, backup) => acc + (backup.dumpSpaceAdded ?? 0), 0)),
         totalBackupCount: run.totalBackupsCount ?? 0,
