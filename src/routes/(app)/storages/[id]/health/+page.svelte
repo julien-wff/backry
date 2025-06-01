@@ -4,9 +4,9 @@
     import ElementForm from '$lib/components/forms/ElementForm.svelte';
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
     import { FolderHeart } from '$lib/components/icons';
-    import LocksDisplay from '$lib/components/storages/LocksDisplay.svelte';
-    import PruneDesyncDisplay from '$lib/components/storages/PruneDesyncDisplay.svelte';
-    import StaleSnapshotsDisplay from '$lib/components/storages/StaleSnapshotsDisplay.svelte';
+    import LocksDisplay from '$lib/components/storages/health/LocksDisplay.svelte';
+    import PruneDesyncDisplay from '$lib/components/storages/health/PruneDesyncDisplay.svelte';
+    import StaleSnapshotsDisplay from '$lib/components/storages/health/StaleSnapshotsDisplay.svelte';
     import type { PageProps } from './$types';
 
     let { data }: PageProps = $props();
