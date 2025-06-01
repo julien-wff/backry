@@ -15,9 +15,9 @@
     const { errors }: Props = $props();
 </script>
 
-<aside class="sticky top-0 flex h-screen flex-col gap-8 overflow-y-auto p-2 shadow-md bg-base-100 rounded-r-box">
+<aside class="fixed top-0 flex h-screen w-28 flex-col gap-8 overflow-y-auto p-2 shadow-md bg-base-100 rounded-r-box">
     <a class="flex flex-col items-center gap-2" href="/">
-        <img alt="Backry Logo" class="w-10 h-10" height="128" src="/favicon.png" width="128"/>
+        <img alt="Backry Logo" class="h-10 w-10" height="128" src="/favicon.png" width="128"/>
         <span class="text-xl font-bold">Backry</span>
     </a>
 
@@ -29,7 +29,7 @@
         <NavbarElement hasError={errors.backups > 0} href="/backups" icon={FileCheck} label="Backups"/>
         <!--        <NavbarElement href="/restore" icon={History} label="Restore"/>-->
 
-        <div class="flex flex-1 flex-col gap-4 justify-end">
+        <div class="flex flex-1 flex-col justify-end gap-4">
             <NavbarElement href="/integrations/docker" icon={Blocks} label="Integrations"/>
             <NavbarElement hasError={errors.tools || errors.notifications > 0}
                            href="/settings"

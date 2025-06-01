@@ -35,6 +35,9 @@
 <div class="flex min-h-screen bg-base-300">
     <Navbar errors={data.errors}/>
 
+    <!-- Navbar spacer (because position: fixed) -->
+    <div class="w-28"></div>
+
     <main class="flex flex-1 p-4">
         <div class="mx-auto flex w-full max-w-5xl flex-col gap-6">
             {@render children()}
