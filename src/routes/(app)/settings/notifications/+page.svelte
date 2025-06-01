@@ -13,10 +13,10 @@
 </script>
 
 
-<Head title="Notifications"/>
+<Head title="Settings - Notifications"/>
 
 <PageContentHeader buttonType="new" icon={Bell}>
-    Notifications
+    Settings - Notifications
 </PageContentHeader>
 
 <div class="grid grid-cols-1 gap-4">
