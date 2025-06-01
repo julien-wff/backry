@@ -152,6 +152,35 @@
 </PageContentHeader>
 
 
+{#snippet repositoryUrlHelp()}
+    <p>
+        Enter the URL of the Restic repository. It can be, for example, a:
+    </p>
+
+    <ul class="list-disc pl-5">
+        <li>local path (e.g., <code>local:/data/repo-path</code>)</li>
+        <li>SFTP URL (e.g., <code>sftp://user:pwd@host:/path/to/repo</code>)</li>
+        <li>S3 URL (e.g., <code>s3://bucket-name/path/to/repo</code>)</li>
+    </ul>
+
+    <p class="mt-1">
+        Or any other URL supported by Restic. To see the full list, visit the
+        <a href="https://restic.readthedocs.io/en/stable/030_preparing_a_new_repo.html"
+           rel="noopener noreferrer"
+           target="_blank"
+           class="link link-primary">
+            Restic documentation
+        </a>.
+    </p>
+
+    {#if !isExistingRepository}
+        <p class="mt-2">
+            Note that Backry will initialize a new Restic repository for you, so please ensure that the specified full
+            path exists and is empty.
+        </p>
+    {/if}
+{/snippet}
+
 <ElementForm bind:error={error}
              onsubmit={handleFormSubmit}
              title="{data.storage ? 'Edit' : 'Add'} {isExistingRepository ? 'existing' : 'and initialize'} Restic repository">
@@ -182,7 +211,7 @@
         <input bind:value={repoName} class="input w-full" id="repo-name" required>
     </InputContainer>
 
-    <InputContainer for="repo-path" label="Repository URL">
+    <InputContainer for="repo-path" helpContent={repositoryUrlHelp} label="Repository URL">
         <input bind:value={repoUrl} class="input w-full" id="repo-path" placeholder="local:/data/repo-path" required>
     </InputContainer>
 
@@ -193,7 +222,7 @@
     <EnvVarInput bind:envVars/>
 
     <button class="btn btn-primary" disabled={arePreChecksValid || isLoading} type="submit">
-        {isExistingRepository ? 'Check and save' : 'Check URL'}
+        {isExistingRepository ? 'Validate and save' : 'Validate URL'}
     </button>
 
     {#if arePreChecksValid}
