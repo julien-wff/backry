@@ -3,7 +3,7 @@
     import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
     import FullScreenSelectorCard from '$lib/components/common/selector/FullScreenSelectorCard.svelte';
     import FullScreenSelectorContainer from '$lib/components/common/selector/FullScreenSelectorContainer.svelte';
-    import { Bell, Settings, Wrench } from '$lib/components/icons';
+    import { Bell, Info, Settings, Wrench } from '$lib/components/icons';
     import type { PageProps } from './$types';
 
     let { data }: PageProps = $props();
@@ -15,7 +15,10 @@
     Settings
 </PageContentHeader>
 
-<FullScreenSelectorContainer gridClass="grid-cols-2">
+<FullScreenSelectorContainer gridClass="grid-cols-3">
+    <FullScreenSelectorCard href="about" icon={Info}>
+        About Backry
+    </FullScreenSelectorCard>
     <FullScreenSelectorCard error={data.errors.tools} href="tools" icon={Wrench}>
         Tools info
     </FullScreenSelectorCard>
