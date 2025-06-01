@@ -59,13 +59,10 @@ RUN apk add --no-cache \
 
 COPY --from=binaries /app/bin /usr/local/bin/
 
-# Install app
-
-COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile --production
+# Copy application files
 
 COPY drizzle.config.ts ./
-COPY src/lib/server/db/schema.ts ./src/lib/server/db/schema.ts
+COPY ./drizzle ./drizzle
 COPY --from=builder /app/build .
 
 # Database engines
@@ -88,4 +85,4 @@ VOLUME ["/app/db"]
 HEALTHCHECK --interval=30s --timeout=10s --start-period=3s --retries=3 \
     CMD sh -c "wget -qO- http://$HOSTNAME:3000/api/healthcheck || exit 1"
 
-CMD ["sh", "-c", "bun run db:push --force && bun ."]
+CMD ["sh", "-c", "bun ."]
