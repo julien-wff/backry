@@ -1,3 +1,5 @@
+import { randomId } from '$lib/helpers/common';
+
 export type ToastType = 'success' | 'error';
 
 export interface Toast {
@@ -19,7 +21,7 @@ export function addToast(message: string, type: ToastType) {
         {
             message,
             type,
-            id: crypto.randomUUID(),
+            id: randomId(),
         },
     ];
 }

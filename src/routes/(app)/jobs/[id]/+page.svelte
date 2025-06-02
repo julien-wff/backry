@@ -8,6 +8,7 @@
     import { Timer } from '$lib/components/icons';
     import JobDatabaseSelector from '$lib/components/jobs/JobDatabaseSelector.svelte';
     import JobPrunePolicyField from '$lib/components/jobs/JobPrunePolicyField.svelte';
+    import { randomId } from '$lib/helpers/common';
     import { fetchApi } from '$lib/helpers/fetch';
     import { type jobRequest, type JobResponse } from '$lib/server/schemas/api';
     import { sendAt, validateCronExpression } from 'cron';
@@ -30,7 +31,7 @@
     let selectedDatabases = $state(data.job?.jobsDatabases.map(jd => ({
         databaseId: jd.databaseId,
         enabled: jd.status === 'active',
-        selectionId: crypto.randomUUID(),
+        selectionId: randomId(),
     })) ?? []);
 
     const clientTimeZone = new Intl.DateTimeFormat().resolvedOptions().timeZone;
