@@ -1,0 +1,49 @@
+name: Docker Hub Release
+
+on:
+  release:
+    types: [ published ]
+
+jobs:
+  build:
+    name: Build and Publish Docker Image
+    runs-on: ubuntu-latest
+
+    env:
+      IMAGE_NAME: cefadrom/backry
+      IMAGE_TAG: ${{ github.event.release.tag_name }}
+      BUILD_DATE: ${{ github.event.release.published_at }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          tags: |
+            type=semver,pattern={{ version }}
+            type=semver,pattern={{ major }}.{{ minor }}
+            type=semver,pattern={{ major }}
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          target: runtime
+          build-args: |
+            VERSION=${{ env.IMAGE_TAG }}
+            BUILD_DATE=${{ env.BUILD_DATE }}
+            VCS_REF=${{ github.sha }}
+            VCS_URL=${{ github.repositoryUrl }}
