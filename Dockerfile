@@ -97,6 +97,7 @@ LABEL org.opencontainers.image.version=$VERSION \
       org.opencontainers.image.title="Backry" \
       org.opencontainers.image.description="An easy-to-use, fast, and efficient database backup solution based on Restic." \
       org.opencontainers.image.authors="Julien W <cefadrom1@gmail.com>" \
+      org.opencontainers.image.licenses="AGPL-3.0" \
       org.opencontainers.image.url=$VCS_URL \
       org.opencontainers.image.source=$VCS_URL \
       org.opencontainers.image.revision=$VCS_REF \
