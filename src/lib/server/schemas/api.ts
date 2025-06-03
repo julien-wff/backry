@@ -9,6 +9,7 @@ import {
     runs,
     storages,
 } from '$lib/server/db/schema';
+import type { Desyncedbackup } from '$lib/server/storages/health';
 import type { ResticError, ResticInit, ResticLock, ResticSnapshot } from '$lib/types/restic';
 import { validateCronExpression } from 'cron';
 import { z } from 'zod';
@@ -113,12 +114,7 @@ export const storageStaleSnapshotsDeleteRequest = z.object({
 
 /** `GET /api/storages/[id]/prune-desync` */
 export interface StoragePruneDesyncResponse {
-    backups: Array<{
-        id: number;
-        name: string;
-        startedAt: string;
-        snapshotShortId: string;
-    }>;
+    backups: Desyncedbackup[];
 }
 
 /** `POST /api/storages/[id]/prune-desync` */

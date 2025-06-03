@@ -1,10 +1,10 @@
 import { apiError, apiSuccess } from '$lib/server/api/responses';
 import { getStorageFromRequest } from '$lib/server/api/storages';
-import { getUnprunedSnapshotByStorageId, setBackupsToPrunedById } from '$lib/server/queries/backups';
+import { setBackupsToPrunedById } from '$lib/server/queries/backups';
 import { parseRequestBody } from '$lib/server/schemas';
 import { type StoragePruneDesyncResponse, storagePruneDesyncUpdateRequest } from '$lib/server/schemas/api';
 import { logger } from '$lib/server/services/logger';
-import { getRepositorySnapshots } from '$lib/server/services/restic';
+import { getPruneDesyncBackups } from '$lib/server/storages/health';
 import type { RequestHandler } from '@sveltejs/kit';
 
 /**
@@ -16,32 +16,14 @@ export const GET: RequestHandler = async ({ params }) => {
         return storage.error;
     }
 
-    const backups = getUnprunedSnapshotByStorageId(storage.value.id);
-    if (backups.length === 0) {
-        return apiSuccess<StoragePruneDesyncResponse>({ backups: [] });
-    }
-
-    const res = await getRepositorySnapshots(
-        storage.value.url,
-        storage.value.password!,
-        storage.value.env,
-        true,
-    );
+    const res = await getPruneDesyncBackups(storage.value);
     if (res.isErr()) {
-        return apiError(res.error.message, 500);
+        return apiError(res.error, 500);
+    } else {
+        return apiSuccess<StoragePruneDesyncResponse>({
+            backups: res.value,
+        });
     }
-    const snapshots = new Set(res.value[0].map(s => s.id));
-
-    return apiSuccess<StoragePruneDesyncResponse>({
-        backups: backups
-            .filter(backup => !snapshots.has(backup.snapshotId!))
-            .map(backup => ({
-                id: backup.id,
-                name: `${backup.jobName} - ${backup.databaseName}`,
-                startedAt: backup.startedAt!,
-                snapshotShortId: backup.snapshotId!.slice(0, 8),
-            })),
-    });
 };
 
 

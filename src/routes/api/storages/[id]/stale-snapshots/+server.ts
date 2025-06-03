@@ -1,9 +1,9 @@
 import { apiError, apiSuccess } from '$lib/server/api/responses';
 import { getStorageFromRequest } from '$lib/server/api/storages';
-import { getSnapshotsIdsByStorageId } from '$lib/server/queries/backups';
 import { parseRequestBody } from '$lib/server/schemas';
 import { storageStaleSnapshotsDeleteRequest, type StorageStaleSnapshotsResponse } from '$lib/server/schemas/api';
-import { deleteSnapshots, getRepositorySnapshots } from '$lib/server/services/restic';
+import { deleteSnapshots } from '$lib/server/services/restic';
+import { getStaleSnapshots } from '$lib/server/storages/health';
 import { type RequestHandler } from '@sveltejs/kit';
 
 /**
@@ -15,25 +15,14 @@ export const GET: RequestHandler = async ({ params }) => {
         return storage.error;
     }
 
-    const backupsSnapshotsIds = getSnapshotsIdsByStorageId(storage.value.id);
-
-    const res = await getRepositorySnapshots(
-        storage.value.url,
-        storage.value.password!,
-        storage.value.env,
-        true,
-    );
+    const res = await getStaleSnapshots(storage.value);
     if (res.isErr()) {
-        return apiError(res.error.message, 500);
+        return apiError(res.error, 500);
+    } else {
+        return apiSuccess<StorageStaleSnapshotsResponse>({
+            snapshots: res.value,
+        });
     }
-
-    if (res.value.length === 0 || !Array.isArray(res.value[0])) {
-        return apiSuccess<StorageStaleSnapshotsResponse>({ snapshots: [] });
-    }
-
-    return apiSuccess<StorageStaleSnapshotsResponse>({
-        snapshots: res.value[0].filter(snapshot => !backupsSnapshotsIds.includes(snapshot.id)),
-    });
 };
 
 /**
