@@ -1,7 +1,10 @@
 import { storages } from '$lib/server/db/schema';
 import { getSnapshotsIdsByStorageId, getUnprunedSnapshotByStorageId } from '$lib/server/queries/backups';
-import { getRepositorySnapshots } from '$lib/server/services/restic';
+import { storagesList, updateStorage } from '$lib/server/queries/storages';
+import { logger } from '$lib/server/services/logger';
+import { getRepositoryLocks, getRepositorySnapshots } from '$lib/server/services/restic';
 import type { ResticSnapshot } from '$lib/types/restic';
+import dayjs from 'dayjs';
 import { err, ok, type ResultAsync } from 'neverthrow';
 
 /**
@@ -71,4 +74,48 @@ export async function getStaleSnapshots(storage: typeof storages.$inferSelect): 
     } else {
         return ok(res.value[0].filter(snapshot => !backupsSnapshotsIds.includes(snapshot.id)));
     }
+}
+
+
+/**
+ * Check the health of a single storage and update its status if necessary.
+ * @param storage The storage object to check.
+ * @return The updated storage object
+ */
+export async function updateStorageHealth(storage: typeof storages.$inferSelect) {
+    const [ locks, desyncedBackups, staleSnapshots ] = await Promise.all([
+        getRepositoryLocks(storage.url, storage.password!, storage.env),
+        getPruneDesyncBackups(storage),
+        getStaleSnapshots(storage),
+    ]);
+
+    const isHealthy = locks.isOk()
+        && locks.value.filter(lock => dayjs(lock.time).add(-30, 'minutes').isBefore()).length === 0
+        && desyncedBackups.isOk()
+        && desyncedBackups.value.length === 0
+        && staleSnapshots.isOk()
+        && staleSnapshots.value.length === 0;
+
+    if (storage.status === 'active' && !isHealthy) {
+        logger.warn(`Set storage ${storage.name} (${storage.id}) status to 'unhealthy'.`);
+        return updateStorage(storage.id, {
+            status: 'unhealthy',
+        });
+    } else if (storage.status === 'unhealthy' && isHealthy) {
+        logger.info(`Set storage ${storage.name} (${storage.id}) status back to 'active' from 'unhealthy'.`);
+        return updateStorage(storage.id, {
+            status: 'active',
+        });
+    }
+}
+
+
+/**
+ * Check all storages for any unhealthy sign. If any, mark the storage as unhealthy.
+ */
+export async function updateAllStoragesHealth() {
+    const stg = await storagesList();
+
+    // Run all checks in parallel for each storage
+    await Promise.all(stg.map(updateStorageHealth));
 }

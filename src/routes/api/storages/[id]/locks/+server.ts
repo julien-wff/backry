@@ -2,6 +2,7 @@ import { apiError, apiSuccess } from '$lib/server/api/responses';
 import { getStorageFromRequest } from '$lib/server/api/storages';
 import type { StorageLocksResponse } from '$lib/server/schemas/api';
 import { getRepositoryLocks, unlockRepository } from '$lib/server/services/restic';
+import { updateStorageHealth } from '$lib/server/storages/health';
 import { type RequestHandler } from '@sveltejs/kit';
 
 /**
@@ -34,6 +35,9 @@ export const DELETE: RequestHandler = async ({ params }) => {
     if (res.isErr()) {
         return apiError(res.error.message, 500);
     }
+
+    // Queue health update
+    void updateStorageHealth(storage.value);
 
     return apiSuccess({});
 };

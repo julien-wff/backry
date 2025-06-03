@@ -4,7 +4,7 @@ import { setBackupsToPrunedById } from '$lib/server/queries/backups';
 import { parseRequestBody } from '$lib/server/schemas';
 import { type StoragePruneDesyncResponse, storagePruneDesyncUpdateRequest } from '$lib/server/schemas/api';
 import { logger } from '$lib/server/services/logger';
-import { getPruneDesyncBackups } from '$lib/server/storages/health';
+import { getPruneDesyncBackups, updateStorageHealth } from '$lib/server/storages/health';
 import type { RequestHandler } from '@sveltejs/kit';
 
 /**
@@ -50,6 +50,9 @@ export const POST: RequestHandler = async ({ request, params }) => {
             500,
         );
     }
+
+    // Queue health update
+    void updateStorageHealth(storage.value);
 
     return apiSuccess({});
 };
