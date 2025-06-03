@@ -94,7 +94,7 @@ export async function getResticVersion(): Promise<ResultAsync<string, string>> {
 export async function getRepositoryStats(path: string, password: string, env: Record<string, string>, onlyBackry = false) {
     const res = await runCommandSync(
         RESTIC_CMD,
-        [ 'stats', '-r', path, '--json', '--mode', 'raw-data', ...(onlyBackry ? [ '--tag', 'backry' ] : []) ],
+        [ 'stats', '-r', path, '--json', '--no-lock', '--mode', 'raw-data', ...(onlyBackry ? [ '--tag', 'backry' ] : []) ],
         { env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env } },
     );
 
@@ -204,6 +204,7 @@ export async function readFileContent(url: string,
         RESTIC_CMD,
         [
             '-r', url,
+            '--no-lock',
             'dump',
             snapshotId,
             fileName,
