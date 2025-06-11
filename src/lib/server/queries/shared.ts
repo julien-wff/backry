@@ -4,7 +4,7 @@ import type { getNextJobs } from '$lib/server/shared/cron';
 import { avg, count, desc, eq, inArray, isNotNull, sum } from 'drizzle-orm';
 
 /**
- * Get the number of errors for databases, storages, backups.
+ * Get the number of errors for databases, storages, backups, and notifications.
  * @returns Error count per type.
  */
 export async function getErrorCountPerType() {
@@ -20,6 +20,20 @@ export async function getErrorCountPerType() {
         storages: errorStorages.length,
         backups: errorBackups.length,
         notifications: errorNotifications.length,
+    };
+}
+
+/**
+ * Get the number of warnings for databases, storages, backups.
+ * @returns Warning count per type.
+ */
+export async function getWarningCountPerType() {
+    const [ warningStorages ] = await Promise.all([
+        db.select({ id: storages.id }).from(storages).where(eq(storages.status, 'unhealthy')),
+    ]);
+
+    return {
+        storages: warningStorages.length,
     };
 }
 

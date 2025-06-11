@@ -1,9 +1,12 @@
-import { getErrorCountPerType } from '$lib/server/queries/shared';
+import { getErrorCountPerType, getWarningCountPerType } from '$lib/server/queries/shared';
 import { areToolChecksSuccessful } from '$lib/server/shared/tool-checks';
 import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = async () => {
-    const errors = await getErrorCountPerType();
+    const [ errors, warnings ] = await Promise.all([
+        getErrorCountPerType(),
+        getWarningCountPerType(),
+    ]);
 
     return {
         errors: {
@@ -12,6 +15,9 @@ export const load: LayoutServerLoad = async () => {
             backups: errors.backups,
             notifications: errors.notifications,
             tools: !areToolChecksSuccessful(),
+        },
+        warnings: {
+            storages: warnings.storages,
         },
     };
 };

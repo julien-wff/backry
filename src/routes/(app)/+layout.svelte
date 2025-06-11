@@ -33,7 +33,7 @@
 <svelte:document onvisibilitychange={handleVisibilityChange}/>
 
 <div class="flex min-h-screen bg-base-300">
-    <Navbar errors={data.errors}/>
+    <Navbar errors={data.errors} warnings={data.warnings}/>
 
     <!-- Navbar spacer (because position: fixed) -->
     <div class="w-28"></div>
