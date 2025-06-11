@@ -1,10 +1,10 @@
+import { staleLocksCount } from '$lib/helpers/storage';
 import { storages } from '$lib/server/db/schema';
 import { getSnapshotsIdsByStorageId, getUnprunedSnapshotByStorageId } from '$lib/server/queries/backups';
 import { storagesList, updateStorage } from '$lib/server/queries/storages';
 import { logger } from '$lib/server/services/logger';
 import { getRepositoryLocks, getRepositorySnapshots } from '$lib/server/services/restic';
 import type { ResticSnapshot } from '$lib/types/restic';
-import dayjs from 'dayjs';
 import { err, ok, type ResultAsync } from 'neverthrow';
 
 /**
@@ -90,7 +90,7 @@ export async function updateStorageHealth(storage: typeof storages.$inferSelect)
     ]);
 
     const isHealthy = locks.isOk()
-        && locks.value.filter(lock => dayjs(lock.time).add(-30, 'minutes').isBefore()).length === 0
+        && staleLocksCount(locks.value) === 0
         && desyncedBackups.isOk()
         && desyncedBackups.value.length === 0
         && staleSnapshots.isOk()
