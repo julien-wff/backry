@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { invalidateAll } from '$app/navigation';
     import Head from '$lib/components/common/Head.svelte';
     import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
     import ElementForm from '$lib/components/forms/ElementForm.svelte';
@@ -7,9 +8,41 @@
     import LocksDisplay from '$lib/components/storages/health/LocksDisplay.svelte';
     import PruneDesyncDisplay from '$lib/components/storages/health/PruneDesyncDisplay.svelte';
     import StaleSnapshotsDisplay from '$lib/components/storages/health/StaleSnapshotsDisplay.svelte';
+    import { fetchApi } from '$lib/helpers/fetch';
+    import type { ELEMENT_STATUS } from '$lib/server/db/schema';
+    import type { storagePatchRequest, StorageResponse } from '$lib/server/schemas/api';
     import type { PageProps } from './$types';
 
     let { data }: PageProps = $props();
+
+    let locksHealthy = $state<boolean | undefined>();
+    let staleSnapshotsHealthy = $state<boolean | undefined>();
+    let pruneDesyncHealthy = $state<boolean | undefined>();
+
+    let isLoaded = $derived(locksHealthy !== undefined && staleSnapshotsHealthy !== undefined && pruneDesyncHealthy !== undefined);
+    let isHealthy = $derived(locksHealthy === true && staleSnapshotsHealthy === true && pruneDesyncHealthy === true);
+
+    /**
+     * Update the storage health status based on the current health of the components.
+     * If one of them is unhealthy, and the storage status is not already 'unhealthy', update it.
+     * Also put it to 'active' if all components are healthy and the status is not already 'active'.
+     * If the storage is in error state, do not update the status (error has priority over health).
+     */
+    $effect(() => {
+        const allowedStatuses: typeof ELEMENT_STATUS[number][] = [ 'active', 'unhealthy' ];
+        const newStatus = isHealthy ? 'active' : 'unhealthy';
+        if (!isLoaded || !allowedStatuses.includes(data.storage.status) || data.storage.status === newStatus) {
+            return;
+        }
+
+        fetchApi<StorageResponse, typeof storagePatchRequest>(
+            'PATCH',
+            `/api/storages/${data.storage.id}`,
+            {
+                status: newStatus,
+            },
+        ).then(() => invalidateAll()); // Invalidate so page has the updated status
+    });
 </script>
 
 <Head title="{data.storage.name} repository health"/>
@@ -76,14 +109,14 @@
 
 <ElementForm title="Repository health">
     <InputContainer helpContent={locksHelpContent} label="Locks">
-        <LocksDisplay/>
+        <LocksDisplay bind:healthy={locksHealthy}/>
     </InputContainer>
 
     <InputContainer helpContent={staleSnapshotsHelpContent} label="Stale snapshots">
-        <StaleSnapshotsDisplay/>
+        <StaleSnapshotsDisplay bind:healthy={staleSnapshotsHealthy}/>
     </InputContainer>
 
     <InputContainer helpContent={pruneDesyncHelpContent} label="Pruned backups desynchronization">
-        <PruneDesyncDisplay/>
+        <PruneDesyncDisplay bind:healthy={pruneDesyncHealthy}/>
     </InputContainer>
 </ElementForm>

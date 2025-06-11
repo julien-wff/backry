@@ -11,9 +11,21 @@
     import type { ResticSnapshot } from '$lib/types/restic';
     import { onMount } from 'svelte';
 
+    interface Props {
+        healthy?: boolean;
+    }
+
+    let { healthy = $bindable() }: Props = $props();
+
     let loading = $state(true);
     let error = $state<string | null>(null);
     let snapshots = $state<ResticSnapshot[] | null>(null);
+
+    $effect(() => {
+        if (!loading) {
+            healthy = !error && !!snapshots && snapshots.length === 0;
+        }
+    });
 
     let snapshotsToDelete = $state<string[]>([]);
     let deleteConfirmDialog = $state<HTMLDialogElement | null>(null);

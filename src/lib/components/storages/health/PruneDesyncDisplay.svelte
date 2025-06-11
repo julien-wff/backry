@@ -6,10 +6,22 @@
     import type { StoragePruneDesyncResponse, storagePruneDesyncUpdateRequest } from '$lib/server/schemas/api';
     import { onMount } from 'svelte';
 
+    interface Props {
+        healthy?: boolean;
+    }
+
+    let { healthy = $bindable() }: Props = $props();
+
     let loading = $state(true);
     let error = $state<string | null>(null);
     let unprunedBackups = $state<StoragePruneDesyncResponse['backups'] | null>(null);
     let idsToMarkAsPruned = $state<number[]>([]);
+
+    $effect(() => {
+        if (!loading) {
+            healthy = !error && !!unprunedBackups && unprunedBackups.length === 0;
+        }
+    });
 
     onMount(() => {
         fetchUnprunedBackups();
