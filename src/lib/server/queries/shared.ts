@@ -105,6 +105,7 @@ export async function getDashboardStats(nextJobParams: ReturnType<typeof getNext
             total: storageStats.length,
             active: storageStats.filter(storage => storage.status === 'active').length,
             error: storageStats.filter(storage => storage.status === 'error').length,
+            unhealthy: storageStats.filter(storage => storage.status === 'unhealthy').length,
         },
         jobs: {
             total: jobsCount.length,
