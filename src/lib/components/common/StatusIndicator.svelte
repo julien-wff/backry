@@ -33,7 +33,7 @@
 
 <div class="tooltip grid place-items-center"
      class:tooltip-error={status === 'error'}
-     class:tooltip-warning={status === 'pruned'}
+     class:tooltip-warning={status === 'pruned' || status === 'unhealthy'}
      data-tip={tooltip}>
     <div class="badge badge-sm"
          class:badge-error={status === 'error'}

@@ -34,7 +34,7 @@
         {/if}
     {/snippet}
 
-    {#if active || inactive || error}
+    {#if active || inactive || error || unhealthy}
         <div class="flex flex-col gap-2 mt-4">
             {@render status('Active', active, 'status-success')}
             {@render status('Inactive', inactive, 'status-neutral')}
