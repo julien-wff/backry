@@ -3,7 +3,7 @@ import { getStorageFromRequest } from '$lib/server/api/storages';
 import { parseRequestBody } from '$lib/server/schemas';
 import { storageStaleSnapshotsDeleteRequest, type StorageStaleSnapshotsResponse } from '$lib/server/schemas/api';
 import { deleteSnapshots } from '$lib/server/services/restic';
-import { getStaleSnapshots, updateStorageHealth } from '$lib/server/storages/health';
+import { getStaleSnapshots } from '$lib/server/storages/health';
 import { type RequestHandler } from '@sveltejs/kit';
 
 /**
@@ -48,9 +48,6 @@ export const DELETE: RequestHandler = async ({ request, params }) => {
     if (res.isErr()) {
         return apiError(res.error.message, 500);
     }
-
-    // Queue health update
-    void updateStorageHealth(storage.value);
 
     return apiSuccess({});
 };
