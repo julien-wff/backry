@@ -1,3 +1,4 @@
+import { formatSize } from '$lib/helpers/format';
 import { db } from '$lib/server/db';
 import { backups, databases, jobs, notifications, storages } from '$lib/server/db/schema';
 import type { getNextJobs } from '$lib/server/shared/cron';
@@ -121,5 +122,42 @@ export async function getDashboardStats(nextJobParams: ReturnType<typeof getNext
         totalStorageSize: parseInt(totalStorageSize[0]?.size ?? '0'),
         averageDumpSize: parseInt(avgBackupSize[0]?.size ?? '0'),
         averageBackupDuration: parseFloat(avgBackupDuration[0]?.duration ?? '0'),
+    };
+}
+
+/**
+ * Get statistics that are exposed on the API, used for things like Homepage
+ */
+export async function getApiStats() {
+    const [ backupsStats, jobsStats, databasesStats, storagesStats, diskStats ] = await Promise.all([
+        db.query.backups.findMany({
+            columns: {
+                error: true,
+                prunedAt: true,
+                finishedAt: true,
+            },
+        }),
+        db.select({ status: jobs.status, count: count() }).from(jobs).groupBy(jobs.status),
+        db.select({ status: databases.status, count: count() }).from(databases).groupBy(databases.status),
+        db.select({ status: storages.status, count: count() }).from(storages).groupBy(storages.status),
+        db.select({ diskSizeTotal: sum(storages.diskSize) }).from(storages),
+    ]);
+
+    return {
+        backupsError: backupsStats.filter(b => b.error).length,
+        backupsPruned: backupsStats.filter(b => !b.error && b.prunedAt).length,
+        backupsSuccess: backupsStats.filter(b => !b.error && !b.prunedAt && b.finishedAt).length,
+        backupsRunning: backupsStats.filter(b => !b.error && !b.prunedAt && !b.finishedAt).length,
+        backupsTotal: backupsStats.length,
+        jobsActive: jobsStats.find(j => j.status === 'active')?.count ?? 0,
+        jobsTotal: jobsStats.reduce((acc, j) => acc + j.count, 0),
+        databasesActive: databasesStats.find(d => d.status === 'active')?.count ?? 0,
+        databasesError: databasesStats.find(d => d.status === 'error')?.count ?? 0,
+        databasesTotal: databasesStats.reduce((acc, d) => acc + d.count, 0),
+        storagesActive: storagesStats.find(s => s.status === 'active')?.count ?? 0,
+        storagesError: storagesStats.find(s => s.status === 'error')?.count ?? 0,
+        storagesUnhealthy: storagesStats.find(s => s.status === 'unhealthy')?.count ?? 0,
+        storagesTotal: storagesStats.reduce((acc, s) => acc + s.count, 0),
+        diskSizeTotal: formatSize(Number.parseInt(diskStats[0].diskSizeTotal ?? '0')),
     };
 }
