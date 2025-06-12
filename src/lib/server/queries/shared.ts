@@ -158,6 +158,7 @@ export async function getApiStats() {
         storagesError: storagesStats.find(s => s.status === 'error')?.count ?? 0,
         storagesUnhealthy: storagesStats.find(s => s.status === 'unhealthy')?.count ?? 0,
         storagesTotal: storagesStats.reduce((acc, s) => acc + s.count, 0),
-        diskSizeTotal: formatSize(Number.parseInt(diskStats[0].diskSizeTotal ?? '0')),
+        diskSizeTotal: Number.parseInt(diskStats[0].diskSizeTotal ?? '0'),
+        diskSizeTotalFormatted: formatSize(Number.parseInt(diskStats[0].diskSizeTotal ?? '0')),
     };
 }
