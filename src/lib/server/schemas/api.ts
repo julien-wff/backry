@@ -9,9 +9,12 @@ import {
     runs,
     storages,
 } from '$lib/server/db/schema';
+import type { Desyncedbackup } from '$lib/server/storages/health';
 import type { ResticError, ResticInit, ResticLock, ResticSnapshot } from '$lib/types/restic';
 import { validateCronExpression } from 'cron';
 import { z } from 'zod';
+
+const EDITABLE_STATUS = [ 'active', 'inactive', 'unhealthy' ] as const satisfies typeof ELEMENT_STATUS[number][];
 
 // DATABASES
 
@@ -51,6 +54,11 @@ export const storageRequest = z.object({
     url: z.string().nonempty(),
     password: z.string().nonempty(),
     env: z.record(z.string()),
+});
+
+/** `PATCH /api/storages/[id]` */
+export const storagePatchRequest = storageRequest.partial().extend({
+    status: z.enum(EDITABLE_STATUS).optional(),
 });
 
 /**
@@ -113,12 +121,7 @@ export const storageStaleSnapshotsDeleteRequest = z.object({
 
 /** `GET /api/storages/[id]/prune-desync` */
 export interface StoragePruneDesyncResponse {
-    backups: Array<{
-        id: number;
-        name: string;
-        startedAt: string;
-        snapshotShortId: string;
-    }>;
+    backups: Desyncedbackup[];
 }
 
 /** `POST /api/storages/[id]/prune-desync` */

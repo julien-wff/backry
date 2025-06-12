@@ -8,9 +8,10 @@
         active?: number;
         inactive?: number;
         error?: number;
+        unhealthy?: number;
     }
 
-    let { title, icon: Icon, href, active, inactive, error }: Props = $props();
+    let { title, icon: Icon, href, active, inactive, error, unhealthy }: Props = $props();
 </script>
 
 
@@ -33,11 +34,12 @@
         {/if}
     {/snippet}
 
-    {#if active || inactive || error}
+    {#if active || inactive || error || unhealthy}
         <div class="flex flex-col gap-2 mt-4">
             {@render status('Active', active, 'status-success')}
             {@render status('Inactive', inactive, 'status-neutral')}
             {@render status('Error', error, 'status-error')}
+            {@render status('Unhealthy', unhealthy, 'status-warning')}
         </div>
     {/if}
 </a>

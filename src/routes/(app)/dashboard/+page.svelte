@@ -38,7 +38,8 @@
                     error={data.stats.storages.error}
                     href="/storages"
                     icon={CloudUpload}
-                    title="{data.stats.storages.total} Storage backends"/>
+                    title="{data.stats.storages.total} Storage backends"
+                    unhealthy={data.stats.storages.unhealthy}/>
         <StatusCard active={data.stats.jobs.active}
                     href="/jobs"
                     icon={Timer}

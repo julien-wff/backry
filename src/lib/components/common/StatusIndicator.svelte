@@ -1,5 +1,13 @@
 <script lang="ts">
-    import { CircleCheck, CirclePlay, CircleX, OctagonAlert, Trash2 } from '$lib/components/icons';
+    import {
+        CircleCheck,
+        CirclePlay,
+        CircleX,
+        HeartCrack,
+        type IconType,
+        OctagonAlert,
+        Trash2,
+    } from '$lib/components/icons';
     import { type BACKUP_STATUS, type ELEMENT_STATUS } from '$lib/server/db/schema';
 
     interface Props {
@@ -8,38 +16,33 @@
     }
 
     let { status, tooltip }: Props = $props();
+
+    const STATUS_MAPPING: Record<typeof status, { label: string, icon: typeof IconType }> = {
+        active: { label: 'Active', icon: CircleCheck },
+        inactive: { label: 'Inactive', icon: CircleX },
+        error: { label: 'Error', icon: OctagonAlert },
+        unhealthy: { label: 'Unhealthy', icon: HeartCrack },
+        running: { label: 'Running', icon: CirclePlay },
+        success: { label: 'Success', icon: CircleCheck },
+        pruned: { label: 'Pruned', icon: Trash2 },
+    };
+
+    const Icon = STATUS_MAPPING[status].icon;
 </script>
 
 
 <div class="tooltip grid place-items-center"
      class:tooltip-error={status === 'error'}
-     class:tooltip-warning={status === 'pruned'}
+     class:tooltip-warning={status === 'pruned' || status === 'unhealthy'}
      data-tip={tooltip}>
     <div class="badge badge-sm"
          class:badge-error={status === 'error'}
          class:badge-info={status === 'running'}
          class:badge-neutral={status === 'inactive'}
          class:badge-success={status === 'active' || status === 'success'}
-         class:badge-warning={status === 'pruned'}>
-        {#if status === 'active'}
-            <CircleCheck class="w-4 h-4"/>
-            Active
-        {:else if status === 'inactive'}
-            <CircleX class="w-4 h-4"/>
-            Inactive
-        {:else if status === 'error'}
-            <OctagonAlert class="w-4 h-4"/>
-            Error
-        {:else if status === 'running'}
-            <CirclePlay class="w-4 h-4"/>
-            Running
-        {:else if status === 'success'}
-            <CircleCheck class="w-4 h-4"/>
-            Success
-        {:else if status === 'pruned'}
-            <Trash2 class="w-4 h-4"/>
-            Pruned
-        {/if}
+         class:badge-warning={status === 'pruned' || status === 'unhealthy'}>
+        <Icon class="w-4 h-4"/>
+        {STATUS_MAPPING[status].label}
     </div>
 </div>
 

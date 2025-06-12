@@ -2,13 +2,26 @@
     import { page } from '$app/state';
     import { LockKeyholeOpen, OctagonAlert, ShieldCheck } from '$lib/components/icons';
     import { fetchApi } from '$lib/helpers/fetch';
+    import { staleLocksCount } from '$lib/helpers/storage';
     import type { StorageLocksResponse } from '$lib/server/schemas/api';
     import type { ResticLock } from '$lib/types/restic';
     import { onMount } from 'svelte';
 
+    interface Props {
+        healthy?: boolean;
+    }
+
+    let { healthy = $bindable() }: Props = $props();
+
     let loading = $state(true);
     let error = $state<string | null>(null);
     let locks = $state<ResticLock[] | null>(null);
+
+    $effect(() => {
+        if (!loading) {
+            healthy = !error && !!locks && staleLocksCount(locks) === 0;
+        }
+    });
 
     onMount(() => {
         fetchLocks();

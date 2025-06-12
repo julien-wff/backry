@@ -7,6 +7,7 @@ import { logger } from '$lib/server/services/logger';
 import { addOrUpdateCronJob } from '$lib/server/shared/cron';
 import { computeToolChecksSuccess } from '$lib/server/shared/tool-checks';
 import { checkAllActiveRepositories } from '$lib/server/storages/checks';
+import { updateAllStoragesHealth } from '$lib/server/storages/health';
 import type { ServerInit } from '@sveltejs/kit';
 import { migrate } from 'drizzle-orm/bun-sql/migrator';
 
@@ -27,6 +28,12 @@ export const init: ServerInit = async () => {
         'system:check-dbs',
         '* * * * *',
         () => checkAllActiveDatabases(),
+    );
+
+    addOrUpdateCronJob(
+        'system:update-storages-health',
+        '5,35 * * * *',
+        () => updateAllStoragesHealth(),
     );
 
     await setUnfinishedBackupsToError();

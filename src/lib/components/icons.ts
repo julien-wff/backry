@@ -25,6 +25,7 @@ import Funnel from '@lucide/svelte/icons/funnel';
 import Hammer from '@lucide/svelte/icons/hammer';
 import HardDrive from '@lucide/svelte/icons/hard-drive';
 import HardDriveDownload from '@lucide/svelte/icons/hard-drive-download';
+import HeartCrack from '@lucide/svelte/icons/heart-crack';
 import History from '@lucide/svelte/icons/history';
 import Info from '@lucide/svelte/icons/info';
 import LayoutDashboard from '@lucide/svelte/icons/layout-dashboard';
@@ -73,6 +74,7 @@ export {
     Hammer,
     HardDrive,
     HardDriveDownload,
+    HeartCrack,
     History,
     Info,
     LayoutDashboard,

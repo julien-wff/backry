@@ -10,9 +10,12 @@
             notifications: number;
             tools: boolean;
         };
+        warnings: {
+            storages: number;
+        };
     }
 
-    const { errors }: Props = $props();
+    const { errors, warnings }: Props = $props();
 </script>
 
 <aside class="fixed top-0 flex h-screen w-28 flex-col gap-8 overflow-y-auto p-2 shadow-md bg-base-100 rounded-r-box">
@@ -24,7 +27,11 @@
     <nav class="flex flex-1 flex-col gap-4">
         <NavbarElement href="/dashboard" icon={LayoutDashboard} label="Dashboard"/>
         <NavbarElement hasError={errors.databases > 0} href="/databases" icon={Database} label="Databases"/>
-        <NavbarElement hasError={errors.storages > 0} href="/storages" icon={CloudUpload} label="Storage"/>
+        <NavbarElement hasError={errors.storages > 0}
+                       hasWarning={warnings.storages > 0}
+                       href="/storages"
+                       icon={CloudUpload}
+                       label="Storage"/>
         <NavbarElement href="/jobs" icon={Timer} label="Jobs"/>
         <NavbarElement hasError={errors.backups > 0} href="/backups" icon={FileCheck} label="Backups"/>
         <!--        <NavbarElement href="/restore" icon={History} label="Restore"/>-->
