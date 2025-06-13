@@ -11,12 +11,17 @@
     import { fetchApi } from '$lib/helpers/fetch';
     import { slugify } from '$lib/helpers/format';
     import type { DATABASE_ENGINES } from '$lib/server/db/schema';
-    import { type databaseRequest, type DatabaseResponse, type databasesCheckRequest } from '$lib/server/schemas/api';
+    import type {
+        DATABASE_ALLOWED_STATUSES,
+        databaseRequest,
+        DatabaseResponse,
+        databasesCheckRequest,
+    } from '$lib/server/schemas/api';
     import type { PageProps } from './$types';
 
     let { data }: PageProps = $props();
     const { searchParams } = page.url;
-    let error = $state<null | string>(null);
+    let error = $state<null | string>(data.database?.error ?? null);
 
     const urlEngine = (searchParams.has('engine') && Object.keys(ENGINES_META).includes(searchParams.get('engine')!)
         ? page.url.searchParams.get('engine')
@@ -89,6 +94,17 @@
         }
         isFormSubmitting = true;
 
+        // Undefined means leave it unchanged
+        let databaseStatus: typeof DATABASE_ALLOWED_STATUSES[number] | undefined = undefined;
+        let databaseError: string | null | undefined = undefined;
+        if (databaseConnectionStatus === 'success') {
+            databaseStatus = 'active';
+            databaseError = null;
+        } else if (databaseConnectionStatus === 'error') {
+            databaseStatus = 'error';
+            databaseError = error;
+        }
+
         const res = await fetchApi<DatabaseResponse, typeof databaseRequest>(
             data.database ? 'PUT' : 'POST',
             data.database ? `/api/databases/${data.database.id}` : '/api/databases',
@@ -97,6 +113,8 @@
                 slug,
                 engine: selectedEngine,
                 connectionString,
+                status: databaseStatus,
+                error: databaseError,
             },
         );
         isFormSubmitting = false;
@@ -175,8 +193,8 @@
             {/if}
         </button>
 
-        <button class="btn btn-primary flex-1" disabled={!databaseConnectionStatus || isFormSubmitting} type="submit">
-            Save
+        <button class="btn btn-primary flex-1" disabled={isFormSubmitting} type="submit">
+            Save {databaseConnectionStatus === 'error' ? 'anyway' : ''}
         </button>
     </div>
 </ElementForm>
