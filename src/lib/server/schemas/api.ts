@@ -12,7 +12,7 @@ import {
 import type { Desyncedbackup } from '$lib/server/storages/health';
 import type { ResticError, ResticInit, ResticLock, ResticSnapshot } from '$lib/types/restic';
 import { validateCronExpression } from 'cron';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 const EDITABLE_STATUS = [ 'active', 'inactive', 'unhealthy' ] as const satisfies typeof ELEMENT_STATUS[number][];
 
@@ -53,7 +53,7 @@ export const storageRequest = z.object({
     name: z.string().min(3),
     url: z.string().nonempty(),
     password: z.string().nonempty(),
-    env: z.record(z.string()),
+    env: z.record(z.string(), z.string()),
 });
 
 /** `PATCH /api/storages/[id]` */
@@ -79,7 +79,7 @@ export const storagesCheckRequest = z.object({
     url: z.string().nonempty(),
     checkRepository: z.boolean().optional(),
     password: z.string().optional(),
-    env: z.record(z.string()).optional(),
+    env: z.record(z.string(), z.string()).optional(),
 });
 
 /** `POST /api/storages/check` */
@@ -94,7 +94,7 @@ export interface StoragesCheckResponse {
 export const storageInitRepositoryRequest = z.object({
     url: z.string().nonempty(),
     password: z.string().nonempty(),
-    env: z.record(z.string()),
+    env: z.record(z.string(), z.string()),
 });
 
 /** `POST /api/storages/init-repository` */
@@ -212,7 +212,7 @@ export interface DockerHostnamesCheckResponse {
 
 /** `POST /api/settings/notifications/test` */
 export const notificationTestRequest = z.object({
-    url: z.string().url().nonempty().trim(),
+    url: z.url().nonempty().trim(),
     body: z.string().nonempty().trim(),
     title: z.string().min(2).trim().optional().nullable(),
 });
