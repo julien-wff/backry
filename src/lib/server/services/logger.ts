@@ -1,6 +1,6 @@
 import pino from 'pino';
 
-const PRETTY_LOGGING = process.env.NODE_ENV !== 'production' || process.env.BACKRY_PRETTY_LOG === 'true';
+const PRETTY_LOGGING = process.env.NODE_ENV !== 'production' || process.env.BACKRY_LOG_PRETTY === 'true';
 
 export const logger = pino({
     ...(PRETTY_LOGGING ? {

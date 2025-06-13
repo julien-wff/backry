@@ -64,6 +64,40 @@ networks:
 - [ ] MariaDB (planned)
 - [ ] Microsoft SQL Server (planned)
 
+## Configuration
+
+Backry can be configured using environment variables. If you're using the provided Docker container, do **not** change
+the database URL or the CLI tools commands.
+
+### Backry
+
+| Environment variable | Description                           | Default value                            |
+|----------------------|---------------------------------------|------------------------------------------|
+| `DATABASE_URL`       | Backry's SQLite database path         | `/app/db/backry.db` (**only in Docker**) |
+| `TZ`                 | Timezone for cron jobs                | System / container timezone              |
+| `BACKRY_LOG_LEVEL`   | [Pino](https://getpino.io/) log level | `info`                                   |
+| `BACKRY_LOG_PRETTY`  | Pretty print logs in development      | `true` if `NODE_ENV !== "production"`    |
+
+### System cron jobs
+
+| Environment variable         | Description                                | Default value                                          |
+|------------------------------|--------------------------------------------|--------------------------------------------------------|
+| `BACKRY_STORAGE_CHECK_CRON`  | Ping storage backend and fetch basic stats | `*/10 * * * *` (every 10 minutes)                      |
+| `BACKRY_DATABASE_CHECK_CRON` | Ping database                              | `*/10 * * * *` (every 10 minutes)                      |
+| `BACKRY_STORAGE_HEALTH_CRON` | Advanced checks for storage backend health | `5,35 * * * *` (every 30 minutes, offset by 5 minutes) |
+
+### CLI tools commands
+
+| Environment variable       | Description               | Default value |
+|----------------------------|---------------------------|---------------|
+| `BACKRY_SQLITE_DUMP_CMD`   | Dump SQLite3 databases    | `sqlite3`     |
+| `BACKRY_POSTGRES_DUMP_CMD` | Dump PostgreSQL databases | `pg_dump`     |
+| `BACKRY_MYSQL_DUMP_CMD`    | Dump MySQL databases      | `mysqldump`   |
+| `BACKRY_MYSQL_CHECK_CMD`   | Check MySQL connection    | `mysql`       |
+| `BACKRY_MONGO_DUMP_CMD`    | Dump MongoDB databases    | `mongodump`   |
+| `BACKRY_RESTIC_CMD`        | Restic command            | `restic`      |
+| `BACKRY_SHOUTRR_CMD`       | Shoutrrr command          | `shoutrrr`    |
+
 ## Why Restic?
 
 Using Restic as the "file system" for Backry is a bold choice, as it's not the tool's primary intended use.
