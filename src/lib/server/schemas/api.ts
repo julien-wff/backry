@@ -14,8 +14,8 @@ import type { ResticError, ResticInit, ResticLock, ResticSnapshot } from '$lib/t
 import { validateCronExpression } from 'cron';
 import { z } from 'zod/v4';
 
-export const DATABASE_ALLOWED_STATUSES = [ 'active', 'error' ] as const satisfies typeof ELEMENT_STATUS[number][];
-export const STORAGE_ALLOWED_STATUSES = [ 'active', 'unhealthy' ] as const satisfies typeof ELEMENT_STATUS[number][];
+export const DATABASE_ALLOWED_STATUSES = [ 'active', 'error' ] as const satisfies readonly typeof ELEMENT_STATUS[number][];
+export const STORAGE_ALLOWED_STATUSES = [ 'active', 'unhealthy' ] as const satisfies readonly typeof ELEMENT_STATUS[number][];
 
 // DATABASES
 
