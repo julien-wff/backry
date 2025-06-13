@@ -20,13 +20,13 @@ export const init: ServerInit = async () => {
     logger.info('Migrations applied successfully, starting up Backry...');
 
     addOrUpdateCronJob('system:check-storages',
-        validCronOrDefault(process.env.BACKRY_STORAGE_CHECK_CRON, '* * * * *', 'storage check'),
+        validCronOrDefault(process.env.BACKRY_STORAGE_CHECK_CRON, '*/10 * * * *', 'storage check'),
         () => checkAllActiveRepositories(),
     );
 
     addOrUpdateCronJob(
         'system:check-dbs',
-        validCronOrDefault(process.env.BACKRY_DATABASE_CHECK_CRON, '* * * * *', 'databases check'),
+        validCronOrDefault(process.env.BACKRY_DATABASE_CHECK_CRON, '*/10 * * * *', 'databases check'),
         () => checkAllActiveDatabases(),
     );
 
