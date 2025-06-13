@@ -14,7 +14,8 @@ import type { ResticError, ResticInit, ResticLock, ResticSnapshot } from '$lib/t
 import { validateCronExpression } from 'cron';
 import { z } from 'zod/v4';
 
-const EDITABLE_STATUS = [ 'active', 'inactive', 'unhealthy' ] as const satisfies typeof ELEMENT_STATUS[number][];
+export const DATABASE_ALLOWED_STATUSES = [ 'active', 'error' ] as const satisfies typeof ELEMENT_STATUS[number][];
+export const STORAGE_ALLOWED_STATUSES = [ 'active', 'unhealthy' ] as const satisfies typeof ELEMENT_STATUS[number][];
 
 // DATABASES
 
@@ -27,6 +28,8 @@ export const databaseRequest = z.object({
     name: z.string().min(2),
     slug: z.string().min(2).regex(/^[a-z0-9-]+$/),
     connectionString: z.string().min(2),
+    status: z.enum(DATABASE_ALLOWED_STATUSES).optional(),
+    error: z.string().min(2).nullable().optional(),
 });
 
 
@@ -58,7 +61,7 @@ export const storageRequest = z.object({
 
 /** `PATCH /api/storages/[id]` */
 export const storagePatchRequest = storageRequest.partial().extend({
-    status: z.enum(EDITABLE_STATUS).optional(),
+    status: z.enum(STORAGE_ALLOWED_STATUSES).optional(),
 });
 
 /**

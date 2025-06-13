@@ -11,7 +11,12 @@
     import { fetchApi } from '$lib/helpers/fetch';
     import { slugify } from '$lib/helpers/format';
     import type { DATABASE_ENGINES } from '$lib/server/db/schema';
-    import { type databaseRequest, type DatabaseResponse, type databasesCheckRequest } from '$lib/server/schemas/api';
+    import type {
+        DATABASE_ALLOWED_STATUSES,
+        databaseRequest,
+        DatabaseResponse,
+        databasesCheckRequest,
+    } from '$lib/server/schemas/api';
     import type { PageProps } from './$types';
 
     let { data }: PageProps = $props();
@@ -89,6 +94,17 @@
         }
         isFormSubmitting = true;
 
+        // Undefined means leave it unchanged
+        let databaseStatus: typeof DATABASE_ALLOWED_STATUSES[number] | undefined = undefined;
+        let databaseError: string | null | undefined = undefined;
+        if (databaseConnectionStatus === 'success') {
+            databaseStatus = 'active';
+            databaseError = null;
+        } else if (databaseConnectionStatus === 'error') {
+            databaseStatus = 'error';
+            databaseError = error;
+        }
+
         const res = await fetchApi<DatabaseResponse, typeof databaseRequest>(
             data.database ? 'PUT' : 'POST',
             data.database ? `/api/databases/${data.database.id}` : '/api/databases',
@@ -97,6 +113,8 @@
                 slug,
                 engine: selectedEngine,
                 connectionString,
+                status: databaseStatus,
+                error: databaseError,
             },
         );
         isFormSubmitting = false;
@@ -176,7 +194,7 @@
         </button>
 
         <button class="btn btn-primary flex-1" disabled={!databaseConnectionStatus || isFormSubmitting} type="submit">
-            Save
+            Save {databaseConnectionStatus === 'error' ? 'anyway' : ''}
         </button>
     </div>
 </ElementForm>
