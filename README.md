@@ -80,11 +80,11 @@ the database URL or the CLI tools commands.
 
 ### System cron jobs
 
-| Environment variable         | Description                                | Default value                                          |
-|------------------------------|--------------------------------------------|--------------------------------------------------------|
-| `BACKRY_STORAGE_CHECK_CRON`  | Ping storage backend and fetch basic stats | `*/10 * * * *` (every 10 minutes)                      |
-| `BACKRY_DATABASE_CHECK_CRON` | Ping database                              | `*/10 * * * *` (every 10 minutes)                      |
-| `BACKRY_STORAGE_HEALTH_CRON` | Advanced checks for storage backend health | `5,35 * * * *` (every 30 minutes, offset by 5 minutes) |
+| Environment variable         | Description                                 | Default value                                          |
+|------------------------------|---------------------------------------------|--------------------------------------------------------|
+| `BACKRY_STORAGE_CHECK_CRON`  | Ping storage backends and fetch basic stats | `*/10 * * * *` (every 10 minutes)                      |
+| `BACKRY_DATABASE_CHECK_CRON` | Ping databases                              | `*/10 * * * *` (every 10 minutes)                      |
+| `BACKRY_STORAGE_HEALTH_CRON` | Advanced checks for storage backends health | `5,35 * * * *` (every 30 minutes, offset by 5 minutes) |
 
 ### CLI tools commands
 
