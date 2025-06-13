@@ -21,7 +21,7 @@
 
     let { data }: PageProps = $props();
     const { searchParams } = page.url;
-    let error = $state<null | string>(null);
+    let error = $state<null | string>(data.database?.error ?? null);
 
     const urlEngine = (searchParams.has('engine') && Object.keys(ENGINES_META).includes(searchParams.get('engine')!)
         ? page.url.searchParams.get('engine')
