@@ -1,5 +1,5 @@
 import { logger } from '$lib/server/services/logger';
-import { CronJob } from 'cron';
+import { CronJob, validateCronExpression } from 'cron';
 
 type SystemCronId = `system:${'check-dbs' | 'check-storages' | 'update-storages-health'}`;
 type JobCronId = `job:${number}`;
@@ -65,4 +65,24 @@ export function getNextJobs(count = 3) {
         .flat()
         .sort((a, b) => a.date.getTime() - b.date.getTime())
         .slice(0, count);
+}
+
+/**
+ * Parse cron from user input / env variable, and if undefined or invalid, uses fallback
+ * @param cron Unsafe cron
+ * @param fallback Fallback cron expression
+ * @param consoleName If specified, will be used to log a warning if the cron is invalid
+ * @return cron expression
+ */
+export function validCronOrDefault(cron: any, fallback: string, consoleName?: string) {
+    if (typeof cron !== 'string' || !cron.trim()) {
+        return fallback;
+    }
+
+    if (validateCronExpression(cron).valid) {
+        return cron;
+    } else {
+        logger.warn(`Invalid cron "${cron}" for ${consoleName}, using fallback "${fallback}"`);
+        return fallback;
+    }
 }
