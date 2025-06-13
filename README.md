@@ -6,6 +6,13 @@
   <p align="center">
     An easy-to-use, fast, and efficient database backup solution based on Restic.
   </p>
+  <p align="center">
+    <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/julien-wff/backry/commit.yaml">
+    <img alt="GitHub Release" src="https://img.shields.io/github/v/release/julien-wff/backry">
+    <img alt="Docker Pulls" src="https://img.shields.io/docker/pulls/cefadrom/backry">
+    <img alt="Docker Image Size" src="https://img.shields.io/docker/image-size/cefadrom/backry">
+    <img alt="GitHub License" src="https://img.shields.io/github/license/julien-wff/backry">
+  </p>
 </p>
 
 ## Features
