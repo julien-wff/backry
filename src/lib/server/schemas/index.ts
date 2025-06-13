@@ -1,6 +1,5 @@
 import { err, ok, type ResultAsync } from 'neverthrow';
-import { z, ZodSchema } from 'zod';
-import { fromError } from 'zod-validation-error';
+import { prettifyError, type z, type ZodType } from 'zod/v4';
 
 /**
  * Parses the request body and validates it against the provided Zod schema.
@@ -8,7 +7,7 @@ import { fromError } from 'zod-validation-error';
  * @param schema The Zod schema to validate the request body against.
  * @returns A ResultAsync containing the parsed and validated data or an error message.
  */
-export async function parseRequestBody<S extends ZodSchema>(request: Request, schema: S): Promise<ResultAsync<z.infer<S>, string>> {
+export async function parseRequestBody<S extends ZodType>(request: Request, schema: S): Promise<ResultAsync<z.infer<S>, string>> {
     let body: unknown;
     try {
         body = await request.json();
@@ -18,7 +17,7 @@ export async function parseRequestBody<S extends ZodSchema>(request: Request, sc
 
     const parsed = schema.safeParse(body);
     if (!parsed.success) {
-        return err(fromError(parsed.error).toString());
+        return err(prettifyError(parsed.error));
     }
 
     return ok(parsed.data);
