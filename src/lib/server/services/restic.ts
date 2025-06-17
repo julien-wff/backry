@@ -227,7 +227,6 @@ export async function getRepositoryLocks(url: string,
             '-r', url,
             'list',
             'locks',
-            '--json',
             '--no-lock',
         ],
         {
