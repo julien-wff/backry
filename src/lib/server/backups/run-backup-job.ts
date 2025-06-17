@@ -10,6 +10,7 @@ import { backupEmitter } from '$lib/server/shared/events';
 import type { EngineMethods } from '$lib/types/engine';
 import { sql } from 'drizzle-orm';
 import { err, ok, type ResultAsync } from 'neverthrow';
+import os from 'node:os';
 import path from 'node:path';
 
 /**
@@ -105,8 +106,9 @@ async function jobDatabaseBackup(
     const startTime = Date.now();
 
     backupEmitter.emit('update', backup);
+    console.log(os.hostname());
 
-    const res = await backupFromCommand(
+    const { result: res, pid } = await backupFromCommand(
         job.storage.url,
         job.storage.password!,
         {
@@ -141,6 +143,7 @@ async function jobDatabaseBackup(
         dumpSpaceAdded: backupSummary?.data_added_packed,
         duration: backupSummary?.total_duration,
         snapshotId: backupSummary?.snapshot_id,
+        resticPid: pid,
     });
 
     backupEmitter.emit('update', updatedBackup);

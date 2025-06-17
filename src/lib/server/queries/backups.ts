@@ -1,6 +1,7 @@
 import { db } from '$lib/server/db';
 import { backups, databases, jobDatabases, jobs, storages } from '$lib/server/db/schema';
 import { and, desc, eq, inArray, isNotNull, isNull, sql } from 'drizzle-orm';
+import os from 'node:os';
 
 export const backupsListFull = async () => db.query.backups.findMany({
     orderBy: [ desc(backups.startedAt) ],
@@ -99,6 +100,7 @@ export const createBackup = async (jobDatabaseId: number, fileName: string, runI
             jobDatabaseId,
             fileName,
             runId,
+            resticHostname: os.hostname(),
         })
         .returning()
         .get();

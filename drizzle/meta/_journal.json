@@ -8,6 +8,13 @@
       "when": 1748800170904,
       "tag": "0000_init",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1750149042690,
+      "tag": "0001_add_restic_pid_and_hostname_to_backup",
+      "breakpoints": true
     }
   ]
 }

@@ -118,6 +118,8 @@ export const backups = sqliteTable('backups', {
     duration: real('duration'),
     snapshotId: text('snapshot_id'),
     prunedAt: text('pruned_at'),
+    resticPid: integer('restic_pid'),
+    resticHostname: text('restic_hostname').notNull(),
 });
 
 export const backupsRelations = relations(backups, ({ one }) => ({

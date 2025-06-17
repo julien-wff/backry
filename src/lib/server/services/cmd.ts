@@ -1,5 +1,5 @@
 import { $ } from 'bun';
-import { err, ok, type ResultAsync } from 'neverthrow';
+import { err, ok, type Result, type ResultAsync } from 'neverthrow';
 
 interface CommandOptions {
     cwd?: string;
@@ -80,7 +80,19 @@ async function readAndDecodeStream<T>(
 }
 
 
-export async function runCommandStream<O, E>(command: string, args: string[] = [], options?: StreamCommandOptions<O, E>): Promise<ResultAsync<O[], (E | Error)[]>> {
+/**
+ * Runs a command in a subprocess and streams the output.
+ * @param command The command to run.
+ * @param args The arguments to pass to the command.
+ * @param options Optional options for the command execution
+ * @return If success, an array of parsed output objects from stdout. Else, an array of errors from stderr.
+ *         Also returns the PID of the subprocess.
+ */
+export async function runCommandStream<O, E>(
+    command: string,
+    args: string[] = [],
+    options?: StreamCommandOptions<O, E>,
+): Promise<{ result: Result<O[], (E | Error)[]>, pid: number }> {
     const subprocess = Bun.spawn([ command, ...args ], {
         cwd: options?.cwd,
         env: options?.env,
@@ -96,16 +108,16 @@ export async function runCommandStream<O, E>(command: string, args: string[] = [
     ]);
 
     if (stdoutResult.isErr()) {
-        return err([ stdoutResult.error ]);
+        return { result: err([ stdoutResult.error ]), pid: subprocess.pid };
     }
 
     if (stderrResult.isErr()) {
-        return err([ stderrResult.error ]);
+        return { result: err([ stderrResult.error ]), pid: subprocess.pid };
     }
 
     if (stderrResult.value.length > 0) {
-        return err(stderrResult.value);
+        return { result: err(stderrResult.value), pid: subprocess.pid };
     }
 
-    return ok(stdoutResult.value);
+    return { result: ok(stdoutResult.value), pid: subprocess.pid };
 }
