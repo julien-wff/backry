@@ -52,7 +52,7 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          target: runtime
+          target: production
           build-args: |
             VERSION=${{ env.IMAGE_TAG }}
             BUILD_DATE=${{ env.BUILD_DATE }}

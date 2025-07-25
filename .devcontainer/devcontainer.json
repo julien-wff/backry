@@ -1,0 +1,59 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+{
+    "name": "Backry",
+    "build": {
+        "dockerfile": "../Dockerfile",
+        "target": "devcontainer"
+    },
+    "workspaceFolder": "/workspaces/backry",
+    "forwardPorts": [
+        5173
+    ],
+    "portsAttributes": {
+        "5173": {
+            "label": "Vite Dev Server",
+            "onAutoForward": "openBrowserOnce"
+        }
+    },
+    "postCreateCommand": "bun i --frozen-lockfile && bun -c run dev",
+    "customizations": {
+        "jetbrains": {
+            "settings": {
+                "org.jetbrains.plugins.terminal:app:TerminalOptionsProvider.myShellPath": "/bin/bash",
+                "org.jetbrains.plugins.terminal:app:TerminalOptionsProvider.myTabName": "Bash"
+            },
+            "backend": "WebStorm"
+        },
+        "vscode": {
+            "extensions": [
+                "svelte.svelte-vscode",
+                "ms-vscode-remote.remote-containers",
+                "esbenp.prettier-vscode",
+                "YoavBls.pretty-ts-errors"
+            ],
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "terminal.integrated.profiles.linux": {
+                    "bash": {
+                        "path": "/bin/bash"
+                    }
+                }
+            }
+        }
+    },
+    "remoteEnv": {
+        "DATABASE_URL": "db/backry.db"
+    },
+    "mounts": [
+        {
+            "source": "/var/run/docker.sock",
+            "target": "/var/run/docker.sock",
+            "type": "bind"
+        },
+        {
+            "source": "backry-db",
+            "target": "/workspaces/backry/db",
+            "type": "volume"
+        }
+    ]
+}

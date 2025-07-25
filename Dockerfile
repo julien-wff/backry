@@ -1,6 +1,8 @@
 ARG BASE_IMAGE=oven/bun:1.2.16-alpine
 
+
 FROM ${BASE_IMAGE} AS binaries
+# Download and prepare binaries for the runtime stage
 
 ARG TARGETARCH
 
@@ -32,7 +34,30 @@ RUN apk add --no-cache \
     chmod +x ./bin/shoutrrr
 
 
+FROM ${BASE_IMAGE} AS runtime
+# Base runtime for the application, with binaries fully ready (dev and prod)
+
+WORKDIR /app
+
+# Install tools
+
+# Some packages have lots of heavy binaries (e.g. mariadb-client, mongodb-tools) that we don't need.
+# Make sure their dependencies are installed, then we copy the binaries from the "binaries" stage.
+RUN apk add --no-cache \
+        # For MongoDB tools
+        krb5-libs \
+        # For MariaDB client
+        mariadb-connector-c \
+        # For MongoDB tools
+        musl \
+        postgresql16-client \
+        sqlite
+
+COPY --from=binaries /app/bin /usr/local/bin/
+
+
 FROM ${BASE_IMAGE} AS builder
+# Prodution build of the application
 
 WORKDIR /app
 
@@ -52,7 +77,16 @@ COPY . .
 RUN bun -c run build
 
 
-FROM ${BASE_IMAGE} AS runtime
+FROM runtime AS devcontainer
+# Development container for the application (source code not included)
+
+RUN apk add --no-cache bash curl git wget && \
+    mkdir -p /workspaces/backry/db && \
+    touch /workspaces/backry/db/backry.db
+
+
+FROM runtime AS production
+# Production container for the application
 
 WORKDIR /app
 
