@@ -145,3 +145,10 @@ If there are any bugs or issues, it's all on me :)
 ## Contributing
 
 If you want to contribute to Backry, feel free to open an issue or a pull request. Any help is welcome!
+
+To easily run the project, you can use the provided devcontainer. It automatically installs all dependencies and
+binaries needed.
+
+<a href="https://codespaces.new/julien-wff/backry/" target="_blank" rel="noopener noreferrer">
+  <img decoding="async" loading="lazy" src="https://github.com/codespaces/badge.svg" alt="Open in GitHub Codespaces" class="img_ev3q">
+</a>
