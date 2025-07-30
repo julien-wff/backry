@@ -5,17 +5,20 @@
     import RunOriginIndicator from '$lib/components/common/RunOriginIndicator.svelte';
     import { EllipsisVertical, ExternalLink, Trash2 } from '$lib/components/icons.js';
     import { fetchApi } from '$lib/helpers/fetch';
-    import type { runsListFull } from '$lib/server/queries/runs';
+    import type { getRunsWithBackupFilter } from '$lib/server/queries/runs';
     import type { RunResponse } from '$lib/server/schemas/api';
     import { addToast } from '$lib/stores/toasts.svelte';
     import dayjs from 'dayjs';
     import { fade } from 'svelte/transition';
+    import type { databases, jobs } from '$lib/server/db/schema';
 
     interface Props {
-        run: Awaited<ReturnType<typeof runsListFull>>[number];
+        run: Awaited<ReturnType<typeof getRunsWithBackupFilter>>['runs'][number];
+        job?: typeof jobs.$inferSelect;
+        databases: Map<number, typeof databases.$inferSelect>;
     }
 
-    let { run }: Props = $props();
+    let { run, job, databases: databasesMap }: Props = $props();
 
     let deleteDialog = $state<HTMLDialogElement>();
     let loading = $state(false);
@@ -46,7 +49,7 @@
     <div class="flex justify-between items-center">
         <div class="flex gap-2 text-sm align-center">
             <RunOriginIndicator origin={run.origin}/>
-            Run #{run.id} - {run.backups[0].jobDatabase.job.name} - {dayjs.utc(run.createdAt).fromNow()}
+            Run #{run.id} - {job?.name || '<ERROR_UNKONWN_JOB>'} - {dayjs.utc(run.createdAt).fromNow()}
         </div>
 
         <div class="dropdown dropdown-end">
@@ -58,18 +61,20 @@
                     <Trash2 class="w-4 h-4"/>
                     Delete whole run
                 </button>
-                <a class="btn btn-soft btn-sm btn-primary"
-                   href="/jobs/{run.backups[0].jobDatabase.job.id}">
-                    <ExternalLink class="w-4 h-4"/>
-                    View job
-                </a>
+                {#if job}
+                    <a class="btn btn-soft btn-sm btn-primary"
+                       href="/jobs/{job.id}">
+                        <ExternalLink class="w-4 h-4"/>
+                        View job
+                    </a>
+                {/if}
             </div>
         </div>
     </div>
 
     {#each run.backups as backup (backup.id)}
         <div transition:fade={{ duration: 300 }}>
-            <BackupElement {backup}/>
+            <BackupElement {backup} database={databasesMap.get(backup.databaseId)}/>
         </div>
     {/each}
 </div>

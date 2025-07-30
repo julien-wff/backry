@@ -2,18 +2,18 @@
     import { invalidateAll } from '$app/navigation';
     import BaseListElement from '$lib/components/common/BaseListElement.svelte';
     import { Clock, ExternalLink, FileChartPie, FileDown, HardDriveDownload, Timer } from '$lib/components/icons';
-    import type { BACKUP_STATUS } from '$lib/server/db/schema';
-    import type { backupsListFull } from '$lib/server/queries/backups';
+    import type { BACKUP_STATUS, backups, databases } from '$lib/server/db/schema';
     import type { BackupResponse } from '$lib/server/schemas/api';
     import { addToast } from '$lib/stores/toasts.svelte';
     import { fetchApi } from '$lib/helpers/fetch';
     import { formatDuration, formatSize, formatUtcDate } from '$lib/helpers/format.js';
 
     interface Props {
-        backup: Omit<Awaited<ReturnType<typeof backupsListFull>>[number], 'run'>;
+        backup: typeof backups.$inferSelect;
+        database?: typeof databases.$inferSelect;
     }
 
-    let { backup }: Props = $props();
+    let { backup, database }: Props = $props();
     let status = $derived(((): typeof BACKUP_STATUS[number] => {
         if (backup.error) {
             return 'error';
@@ -58,11 +58,13 @@
         </div>
     {/if}
 
-    <a class="btn btn-soft btn-sm btn-primary"
-       href="/databases/{backup.jobDatabase.database.id}">
-        <ExternalLink class="w-4 h-4"/>
-        View database
-    </a>
+    {#if database}
+        <a class="btn btn-soft btn-sm btn-primary"
+           href="/databases/{database.id}">
+            <ExternalLink class="w-4 h-4"/>
+            View database
+        </a>
+    {/if}
 {/snippet}
 
 
@@ -73,7 +75,7 @@
                  {secondaryBtns}
                  {status}
                  statusTooltip={backup.prunedAt ? formatUtcDate(backup.prunedAt) : undefined}
-                 title={backup.jobDatabase.database.name}>
+                 title={database?.name ?? '<ERROR_UNKNOWN_DATABASE>'}>
     <div class="flex items-center gap-1">
         <Clock class="w-4 h-4"/>
         Started: {formatUtcDate(backup.startedAt!)}
