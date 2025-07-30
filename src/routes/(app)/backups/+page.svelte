@@ -23,10 +23,10 @@
     }
 
     let { data }: Props = $props();
-    let runs = $state(data.runs);
-    let knownBackupIds = $state(new Set(data.runs.flatMap(run => run.backups.map(backup => backup.id))));
+    let runsData = $state(data.runsData);
+    let knownBackupIds = $state(new Set(data.runsData.runs.flatMap(run => run.backups.map(backup => backup.id))));
     $effect(() => {
-        runs = data.runs;
+        runsData = data.runsData;
     });
 
     onMount(() => {
@@ -38,10 +38,13 @@
             knownBackupIds.add(chunk.id);
             invalidateAll();
         } else {
-            runs = runs.map(run => ({
-                ...run,
-                backups: run.backups.map(backup => (backup.id === chunk.id ? { ...backup, ...chunk } : backup)),
-            }));
+            runsData = {
+                ...runsData,
+                runs: runsData.runs.map(run => ({
+                    ...run,
+                    backups: run.backups.map(backup => (backup.id === chunk.id ? { ...backup, ...chunk } : backup)),
+                })),
+            };
         }
     }
 
@@ -63,8 +66,8 @@
 </PageContentHeader>
 
 <div class="grid grid-cols-1 gap-4">
-    {#each runs as run (run.id)}
-        <RunElement {run}/>
+    {#each runsData.runs as run (run.id)}
+        <RunElement {run} job={runsData.jobs.get(run.jobId)!} databases={runsData.databases}/>
     {/each}
 </div>
 

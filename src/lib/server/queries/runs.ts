@@ -65,35 +65,55 @@ export async function getRunsWithBackupFilter(jobId: number | null, databaseId: 
 
     // Group backups by run ID
     // In rows, each row contains a run and a single backup (runs are duplicated for each backup)
-    const backupsMap = new Map<number, (typeof backups.$inferSelect)[]>();
+    const backupsMap = new Map<number, (typeof backups.$inferSelect & { databaseId: number })[]>();
     for (const row of rows) {
         if (!backupsMap.has(row.runs.id)) {
             backupsMap.set(row.runs.id, []);
         }
-        backupsMap.get(row.runs.id)!.push(row.backups);
+        backupsMap.get(row.runs.id)!.push({
+            ...row.backups,
+            databaseId: row.databases.id,
+        });
     }
 
-    return rows
-        .map(row => ({
-            ...row.runs,
-            backups: backupsMap.get(row.runs.id) || [],
-            database: row.databases,
-            job: row.jobs,
-        }))
-        .filter(run => {
-            // Ensure there is at least one backup that matches the filters
-            if (run.backups.length === 0) {
-                return false;
-            }
+    const databasesMap = new Map<number, typeof databases.$inferSelect>();
+    for (const row of rows) {
+        if (!databasesMap.has(row.databases.id)) {
+            databasesMap.set(row.databases.id, row.databases);
+        }
+    }
 
-            // Deduplicate runs using the backups map keys
-            if (!backupsMap.has(run.id)) {
-                return false;
-            }
+    const jobsMap = new Map<number, typeof jobs.$inferSelect>();
+    for (const row of rows) {
+        if (!jobsMap.has(row.jobs.id)) {
+            jobsMap.set(row.jobs.id, row.jobs);
+        }
+    }
 
-            backupsMap.delete(run.id);
-            return true;
-        });
+    return {
+        runs: rows
+            .map(row => ({
+                ...row.runs,
+                jobId: row.jobs.id,
+                backups: backupsMap.get(row.runs.id) || [],
+            }))
+            .filter(run => {
+                // Ensure there is at least one backup that matches the filters
+                if (run.backups.length === 0) {
+                    return false;
+                }
+
+                // Deduplicate runs using the backups map keys
+                if (!backupsMap.has(run.id)) {
+                    return false;
+                }
+
+                backupsMap.delete(run.id);
+                return true;
+            }),
+        databases: databasesMap,
+        jobs: jobsMap,
+    };
 }
 
 

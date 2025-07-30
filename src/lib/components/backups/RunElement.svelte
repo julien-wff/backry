@@ -10,12 +10,15 @@
     import { addToast } from '$lib/stores/toasts.svelte';
     import dayjs from 'dayjs';
     import { fade } from 'svelte/transition';
+    import type { databases, jobs } from '$lib/server/db/schema';
 
     interface Props {
-        run: Awaited<ReturnType<typeof getRunsWithBackupFilter>>[number];
+        run: Awaited<ReturnType<typeof getRunsWithBackupFilter>>['runs'][number];
+        job: typeof jobs.$inferSelect;
+        databases: Map<number, typeof databases.$inferSelect>;
     }
 
-    let { run }: Props = $props();
+    let { run, job, databases: databasesMap }: Props = $props();
 
     let deleteDialog = $state<HTMLDialogElement>();
     let loading = $state(false);
@@ -46,7 +49,7 @@
     <div class="flex justify-between items-center">
         <div class="flex gap-2 text-sm align-center">
             <RunOriginIndicator origin={run.origin}/>
-            Run #{run.id} - {run.job.name} - {dayjs.utc(run.createdAt).fromNow()}
+            Run #{run.id} - {job.name} - {dayjs.utc(run.createdAt).fromNow()}
         </div>
 
         <div class="dropdown dropdown-end">
@@ -59,7 +62,7 @@
                     Delete whole run
                 </button>
                 <a class="btn btn-soft btn-sm btn-primary"
-                   href="/jobs/{run.job.id}">
+                   href="/jobs/{job.id}">
                     <ExternalLink class="w-4 h-4"/>
                     View job
                 </a>
@@ -69,7 +72,7 @@
 
     {#each run.backups as backup (backup.id)}
         <div transition:fade={{ duration: 300 }}>
-            <BackupElement {backup} database={run.database}/>
+            <BackupElement {backup} database={databasesMap.get(backup.databaseId)!}/>
         </div>
     {/each}
 </div>

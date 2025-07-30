@@ -12,14 +12,14 @@ export const load: PageServerLoad = async ({ url }) => {
     const databaseId = !isNaN(parseInt(rawDatabaseId ?? '')) ? parseInt(rawDatabaseId!) : null;
     const status = ([ 'success', 'error', 'pruned' ].includes(rawStatus!) ? rawStatus : null) as 'success' | 'error' | 'pruned' | null;
 
-    const [ runs, jobs, databases ] = await Promise.all([
+    const [ runsData, jobs, databases ] = await Promise.all([
         getRunsWithBackupFilter(jobId, databaseId, status),
         jobListLimited(),
         databasesList(),
     ]);
 
     return {
-        runs,
+        runsData,
         jobs,
         databases,
     };
