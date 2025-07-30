@@ -10,7 +10,7 @@
 
     interface Props {
         backup: typeof backups.$inferSelect;
-        database: typeof databases.$inferSelect;
+        database?: typeof databases.$inferSelect;
     }
 
     let { backup, database }: Props = $props();
@@ -58,11 +58,13 @@
         </div>
     {/if}
 
-    <a class="btn btn-soft btn-sm btn-primary"
-       href="/databases/{database.id}">
-        <ExternalLink class="w-4 h-4"/>
-        View database
-    </a>
+    {#if database}
+        <a class="btn btn-soft btn-sm btn-primary"
+           href="/databases/{database.id}">
+            <ExternalLink class="w-4 h-4"/>
+            View database
+        </a>
+    {/if}
 {/snippet}
 
 
@@ -73,7 +75,7 @@
                  {secondaryBtns}
                  {status}
                  statusTooltip={backup.prunedAt ? formatUtcDate(backup.prunedAt) : undefined}
-                 title={database.name}>
+                 title={database?.name ?? '<ERROR_UNKNOWN_DATABASE>'}>
     <div class="flex items-center gap-1">
         <Clock class="w-4 h-4"/>
         Started: {formatUtcDate(backup.startedAt!)}

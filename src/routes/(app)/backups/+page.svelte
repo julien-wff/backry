@@ -67,7 +67,7 @@
 
 <div class="grid grid-cols-1 gap-4">
     {#each runsData.runs as run (run.id)}
-        <RunElement {run} job={runsData.jobs.get(run.jobId)!} databases={runsData.databases}/>
+        <RunElement {run} job={runsData.jobs.get(run.jobId)} databases={runsData.databases}/>
     {/each}
 </div>
 

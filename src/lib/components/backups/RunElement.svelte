@@ -14,7 +14,7 @@
 
     interface Props {
         run: Awaited<ReturnType<typeof getRunsWithBackupFilter>>['runs'][number];
-        job: typeof jobs.$inferSelect;
+        job?: typeof jobs.$inferSelect;
         databases: Map<number, typeof databases.$inferSelect>;
     }
 
@@ -49,7 +49,7 @@
     <div class="flex justify-between items-center">
         <div class="flex gap-2 text-sm align-center">
             <RunOriginIndicator origin={run.origin}/>
-            Run #{run.id} - {job.name} - {dayjs.utc(run.createdAt).fromNow()}
+            Run #{run.id} - {job?.name || '<ERROR_UNKONWN_JOB>'} - {dayjs.utc(run.createdAt).fromNow()}
         </div>
 
         <div class="dropdown dropdown-end">
@@ -61,18 +61,20 @@
                     <Trash2 class="w-4 h-4"/>
                     Delete whole run
                 </button>
-                <a class="btn btn-soft btn-sm btn-primary"
-                   href="/jobs/{job.id}">
-                    <ExternalLink class="w-4 h-4"/>
-                    View job
-                </a>
+                {#if job}
+                    <a class="btn btn-soft btn-sm btn-primary"
+                       href="/jobs/{job.id}">
+                        <ExternalLink class="w-4 h-4"/>
+                        View job
+                    </a>
+                {/if}
             </div>
         </div>
     </div>
 
     {#each run.backups as backup (backup.id)}
         <div transition:fade={{ duration: 300 }}>
-            <BackupElement {backup} database={databasesMap.get(backup.databaseId)!}/>
+            <BackupElement {backup} database={databasesMap.get(backup.databaseId)}/>
         </div>
     {/each}
 </div>
