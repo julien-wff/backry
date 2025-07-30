@@ -64,9 +64,7 @@
 
 <div class="grid grid-cols-1 gap-4">
     {#each runs as run (run.id)}
-        {#if run.backups.length > 0}
-            <RunElement {run}/>
-        {/if}
+        <RunElement {run}/>
     {/each}
 </div>
 
