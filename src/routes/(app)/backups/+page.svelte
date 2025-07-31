@@ -29,6 +29,8 @@
         runsData = data.runsData;
     });
 
+    let backupCount = $derived(runsData.runs.reduce((acc, run) => acc + run.backups.length, 0));
+
     onMount(() => {
         return subscribeApi('/api/backups/subscribe', handleSubscriptionUpdate);
     });
@@ -56,13 +58,17 @@
     );
 </script>
 
-<Head title="Backups"/>
+<Head title="Latest backups"/>
 
 <PageContentHeader icon={FileCheck}
                    onsecondarybuttonclick={() => filterModal?.showModal()}
                    secondaryButtonText={filterCount > 0 ? `Filters (${filterCount})` : undefined}
                    secondaryButtonType="filter">
-    Backups
+    {#if backupCount <= 1}
+        Latest backups
+    {:else}
+        Latest {backupCount} backups
+    {/if}
 </PageContentHeader>
 
 <div class="grid grid-cols-1 gap-4">
