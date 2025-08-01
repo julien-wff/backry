@@ -127,6 +127,8 @@ export async function getRunsWithBackupFilter({ jobId, databaseId, status, limit
             }),
         databases: databasesMap,
         jobs: jobsMap,
+        nextPageCursor: rows.length > 0 ? rows.at(-1)!.backups.id : null, // Last backup ID as cursor
+        limit: limit ?? 200,
     };
 }
 
