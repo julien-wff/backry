@@ -26,9 +26,23 @@
     );
 
     const backupsStore = new BackupsStore(() => data.runsData);
+    let bottomElement: HTMLElement;
 
     onMount(() => {
-        return backupsStore.subscribe();
+        const unsubscribeStore = backupsStore.subscribe();
+        const observer = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                backupsStore.fetchNextPage(page.url.searchParams);
+            }
+        }, {
+            rootMargin: '400px',
+        });
+        observer.observe(bottomElement);
+
+        return () => {
+            unsubscribeStore();
+            observer.disconnect();
+        };
     });
 </script>
 
@@ -51,7 +65,10 @@
     {/each}
 </div>
 
-<button class="btn btn-primary btn-soft" onclick={() => backupsStore.fetchNextPage(page.url.searchParams)}>
+<button class="btn btn-primary btn-soft"
+        bind:this={bottomElement}
+        onclick={() => backupsStore.fetchNextPage(page.url.searchParams)}
+        disabled={!backupsStore.isMoreAvailable}>
     Load more
 </button>
 

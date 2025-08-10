@@ -19,11 +19,12 @@ export class BackupsStore {
     private _knownApiBackupIds = new Set();
     private _apiJobs = $state<Map<number, ApiRunsQueryResult['jobs'][number]>>(new Map());
     private _apiDatabases = $state<Map<number, ApiRunsQueryResult['databases'][number]>>(new Map());
+    private _lastFetchedCount = $state(0);
 
     // Shared data
     private readonly _jobs: PageRunsQueryResult['jobs'];
     private readonly _databases: PageRunsQueryResult['databases'];
-    private _fetchLimit: number;
+    private readonly _fetchLimit: number;
 
     // Derived values
     readonly backupCount;
@@ -44,6 +45,9 @@ export class BackupsStore {
         this._knownPageBackupIds = $derived(BackupsStore._runsMapToBackupIds(this._pageRuns));
         this._pageJobs = $derived(data().jobs);
         this._pageDatabases = $derived(data().databases);
+
+        // API data
+        this._lastFetchedCount = data().runs.reduce((count, run) => count + run.backups.length, 0);
 
         // Shared data
         this._fetchLimit = data().limit;
@@ -148,7 +152,7 @@ export class BackupsStore {
 
     async fetchNextPage(params?: URLSearchParams) {
         const lastBackupId = this.runs.at(-1)?.backups.at(-1)?.id;
-        if (!lastBackupId) {
+        if (!lastBackupId || !this.isMoreAvailable) {
             return;
         }
 
@@ -163,9 +167,19 @@ export class BackupsStore {
         }
 
         const data = res.value;
+        this._lastFetchedCount = data.runs.reduce((count, run) => count + run.backups.length, 0);
         this._apiRuns = BackupsStore._mergeRuns(this._apiRuns, BackupsStore._arrayToMap(data.runs));
         this._knownApiBackupIds = BackupsStore._runsMapToBackupIds(this._apiRuns);
         this._apiJobs = BackupsStore._arrayToMap([ ...this._apiJobs.values(), ...data.jobs ]);
         this._apiDatabases = BackupsStore._arrayToMap([ ...this._apiDatabases.values(), ...data.databases ]);
+    }
+
+    /**
+     * Checks if there are more backups available to fetch.
+     * @return True if there are more backups, false otherwise
+     */
+    get isMoreAvailable() {
+        // If we fetched less than the limit, there are no more backups to fetch
+        return this._lastFetchedCount === this._fetchLimit;
     }
 }
