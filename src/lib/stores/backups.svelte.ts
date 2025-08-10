@@ -73,7 +73,6 @@ export class BackupsStore {
      * @private
      */
     private _handleSubscriptionUpdate(chunk: BackupUpdateEventPayload) {
-        // TODO: Live update doesn't work
         // TODO: An update on an API backup would call invalidateAll() indefinitely
         if (!this._knownPageBackupIds.has(chunk.id) && !this._knownApiBackupIds.has(chunk.id)) {
             // If the backup is not known, it means it's a new one, so get it via page load function
@@ -82,7 +81,6 @@ export class BackupsStore {
             this._knownPageBackupIds.add(chunk.id);
         } else if (this._knownPageBackupIds.has(chunk.id)) {
             // If the backup is known in the page runs, update it
-            console.log('Updating backup in page runs:', chunk.id);
             this._pageRuns = BackupsStore._updateRunBackup(this._pageRuns, chunk);
         } else if (this._knownApiBackupIds.has(chunk.id)) {
             // If the backup is known in the API runs, update it
@@ -100,7 +98,7 @@ export class BackupsStore {
             ...run,
             backups: run.backups.map(backup => (backup.id === chunk.id ? { ...backup, ...chunk } : backup)),
         });
-        return runs;
+        return new Map(runs);
     }
 
     /**
