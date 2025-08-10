@@ -187,7 +187,12 @@ export type BackupResponse = typeof backups.$inferSelect;
 // RUNS
 
 /** `GET /api/runs` */
-export type RunsQueryResult = Awaited<ReturnType<typeof getRunsWithBackupFilter>>;
+type GetRunsResult = Awaited<ReturnType<typeof getRunsWithBackupFilter>>;
+// Convert maps to arrays to JSON stringify properly
+export type RunsQueryResult = Omit<GetRunsResult, 'jobs' | 'databases'> & {
+    jobs: Array<GetRunsResult['jobs'] extends Map<any, infer I> ? I : never>;
+    databases: Array<GetRunsResult['databases'] extends Map<any, infer I> ? I : never>;
+}
 
 /** `DELETE /api/runs/[id]` */
 export type RunResponse = typeof runs.$inferSelect;

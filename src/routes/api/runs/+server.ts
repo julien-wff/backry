@@ -24,5 +24,9 @@ export const GET: RequestHandler = async ({ url }) => {
         limit,
     });
 
-    return apiSuccess<RunsQueryResult>(runsData);
+    return apiSuccess<RunsQueryResult>({
+        ...runsData,
+        jobs: [ ...runsData.jobs.values() ],
+        databases: [ ...runsData.databases.values() ],
+    });
 };

@@ -1,26 +1,28 @@
-import type { RunsQueryResult } from '$lib/server/schemas/api';
+import type { RunsQueryResult as ApiRunsQueryResult } from '$lib/server/schemas/api';
 import { fetchApi, subscribeApi } from '$lib/helpers/fetch';
 import type { BackupUpdateEventPayload } from '$lib/server/shared/events';
 import { invalidateAll } from '$app/navigation';
+import type { getRunsWithBackupFilter } from '$lib/server/queries/runs';
 
-type Run = RunsQueryResult['runs'][number];
+type PageRunsQueryResult = Awaited<ReturnType<typeof getRunsWithBackupFilter>>;
+type Run = PageRunsQueryResult['runs'][number];
 
 export class BackupsStore {
     // Page runs (coming from +page.server.ts)
     private _pageRuns: Map<number, Run>;
     private readonly _knownPageBackupIds: Set<number>;
-    private readonly _pageJobs: RunsQueryResult['jobs'];
-    private readonly _pageDatabases: RunsQueryResult['databases'];
+    private readonly _pageJobs: PageRunsQueryResult['jobs'];
+    private readonly _pageDatabases: PageRunsQueryResult['databases'];
 
     // API runs (coming from page scroll)
     private _apiRuns = $state<Map<number, Run>>(new Map());
     private _knownApiBackupIds = new Set();
-    private _apiJobs = $state<RunsQueryResult['jobs']>(new Map());
-    private _apiDatabases = $state<RunsQueryResult['databases']>(new Map());
+    private _apiJobs = $state<Map<number, ApiRunsQueryResult['jobs'][number]>>(new Map());
+    private _apiDatabases = $state<Map<number, ApiRunsQueryResult['databases'][number]>>(new Map());
 
     // Shared data
-    private readonly _jobs: RunsQueryResult['jobs'];
-    private readonly _databases: RunsQueryResult['databases'];
+    private readonly _jobs: PageRunsQueryResult['jobs'];
+    private readonly _databases: PageRunsQueryResult['databases'];
     private _fetchLimit: number;
 
     // Derived values
@@ -36,7 +38,7 @@ export class BackupsStore {
     }
 
     // Methods
-    constructor(data: () => RunsQueryResult) {
+    constructor(data: () => PageRunsQueryResult) {
         // Page data
         this._pageRuns = $derived(BackupsStore._arrayToMap(data().runs));
         this._knownPageBackupIds = $derived(BackupsStore._runsMapToBackupIds(this._pageRuns));
@@ -53,7 +55,7 @@ export class BackupsStore {
         this._databases = $derived(BackupsStore._arrayToMap([ ...this._pageDatabases.values(), ...this._apiDatabases.values() ]));
     }
 
-    getRunJob(run: RunsQueryResult['runs'][number]) {
+    getRunJob(run: Run) {
         return this._jobs.get(run.jobId);
     }
 
@@ -156,7 +158,7 @@ export class BackupsStore {
         params.set('cursor', lastBackupId.toString());
         params.set('limit', this._fetchLimit.toString());
 
-        const res = await fetchApi<RunsQueryResult>('GET', `/api/runs?${params}`, null);
+        const res = await fetchApi<ApiRunsQueryResult>('GET', `/api/runs?${params}`, null);
         if (res.isErr()) {
             console.error('Failed to fetch next page of backups:', res.error);
             return;
@@ -165,8 +167,7 @@ export class BackupsStore {
         const data = res.value;
         this._apiRuns = BackupsStore._mergeRuns(this._apiRuns, BackupsStore._arrayToMap(data.runs));
         this._knownApiBackupIds = BackupsStore._runsMapToBackupIds(this._apiRuns);
-        // TODO: no job or database is returned from the API
-        this._apiJobs = BackupsStore._arrayToMap([ ...this._apiJobs.values(), ...data.jobs.values() ]);
-        this._apiDatabases = BackupsStore._arrayToMap([ ...this._apiDatabases.values(), ...data.databases.values() ]);
+        this._apiJobs = BackupsStore._arrayToMap([ ...this._apiJobs.values(), ...data.jobs ]);
+        this._apiDatabases = BackupsStore._arrayToMap([ ...this._apiDatabases.values(), ...data.databases ]);
     }
 }
