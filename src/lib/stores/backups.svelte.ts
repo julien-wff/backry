@@ -182,4 +182,12 @@ export class BackupsStore {
         // If we fetched less than the limit, there are no more backups to fetch
         return this._lastFetchedCount === this._fetchLimit;
     }
+
+    resetApiData() {
+        this._apiRuns = new Map();
+        this._knownApiBackupIds = new Set();
+        this._apiJobs = new Map();
+        this._apiDatabases = new Map();
+        this._lastFetchedCount = this._pageRuns.values().reduce((count, run) => count + run.backups.length, 0);
+    }
 }

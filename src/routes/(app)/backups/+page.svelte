@@ -73,5 +73,7 @@
 </button>
 
 <Modal bind:modal={filterModal} title="Filter backups">
-    <BackupFilterModalContent databases={data.databases} jobs={data.jobs}/>
+    <BackupFilterModalContent databases={data.databases}
+                              jobs={data.jobs}
+                              onupdated={() => backupsStore.resetApiData()}/>
 </Modal>
