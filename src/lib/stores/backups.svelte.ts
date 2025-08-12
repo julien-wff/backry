@@ -38,6 +38,24 @@ export class BackupsStore {
         return this._databases;
     }
 
+    /**
+     * Checks if there are more backups available to fetch.
+     * @return True if there are more backups, false otherwise
+     */
+    get isMoreAvailable() {
+        // If we fetched less than the limit, there are no more backups to fetch
+        return this._lastFetchedCount === this._fetchLimit;
+    }
+
+    /**
+     * Get the job associated with a run.
+     * @param run Run to get the job for
+     * @return Job associated with the run, or undefined if not found
+     */
+    getRunJob(run: Run) {
+        return this._jobs.get(run.jobId);
+    }
+
     // Methods
     constructor(data: () => PageRunsQueryResult) {
         // Page data
@@ -57,10 +75,6 @@ export class BackupsStore {
         );
         this._jobs = $derived(BackupsStore._arrayToMap([ ...this._pageJobs.values(), ...this._apiJobs.values() ]));
         this._databases = $derived(BackupsStore._arrayToMap([ ...this._pageDatabases.values(), ...this._apiDatabases.values() ]));
-    }
-
-    getRunJob(run: Run) {
-        return this._jobs.get(run.jobId);
     }
 
     /**
@@ -92,6 +106,12 @@ export class BackupsStore {
         }
     }
 
+    /**
+     * Updates a run in the given runs map with the provided backup update chunk.
+     * @param runs Map of runs to update
+     * @param chunk Backup update chunk containing the run ID and backup details
+     * @private
+     */
     private static _updateRunBackup(runs: Map<number, Run>, chunk: BackupUpdateEventPayload) {
         const run = runs.values().find(run => run.backups.some(backup => backup.id === chunk.id));
         if (!run) {
@@ -150,6 +170,10 @@ export class BackupsStore {
         ));
     }
 
+    /**
+     * Fetch the next page of backups from the API, and add them to the API store.
+     * @param params Optional URLSearchParams to pass to the API, containing page filters.
+     */
     async fetchNextPage(params?: URLSearchParams) {
         const lastBackupId = this.runs.at(-1)?.backups.at(-1)?.id;
         if (!lastBackupId || !this.isMoreAvailable) {
@@ -175,14 +199,9 @@ export class BackupsStore {
     }
 
     /**
-     * Checks if there are more backups available to fetch.
-     * @return True if there are more backups, false otherwise
+     * Clear all fetched data from the API.
+     * Useful when filters are changed.
      */
-    get isMoreAvailable() {
-        // If we fetched less than the limit, there are no more backups to fetch
-        return this._lastFetchedCount === this._fetchLimit;
-    }
-
     resetApiData() {
         this._apiRuns = new Map();
         this._knownApiBackupIds = new Set();
