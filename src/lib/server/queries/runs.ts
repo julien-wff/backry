@@ -74,7 +74,7 @@ export async function getRunsWithBackupFilter({ jobId, databaseId, status, limit
             eq(jobDatabases.jobId, jobs.id),
         )
         .where(and(...filters))
-        .limit(limit ?? 200)
+        .limit(limit ?? 20)
         .orderBy(desc(runs.id), desc(backups.id));
 
     // Group backups by run ID
@@ -127,6 +127,8 @@ export async function getRunsWithBackupFilter({ jobId, databaseId, status, limit
             }),
         databases: databasesMap,
         jobs: jobsMap,
+        nextPageCursor: rows.length > 0 ? rows.at(-1)!.backups.id : null, // Last backup ID as cursor
+        limit: limit ?? 20,
     };
 }
 

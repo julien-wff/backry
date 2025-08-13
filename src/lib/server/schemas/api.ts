@@ -13,6 +13,7 @@ import type { Desyncedbackup } from '$lib/server/storages/health';
 import type { ResticError, ResticInit, ResticLock, ResticSnapshot } from '$lib/types/restic';
 import { validateCronExpression } from 'cron';
 import { z } from 'zod/v4';
+import type { getRunsWithBackupFilter } from '$lib/server/queries/runs';
 
 export const DATABASE_ALLOWED_STATUSES = [ 'active', 'error' ] as const satisfies readonly typeof ELEMENT_STATUS[number][];
 export const STORAGE_ALLOWED_STATUSES = [ 'active', 'unhealthy' ] as const satisfies readonly typeof ELEMENT_STATUS[number][];
@@ -184,6 +185,14 @@ export const jobRunRequest = z.object({
 export type BackupResponse = typeof backups.$inferSelect;
 
 // RUNS
+
+/** `GET /api/runs` */
+type GetRunsResult = Awaited<ReturnType<typeof getRunsWithBackupFilter>>;
+// Convert maps to arrays to JSON stringify properly
+export type RunsQueryResult = Omit<GetRunsResult, 'jobs' | 'databases'> & {
+    jobs: Array<GetRunsResult['jobs'] extends Map<any, infer I> ? I : never>;
+    databases: Array<GetRunsResult['databases'] extends Map<any, infer I> ? I : never>;
+}
 
 /** `DELETE /api/runs/[id]` */
 export type RunResponse = typeof runs.$inferSelect;
