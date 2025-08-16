@@ -22,8 +22,10 @@
     }
 
     let { data }: Props = $props();
-    let apiData = $state<typeof data['runsData'] | null>(null);
-    let runsData = $derived<typeof data['runsData']>(mergeData(data.runsData, apiData));
+    type RunsData = typeof data['runsData'];
+
+    let apiData = $state<RunsData | null>(null);
+    let runsData = $derived(mergeData(data.runsData, apiData));
 
     let filterModal = $state<HTMLDialogElement>();
     let filterCount = $derived(
@@ -64,12 +66,16 @@
         }
     }
 
-    function mergeData(baseData: typeof data['runsData'], newData: typeof data['runsData'] | null): typeof data['runsData'] {
+    function mergeData(baseData: RunsData, newData: RunsData | null): RunsData {
         const runs = [ ...baseData.runs ];
         for (const newRun of (newData?.runs ?? [])) {
-            const baseRun = runs.find(br => br.id === newRun.id);
-            if (baseRun) {
-                baseRun.backups = [ ...baseRun.backups, ...newRun.backups ];
+            const baseRunIdx = runs.findIndex(br => br.id === newRun.id);
+            const baseRun = runs[baseRunIdx];
+            if (baseRunIdx !== -1) {
+                runs[baseRunIdx] = {
+                    ...baseRun,
+                    backups: [ ...baseRun.backups, ...newRun.backups ],
+                };
             } else {
                 runs.push(newRun);
             }
@@ -82,6 +88,43 @@
             jobs: new Map([ ...baseData.jobs.entries(), ...(newData?.jobs.entries() ?? []) ]),
             databases: new Map([ ...baseData.databases.entries(), ...(newData?.databases.entries() ?? []) ]),
         });
+    }
+
+    function handleRunDelete(deletedRun: RunsData['runs'][number]) {
+        if (apiData?.runs.find(apiRun => apiRun.id === deletedRun.id)) {
+            // If the run is in the current API data, remove it from there
+            apiData.runs = apiData.runs.filter(apiRun => apiRun.id !== deletedRun.id);
+        } else if (apiData) {
+            // If the run is in the page data, remove the x first backups from the API data, since invalidateAll will
+            // load them into the page data
+            // x is the number of backups in the deleted run
+            const backupsToRemove = deletedRun.backups.length;
+            for (let i = 0; i < backupsToRemove; i++) {
+                const firstNonEmptyRun = apiData.runs.findIndex(r => r.backups.length > 0);
+                if (firstNonEmptyRun === -1) {
+                    break; // No more runs with backups to remove
+                }
+                apiData.runs[firstNonEmptyRun].backups = apiData.runs[firstNonEmptyRun].backups.slice(1);
+            }
+        }
+    }
+
+    function handleBackupDelete(deletedBackup: RunsData['runs'][number]['backups'][number]) {
+        if (apiData?.runs.find(apiRun => apiRun.backups.some(apiBackup => apiBackup.id === deletedBackup.id))) {
+            // Remove the backup from the API data
+            apiData.runs = apiData.runs.map(apiRun => ({
+                ...apiRun,
+                backups: apiRun.backups.filter(apiBackup => apiBackup.id !== deletedBackup.id),
+            }));
+        } else if (apiData) {
+            // If the backup is in the page data, remove the first backup of the first run, since invalidateAll will
+            // load it into the API data
+            const firstRunWithBackups = apiData.runs.findIndex(apiRun => apiRun.backups.length > 0);
+            if (firstRunWithBackups === -1) {
+                return; // No runs with backups to remove
+            }
+            apiData.runs[firstRunWithBackups].backups = apiData.runs[firstRunWithBackups].backups.slice(1);
+        }
     }
 
     let bottomElement: HTMLElement;
@@ -112,8 +155,12 @@
 </PageContentHeader>
 
 <div class="grid grid-cols-1 gap-4">
-    {#each runsData.runs as run (run.id)}
-        <RunElement {run} job={runsData.jobs.get(run.jobId)} databases={runsData.databases}/>
+    {#each runsData.runs.filter(r => r.backups.length > 0) as run (run.id)}
+        <RunElement {run}
+                    job={runsData.jobs.get(run.jobId)}
+                    databases={runsData.databases}
+                    onrundeleted={() => handleRunDelete(run)}
+                    onbackupdeleted={handleBackupDelete}/>
     {/each}
 </div>
 

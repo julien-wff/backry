@@ -11,9 +11,10 @@
     interface Props {
         backup: typeof backups.$inferSelect;
         database?: typeof databases.$inferSelect;
+        ondelete?: () => void;
     }
 
-    let { backup, database }: Props = $props();
+    let { backup, database, ondelete }: Props = $props();
     let status = $derived(((): typeof BACKUP_STATUS[number] => {
         if (backup.error) {
             return 'error';
@@ -34,6 +35,7 @@
 
         if (res.isOk()) {
             await invalidateAll();
+            ondelete?.();
         } else {
             addToast(`Failed to delete backup #${backup.id}: ${res.error}`, 'error');
         }
