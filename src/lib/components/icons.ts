@@ -30,6 +30,7 @@ import History from '@lucide/svelte/icons/history';
 import Info from '@lucide/svelte/icons/info';
 import LayoutDashboard from '@lucide/svelte/icons/layout-dashboard';
 import Link from '@lucide/svelte/icons/link';
+import ListCheck from '@lucide/svelte/icons/list-check';
 import LockKeyholeOpen from '@lucide/svelte/icons/lock-keyhole-open';
 import OctagonAlert from '@lucide/svelte/icons/octagon-alert';
 import PackageOpen from '@lucide/svelte/icons/package-open';
@@ -79,6 +80,7 @@ export {
     Info,
     LayoutDashboard,
     Link,
+    ListCheck,
     LockKeyholeOpen,
     OctagonAlert,
     PackageOpen,

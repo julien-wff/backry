@@ -13,7 +13,7 @@ export const load: PageServerLoad = async ({ url }) => {
     const status = ([ 'success', 'error', 'pruned' ].includes(rawStatus!) ? rawStatus : null) as 'success' | 'error' | 'pruned' | null;
 
     const [ runsData, jobs, databases ] = await Promise.all([
-        getRunsWithBackupFilter({ jobId, databaseId, status, limit: 20 }),
+        getRunsWithBackupFilter({ jobId, databaseId, status, limit: 21 }),
         jobListLimited(),
         databasesList(),
     ]);

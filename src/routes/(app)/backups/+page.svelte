@@ -6,7 +6,7 @@
     import Head from '$lib/components/common/Head.svelte';
     import Modal from '$lib/components/common/Modal.svelte';
     import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
-    import { FileCheck } from '$lib/components/icons';
+    import { FileCheck, ListCheck } from '$lib/components/icons';
     import { subscribeApi } from '$lib/helpers/fetch';
     import type { BackupUpdateEventPayload } from '$lib/server/shared/events';
     import dayjs from 'dayjs';
@@ -60,7 +60,9 @@
 
 <Head title="Latest backups"/>
 
-<PageContentHeader icon={FileCheck}
+<PageContentHeader buttonText="See all"
+                   buttonType={(backupCount < runsData.limit && filterCount === 0) ? null : 'all'}
+                   icon={FileCheck}
                    onsecondarybuttonclick={() => filterModal?.showModal()}
                    secondaryButtonText={filterCount > 0 ? `Filters (${filterCount})` : undefined}
                    secondaryButtonType="filter">
@@ -76,6 +78,11 @@
         <RunElement {run} job={runsData.jobs.get(run.jobId)} databases={runsData.databases}/>
     {/each}
 </div>
+
+<a class="btn btn-primary btn-soft" data-sveltekit-noscroll href="backups/all">
+    <ListCheck class="w-4 h-4"/>
+    See all
+</a>
 
 <Modal bind:modal={filterModal} title="Filter backups">
     <BackupFilterModalContent databases={data.databases} jobs={data.jobs}/>

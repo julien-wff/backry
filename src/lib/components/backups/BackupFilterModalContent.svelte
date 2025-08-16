@@ -8,9 +8,10 @@
     interface Props {
         jobs: Awaited<ReturnType<typeof jobListLimited>>;
         databases: typeof databasesSchema.$inferSelect[];
+        onfilterschange?: () => void;
     }
 
-    let { jobs, databases }: Props = $props();
+    let { jobs, databases, onfilterschange }: Props = $props();
 
     function intParam(key: string) {
         const value = page.url.searchParams.get(key);
@@ -28,7 +29,7 @@
         applyFilters();
     }
 
-    function applyFilters() {
+    async function applyFilters() {
         const params = page.url.searchParams;
 
         if (selectedJobId) {
@@ -49,7 +50,8 @@
             params.delete('status');
         }
 
-        goto(`?${params.toString()}`, { invalidateAll: true });
+        await goto(`?${params.toString()}`, { invalidateAll: true, replaceState: true });
+        onfilterschange?.();
     }
 </script>
 
