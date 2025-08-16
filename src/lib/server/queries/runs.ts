@@ -23,7 +23,7 @@ export const updateRun = (id: number, payload: Partial<typeof runs.$inferInsert>
  * @param jobId Job ID to filter by, or null for no filter.
  * @param databaseId Database ID to filter by, or null for no filter.
  * @param status Status to filter by: 'success', 'error', 'pruned', or null for no filter.
- * @param limit Maximum number of **backups** to return, defaults to 200. Descending order by ID.
+ * @param limit Maximum number of **backups** to return, defaults to 20. Descending order by ID.
  * @param cursor Cursor for pagination, only used if limit is set.
  *               If provided, only returns **backups** with IDs lower than the cursor.
  * @return Array of runs with their backups and related data.
@@ -35,6 +35,8 @@ export async function getRunsWithBackupFilter({ jobId, databaseId, status, limit
     limit?: number,
     cursor?: number,
 }) {
+    limit ??= 20;
+
     const filters: SQL[] = [];
     if (jobId !== null) {
         filters.push(eq(jobDatabases.jobId, jobId));
@@ -74,7 +76,7 @@ export async function getRunsWithBackupFilter({ jobId, databaseId, status, limit
             eq(jobDatabases.jobId, jobs.id),
         )
         .where(and(...filters))
-        .limit(limit ?? 20)
+        .limit(limit)
         .orderBy(desc(runs.id), desc(backups.id));
 
     // Group backups by run ID
@@ -127,8 +129,8 @@ export async function getRunsWithBackupFilter({ jobId, databaseId, status, limit
             }),
         databases: databasesMap,
         jobs: jobsMap,
-        nextPageCursor: rows.length > 0 ? rows.at(-1)!.backups.id : null, // Last backup ID as cursor
-        limit: limit ?? 20,
+        nextPageCursor: rows.length === limit ? rows.at(-1)!.backups.id : null, // Last backup ID as cursor
+        limit,
     };
 }
 
