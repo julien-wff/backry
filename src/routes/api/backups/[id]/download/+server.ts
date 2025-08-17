@@ -2,7 +2,6 @@ import { getBackup } from '$lib/server/queries/backups';
 import { streamFileContent } from '$lib/server/services/restic';
 import { logger } from '$lib/server/services/logger';
 import { error, type RequestHandler } from '@sveltejs/kit';
-import { formatSize } from '$lib/helpers/format';
 
 export const GET: RequestHandler = async ({ params }) => {
     const backupId = parseInt(params.id || '');
@@ -17,10 +16,6 @@ export const GET: RequestHandler = async ({ params }) => {
 
     if (backup.error || !backup.finishedAt || !backup.snapshotId || !backup.dumpSize) {
         return error(400, 'Backup is not in a successful state');
-    }
-
-    if (backup.dumpSize > 10e6) {
-        return error(400, `File too large to download (${formatSize(backup.dumpSize)} > 10 MB)`);
     }
 
     const storage = backup.jobDatabase.job.storage;
