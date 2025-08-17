@@ -1,7 +1,7 @@
 import { NOTIFICATION_PAYLOAD_EXAMPLE, renderNotificationTemplate } from '$lib/editors/notification-template';
 import type { notificationRequest } from '$lib/server/schemas/api';
 import { err, ok, Result } from 'neverthrow';
-import type { z } from 'zod/v4';
+import type { z } from 'zod';
 
 /**
  * Make sure all EJS templates in the notification compile successfully.

@@ -1,7 +1,7 @@
 import type { ApiResponse } from '$lib/server/api/responses';
 import type { BackupUpdateEventPayload } from '$lib/server/shared/events';
 import { err, ok, ResultAsync } from 'neverthrow';
-import type { z, ZodType } from 'zod/v4';
+import type { z, ZodType } from 'zod';
 
 /**
  * Fetch API wrapper

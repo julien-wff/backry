@@ -12,7 +12,7 @@ import {
 import type { Desyncedbackup } from '$lib/server/storages/health';
 import type { ResticError, ResticInit, ResticLock, ResticSnapshot } from '$lib/types/restic';
 import { validateCronExpression } from 'cron';
-import { z } from 'zod/v4';
+import { z } from 'zod';
 import type { getRunsWithBackupFilter } from '$lib/server/queries/runs';
 
 export const DATABASE_ALLOWED_STATUSES = [ 'active', 'error' ] as const satisfies readonly typeof ELEMENT_STATUS[number][];
