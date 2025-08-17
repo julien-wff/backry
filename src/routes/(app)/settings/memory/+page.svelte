@@ -50,8 +50,7 @@
 
         <a class="btn btn-primary btn-soft w-full mb-2"
            download
-           href="/api/settings/memory/heap-snapshot"
-           role="button">
+           href="/api/settings/memory/heap-snapshot">
             <HardDriveDownload class="w-4 h-4"/>
             Download heap snapshot
         </a>
