@@ -345,10 +345,18 @@ export async function streamFileContent(url: string,
 
     // Collect stderr asynchronously (without blocking streaming of stdout)
     void (async () => {
-        while (true) {
-            const { done, value } = await stderrReader.read();
-            if (done) break;
-            if (value) stderrChunks.push(value);
+        try {
+            while (true) {
+                const { done, value } = await stderrReader.read();
+                if (done) break;
+                if (value) stderrChunks.push(value);
+            }
+        } finally {
+            try {
+                stderrReader.releaseLock();
+            } catch (e) {
+                logger.warn(e, 'Failed to release stderr reader lock');
+            }
         }
     })();
 
@@ -356,6 +364,11 @@ export async function streamFileContent(url: string,
         async pull(controller) {
             const { done, value } = await stdoutReader.read();
             if (done) {
+                try {
+                    stdoutReader.releaseLock();
+                } catch (e) {
+                    logger.warn(e, 'Failed to release stdout reader lock');
+                }
                 controller.close();
                 return;
             }
