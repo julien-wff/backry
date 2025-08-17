@@ -52,7 +52,7 @@ export async function getRunsWithBackupFilter({ jobId, databaseId, status, limit
         filters.push(isNull(backups.error), isNull(backups.prunedAt), isNotNull(backups.finishedAt));
     }
 
-    if (limit && cursor) {
+    if (limit && cursor !== undefined) {
         filters.push(lt(backups.id, cursor));
     }
 
@@ -76,8 +76,8 @@ export async function getRunsWithBackupFilter({ jobId, databaseId, status, limit
             eq(jobDatabases.jobId, jobs.id),
         )
         .where(and(...filters))
-        .limit(limit)
-        .orderBy(desc(runs.id), desc(backups.id));
+        .orderBy(desc(runs.id), desc(backups.id))
+        .limit(limit);
 
     // Group backups by run ID
     // In rows, each row contains a run and a single backup (runs are duplicated for each backup)
