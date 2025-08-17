@@ -25,7 +25,6 @@
         "@types/bun": "^1.2.20",
         "@types/dockerode": "^3.3.42",
         "@types/ejs": "^3.1.5",
-        "@types/mongodb": "^4.0.7",
         "cron": "^4.3.3",
         "daisyui": "^5.0.50",
         "dayjs": "^1.11.13",
