@@ -51,7 +51,7 @@
         <div class="tooltip-warning"
              class:tooltip={isBigFile}
              data-tip="Big file: Backry's RAM usage will increase during download.">
-            <a download
+            <a download={backup.fileName}
                href="/api/backups/{backup.id}/download"
                class="btn btn-sm btn-soft w-full"
                class:btn-success={!isBigFile}
