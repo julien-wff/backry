@@ -95,7 +95,7 @@
 {#snippet pruneDesyncHelpContent()}
     <p class="mb-2">
         Backry automatically prunes backups based on the defined retention policy. This process involves deleting
-        snapshots in Restic and updating Backry's database. However, the Restic repository is modified directly
+        snapshots in Restic and updating Backry's database. However, if the Restic repository is modified directly
         (e.g., using Restic commands outside of Backry), Backry's record of which backups are active or pruned might no
         longer match the actual state of your repository. This is a "desynchronization."
     </p>
