@@ -39,18 +39,14 @@
         {/if}
 
         {#if buttonType === 'new'}
-            <a href="{page.url.pathname}/new">
-                <button class="btn btn-primary">
-                    <Plus class="w-4 h-4"/>
-                    {buttonText ?? 'Add new'}
-                </button>
+            <a href="{page.url.pathname}/new" class="btn btn-primary">
+                <Plus class="w-4 h-4"/>
+                {buttonText ?? 'Add new'}
             </a>
         {:else if buttonType === 'all'}
-            <a href="{page.url.pathname}/all">
-                <button class="btn btn-primary">
-                    <ListCheck class="w-4 h-4"/>
-                    {buttonText ?? 'See all'}
-                </button>
+            <a href="{page.url.pathname}/all" class="btn btn-primary">
+                <ListCheck class="w-4 h-4"/>
+                {buttonText ?? 'See all'}
             </a>
         {:else if buttonType === 'back'}
             <button class="btn btn-primary btn-soft" onclick={() => window.history.back()}>
