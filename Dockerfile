@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=oven/bun:1.2.16-alpine
+ARG BASE_IMAGE=oven/bun:1.2.20-alpine
 
 
 FROM ${BASE_IMAGE} AS binaries
@@ -7,7 +7,7 @@ FROM ${BASE_IMAGE} AS binaries
 ARG TARGETARCH
 
 ARG RESTIC_VERSION=0.18.0
-ARG SHOUTRRR_VERSION=0.8.14
+ARG SHOUTRRR_VERSION=0.8.17
 
 WORKDIR /app
 
@@ -30,7 +30,7 @@ RUN apk add --no-cache \
     SHOUTRRR_URL=$(if [ "$TARGETARCH" = "amd64" ]; then echo "$SHOUTRRR_URL_AMD64"; else echo "$SHOUTRRR_URL_ARM64"; fi) && \
     wget ${SHOUTRRR_URL} -O shoutrrr.tar.gz && \
     tar -xzf shoutrrr.tar.gz && \
-    mv shoutrrr/shoutrrr ./bin/shoutrrr && \
+    mv ./shoutrrr ./bin/shoutrrr && \
     chmod +x ./bin/shoutrrr
 
 

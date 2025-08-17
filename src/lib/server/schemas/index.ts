@@ -1,5 +1,5 @@
 import { err, ok, type ResultAsync } from 'neverthrow';
-import { prettifyError, type z, type ZodType } from 'zod/v4';
+import { prettifyError, type z, type ZodType } from 'zod';
 
 /**
  * Parses the request body and validates it against the provided Zod schema.

@@ -388,7 +388,7 @@ export async function streamFileContent(url: string,
         const exitCode = await subprocess.exited;
         if (exitCode !== 0) {
             // Attempt to parse stderr as restic JSON error, else fallback to raw text
-            const stderrText = (await new Blob(stderrChunks).text()).trim();
+            const stderrText = (await new Blob(stderrChunks as BlobPart[]).text()).trim();
             try {
                 return err(JSON.parse(stderrText));
             } catch {
