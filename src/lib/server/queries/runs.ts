@@ -49,7 +49,7 @@ export async function getRunsWithBackupFilter({ jobId, databaseId, status, limit
     } else if (status === 'pruned') {
         filters.push(isNotNull(backups.prunedAt));
     } else if (status === 'success') {
-        filters.push(isNull(backups.error), isNull(backups.prunedAt));
+        filters.push(isNull(backups.error), isNull(backups.prunedAt), isNotNull(backups.finishedAt));
     }
 
     if (limit && cursor) {
