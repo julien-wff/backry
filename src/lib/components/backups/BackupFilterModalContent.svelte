@@ -4,6 +4,8 @@
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
     import type { databases as databasesSchema } from '$lib/server/db/schema';
     import type { jobListLimited } from '$lib/server/queries/jobs';
+    import { positiveInt } from '$lib/helpers/parse';
+    import { itemFromList } from '$lib/helpers/parse.js';
 
     interface Props {
         jobs: Awaited<ReturnType<typeof jobListLimited>>;
@@ -13,14 +15,12 @@
 
     let { jobs, databases, onfilterschange }: Props = $props();
 
-    function intParam(key: string) {
-        const value = page.url.searchParams.get(key);
-        return isNaN(parseInt(value ?? '')) ? null : parseInt(value!);
-    }
-
-    let selectedJobId = $state<number | null>(intParam('job'));
-    let selectedDatabaseId = $state<number | null>(intParam('database'));
-    let selectedStatus = $state<string | null>(page.url.searchParams.get('status'));
+    let selectedJobId = $derived(positiveInt(page.url.searchParams.get('job')));
+    let selectedDatabaseId = $derived(positiveInt(page.url.searchParams.get('database')));
+    let selectedStatus = $derived(itemFromList(
+        page.url.searchParams.get('status'),
+        [ 'success', 'pruned', 'error' ],
+    ));
 
     function resetFilters() {
         selectedJobId = null;
