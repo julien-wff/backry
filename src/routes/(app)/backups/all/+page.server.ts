@@ -6,7 +6,7 @@ import { parseBackupFilters } from '$lib/server/api/backups';
 
 export const load: PageServerLoad = async ({ url }) => {
     const [ runsData, jobs, databases ] = await Promise.all([
-        getRunsWithBackupFilter({ ...parseBackupFilters(url.searchParams), limit: 20 }),
+        getRunsWithBackupFilter({ ...parseBackupFilters(url.searchParams), limit: 21 }),
         jobListLimited(),
         databasesList(),
     ]);

@@ -12,16 +12,34 @@
     import { fade } from 'svelte/transition';
     import type { databases, jobs } from '$lib/server/db/schema';
 
+    type Run = Awaited<ReturnType<typeof getRunsWithBackupFilter>>['runs'][number];
+
     interface Props {
-        run: Awaited<ReturnType<typeof getRunsWithBackupFilter>>['runs'][number];
+        run: Run;
         job?: typeof jobs.$inferSelect;
         databases: Map<number, typeof databases.$inferSelect>;
+        onrundeleted?: () => void;
+        onbackupdeleted?: (backup: Run['backups'][number]) => void;
     }
 
-    let { run, job, databases: databasesMap }: Props = $props();
+    let { run, job, databases: databasesMap, onrundeleted, onbackupdeleted }: Props = $props();
 
     let deleteDialog = $state<HTMLDialogElement>();
     let loading = $state(false);
+
+    // We deduplicated backups because when a page data run is deleted, the invalidateAll() will fetch one or more backups
+    // that already exist inside the API runs, just before they are manually removed via the onrundeleted callback.
+    let deduplicatedBackups = $derived([
+        ...run.backups.reduce(
+            (acc, backup) => {
+                if (!acc.has(backup.id)) {
+                    acc.set(backup.id, backup);
+                }
+                return acc;
+            },
+            new Map<number, typeof run.backups[number]>(),
+        ).values(),
+    ]);
 
     function handleDeleteRun(ev: MouseEvent) {
         if (ev.shiftKey) {
@@ -37,6 +55,7 @@
         const res = await fetchApi<RunResponse>('DELETE', `/api/runs/${run.id}`, null);
         if (res.isOk()) {
             await invalidateAll();
+            onrundeleted?.();
         } else {
             addToast(`Failed to delete run #${run.id}: ${res.error}`, 'error');
         }
@@ -72,9 +91,11 @@
         </div>
     </div>
 
-    {#each run.backups as backup (backup.id)}
+    {#each deduplicatedBackups as backup (backup.id)}
         <div transition:fade={{ duration: 300 }}>
-            <BackupElement {backup} database={databasesMap.get(backup.databaseId)}/>
+            <BackupElement {backup}
+                           database={databasesMap.get(backup.databaseId)}
+                           ondelete={() => onbackupdeleted?.(backup)}/>
         </div>
     {/each}
 </div>

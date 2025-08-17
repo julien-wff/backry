@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db';
 import { backups, databases, jobDatabases, jobs, RUN_ORIGIN, runs } from '$lib/server/db/schema';
-import { and, desc, eq, isNotNull, isNull, type SQL } from 'drizzle-orm';
+import { and, desc, eq, isNotNull, isNull, lt, type SQL } from 'drizzle-orm';
 
 /**
  * Create a new run in the database.
@@ -23,9 +23,20 @@ export const updateRun = (id: number, payload: Partial<typeof runs.$inferInsert>
  * @param jobId Job ID to filter by, or null for no filter.
  * @param databaseId Database ID to filter by, or null for no filter.
  * @param status Status to filter by: 'success', 'error', 'pruned', or null for no filter.
+ * @param limit Maximum number of **backups** to return, defaults to 20. Descending order by ID.
+ * @param cursor Cursor for pagination, only used if limit is set.
+ *               If provided, only returns **backups** with IDs lower than the cursor.
  * @return Array of runs with their backups and related data.
  */
-export async function getRunsWithBackupFilter(jobId: number | null, databaseId: number | null, status: 'success' | 'error' | 'pruned' | null) {
+export async function getRunsWithBackupFilter({ jobId, databaseId, status, limit, cursor }: {
+    jobId: number | null,
+    databaseId: number | null,
+    status: 'success' | 'error' | 'pruned' | null,
+    limit?: number,
+    cursor?: number,
+}) {
+    limit ??= 20;
+
     const filters: SQL[] = [];
     if (jobId !== null) {
         filters.push(eq(jobDatabases.jobId, jobId));
@@ -38,7 +49,11 @@ export async function getRunsWithBackupFilter(jobId: number | null, databaseId: 
     } else if (status === 'pruned') {
         filters.push(isNotNull(backups.prunedAt));
     } else if (status === 'success') {
-        filters.push(isNull(backups.error), isNull(backups.prunedAt));
+        filters.push(isNull(backups.error), isNull(backups.prunedAt), isNotNull(backups.finishedAt));
+    }
+
+    if (limit && cursor !== undefined) {
+        filters.push(lt(backups.id, cursor));
     }
 
     const rows = await db
@@ -61,7 +76,8 @@ export async function getRunsWithBackupFilter(jobId: number | null, databaseId: 
             eq(jobDatabases.jobId, jobs.id),
         )
         .where(and(...filters))
-        .orderBy(desc(runs.createdAt), desc(backups.startedAt));
+        .orderBy(desc(runs.id), desc(backups.id))
+        .limit(limit);
 
     // Group backups by run ID
     // In rows, each row contains a run and a single backup (runs are duplicated for each backup)
@@ -113,6 +129,8 @@ export async function getRunsWithBackupFilter(jobId: number | null, databaseId: 
             }),
         databases: databasesMap,
         jobs: jobsMap,
+        nextPageCursor: rows.length === limit ? rows.at(-1)!.backups.id : null, // Last backup ID as cursor
+        limit,
     };
 }
 

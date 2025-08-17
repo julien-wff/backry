@@ -1,12 +1,12 @@
 <script lang="ts">
     import { page } from '$app/state';
-    import { ChevronLeft, Funnel, type IconType, Plus } from '$lib/components/icons';
+    import { ChevronLeft, Funnel, type IconType, ListCheck, Plus } from '$lib/components/icons';
     import type { Snippet } from 'svelte';
 
     interface Props {
         children: Snippet;
         icon: typeof IconType;
-        buttonType?: null | 'back' | 'new';
+        buttonType?: null | 'back' | 'new' | 'all';
         buttonText?: string;
         secondaryButtonType?: null | 'filter';
         secondaryButtonText?: string;
@@ -39,11 +39,14 @@
         {/if}
 
         {#if buttonType === 'new'}
-            <a href="{page.url.pathname}/new">
-                <button class="btn btn-primary">
-                    <Plus class="w-4 h-4"/>
-                    {buttonText ?? 'Add new'}
-                </button>
+            <a href="{page.url.pathname}/new" class="btn btn-primary">
+                <Plus class="w-4 h-4"/>
+                {buttonText ?? 'Add new'}
+            </a>
+        {:else if buttonType === 'all'}
+            <a href="{page.url.pathname}/all" class="btn btn-primary">
+                <ListCheck class="w-4 h-4"/>
+                {buttonText ?? 'See all'}
             </a>
         {:else if buttonType === 'back'}
             <button class="btn btn-primary btn-soft" onclick={() => window.history.back()}>

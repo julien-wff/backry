@@ -4,22 +4,22 @@
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
     import type { databases as databasesSchema } from '$lib/server/db/schema';
     import type { jobListLimited } from '$lib/server/queries/jobs';
+    import { itemFromList, positiveInt } from '$lib/helpers/parse';
 
     interface Props {
         jobs: Awaited<ReturnType<typeof jobListLimited>>;
         databases: typeof databasesSchema.$inferSelect[];
+        onfilterschange?: () => void;
     }
 
-    let { jobs, databases }: Props = $props();
+    let { jobs, databases, onfilterschange }: Props = $props();
 
-    function intParam(key: string) {
-        const value = page.url.searchParams.get(key);
-        return isNaN(parseInt(value ?? '')) ? null : parseInt(value!);
-    }
-
-    let selectedJobId = $state<number | null>(intParam('job'));
-    let selectedDatabaseId = $state<number | null>(intParam('database'));
-    let selectedStatus = $state<string | null>(page.url.searchParams.get('status'));
+    let selectedJobId = $derived(positiveInt(page.url.searchParams.get('job')));
+    let selectedDatabaseId = $derived(positiveInt(page.url.searchParams.get('database')));
+    let selectedStatus = $derived(itemFromList(
+        page.url.searchParams.get('status'),
+        [ 'success', 'pruned', 'error' ],
+    ));
 
     function resetFilters() {
         selectedJobId = null;
@@ -28,7 +28,7 @@
         applyFilters();
     }
 
-    function applyFilters() {
+    async function applyFilters() {
         const params = page.url.searchParams;
 
         if (selectedJobId) {
@@ -49,7 +49,8 @@
             params.delete('status');
         }
 
-        goto(`?${params.toString()}`, { invalidateAll: true });
+        await goto(`?${params.toString()}`, { invalidateAll: true, replaceState: true });
+        onfilterschange?.();
     }
 </script>
 
