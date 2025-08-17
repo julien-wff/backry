@@ -30,7 +30,7 @@ RUN apk add --no-cache \
     SHOUTRRR_URL=$(if [ "$TARGETARCH" = "amd64" ]; then echo "$SHOUTRRR_URL_AMD64"; else echo "$SHOUTRRR_URL_ARM64"; fi) && \
     wget ${SHOUTRRR_URL} -O shoutrrr.tar.gz && \
     tar -xzf shoutrrr.tar.gz && \
-    mv shoutrrr/shoutrrr ./bin/shoutrrr && \
+    mv ./shoutrrr ./bin/shoutrrr && \
     chmod +x ./bin/shoutrrr
 
 
