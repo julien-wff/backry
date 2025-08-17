@@ -13,6 +13,7 @@
     import { fetchApi } from '$lib/helpers/fetch';
     import type { RunsQueryResult } from '$lib/server/schemas/api';
     import { onMount } from 'svelte';
+    import NoBackupWIthFiltersAlert from '$lib/components/backups/NoBackupWIthFiltersAlert.svelte';
 
     dayjs.extend(relativeTime);
     dayjs.extend(utc);
@@ -166,11 +167,16 @@
 
 <button bind:this={bottomElement}
         class="btn btn-primary btn-soft"
+        class:hidden={runsData.runs.length === 0}
         disabled={runsData.nextPageCursor === null}
         onclick={loadMoreRuns}>
     <Plus class="w-4 h-4"/>
     Load more
 </button>
+
+{#if runsData.runs.length === 0 && filterCount > 0}
+    <NoBackupWIthFiltersAlert {filterCount}/>
+{/if}
 
 <Modal bind:modal={filterModal} title="Filter backups">
     <BackupFilterModalContent databases={data.databases} jobs={data.jobs} onfilterschange={resetApiData}/>
