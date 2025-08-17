@@ -11,11 +11,14 @@
     let { data }: PageProps = $props();
 
     let autoRefresh = $state(true);
+    let refreshing = $state(false);
 
     onMount(() => {
-        const timer = setInterval(() => {
-            if (!document.hidden && autoRefresh) {
-                invalidateAll();
+        const timer = setInterval(async () => {
+            if (!document.hidden && autoRefresh && !refreshing) {
+                refreshing = true;
+                await invalidateAll();
+                refreshing = false;
             }
         }, 1000);
 
