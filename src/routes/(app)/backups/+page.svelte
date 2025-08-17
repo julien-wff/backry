@@ -79,9 +79,17 @@
     {/each}
 </div>
 
-<a class="btn btn-primary btn-soft" data-sveltekit-noscroll href="backups/all">
+<a class="btn btn-primary btn-soft"
+   class:btn-disabled={runsData.nextPageCursor === null}
+   data-sveltekit-noscroll
+   href="backups/all?{page.url.searchParams}"
+   role="button">
     <ListCheck class="w-4 h-4"/>
-    See all
+    {#if filterCount > 0}
+        See more ({filterCount} filter{filterCount > 1 ? 's' : ''})
+    {:else}
+        See all
+    {/if}
 </a>
 
 <Modal bind:modal={filterModal} title="Filter backups">
