@@ -1,7 +1,8 @@
-import { formatSize } from '$lib/helpers/format';
 import { getBackup } from '$lib/server/queries/backups';
-import { readFileContent } from '$lib/server/services/restic';
+import { streamFileContent } from '$lib/server/services/restic';
+import { logger } from '$lib/server/services/logger';
 import { error, type RequestHandler } from '@sveltejs/kit';
+import { formatSize } from '$lib/helpers/format';
 
 export const GET: RequestHandler = async ({ params }) => {
     const backupId = parseInt(params.id || '');
@@ -23,7 +24,9 @@ export const GET: RequestHandler = async ({ params }) => {
     }
 
     const storage = backup.jobDatabase.job.storage;
-    const content = await readFileContent(
+
+    // Stream the file content to avoid buffering the entire file in memory
+    const { stream, exitPromise } = await streamFileContent(
         storage.url,
         storage.password!,
         storage.env,
@@ -31,15 +34,21 @@ export const GET: RequestHandler = async ({ params }) => {
         backup.fileName,
     );
 
-    if (content.isErr()) {
-        return error(500, content.error.message);
-    }
+    // Log restic exit status asynchronously
+    exitPromise
+        .then((res) => {
+            if (res.isErr()) {
+                logger.error(`Failed streaming backup ${backup.id}: ${res.error.message}`);
+            }
+        })
+        .catch((e) => logger.error(`Unexpected stream error for backup ${backup.id}: ${e}`));
 
-    return new Response(content.value.join('\n'), {
+    return new Response(stream, {
         status: 200,
         headers: {
             'Content-Type': 'application/sql',
             'Content-Disposition': `attachment; filename="${backup.fileName}"`,
+            'Content-Length': backup.dumpSize.toString(),
             'Cache-Control': 'no-store',
             'Pragma': 'no-cache',
         },
