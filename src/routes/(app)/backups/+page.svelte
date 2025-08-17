@@ -14,7 +14,7 @@
     import utc from 'dayjs/plugin/utc';
     import { onMount } from 'svelte';
     import type { PageData } from './$types';
-    import NoBackupWIthFiltersAlert from '$lib/components/backups/NoBackupWIthFiltersAlert.svelte';
+    import NoBackupWithFiltersAlert from '$lib/components/backups/NoBackupWithFiltersAlert.svelte';
 
     dayjs.extend(relativeTime);
     dayjs.extend(utc);
@@ -95,7 +95,7 @@
 </a>
 
 {#if runsData.runs.length === 0 && filterCount > 0}
-    <NoBackupWIthFiltersAlert {filterCount}/>
+    <NoBackupWithFiltersAlert {filterCount}/>
 {/if}
 
 <Modal bind:modal={filterModal} title="Filter backups">
