@@ -41,7 +41,7 @@ export const GET: RequestHandler = async ({ params }) => {
     return new Response(stream, {
         status: 200,
         headers: {
-            'Content-Type': 'application/sql',
+            'Content-Type': 'application/octet-stream',
             'Content-Disposition': `attachment; filename="${backup.fileName}"`,
             'Content-Length': backup.dumpSize.toString(),
             'Cache-Control': 'no-store',
