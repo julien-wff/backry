@@ -27,6 +27,7 @@
 
     let apiData = $state<RunsData | null>(null);
     let runsData = $derived(mergeData(data.runsData, apiData));
+    let isLoadingMore = $state(false);
 
     let filterModal = $state<HTMLDialogElement>();
     let filterCount = $derived(
@@ -40,9 +41,11 @@
     }
 
     async function loadMoreRuns() {
-        if (runsData.nextPageCursor === null) {
+        if (isLoadingMore || runsData.nextPageCursor === null) {
             return;
         }
+
+        isLoadingMore = true;
 
         const params = new URLSearchParams(page.url.searchParams);
         params.set('cursor', runsData.nextPageCursor.toString());
@@ -51,6 +54,7 @@
         const res = await fetchApi<RunsQueryResult>('GET', `/api/runs?${params}`, null);
         if (res.isErr()) {
             console.error('Failed to fetch next page of backups:', res.error);
+            isLoadingMore = false;
             return;
         }
 
@@ -65,6 +69,7 @@
         } else {
             apiData = mergeData(apiData, resData);
         }
+        isLoadingMore = false;
     }
 
     function mergeData(baseData: RunsData, newData: RunsData | null): RunsData {
