@@ -4,8 +4,7 @@
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
     import type { databases as databasesSchema } from '$lib/server/db/schema';
     import type { jobListLimited } from '$lib/server/queries/jobs';
-    import { positiveInt } from '$lib/helpers/parse';
-    import { itemFromList } from '$lib/helpers/parse.js';
+    import { itemFromList, positiveInt } from '$lib/helpers/parse';
 
     interface Props {
         jobs: Awaited<ReturnType<typeof jobListLimited>>;
