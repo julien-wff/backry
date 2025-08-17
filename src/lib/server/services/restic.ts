@@ -195,29 +195,6 @@ export async function deleteSnapshots(url: string,
 }
 
 
-export async function readFileContent(url: string,
-                                      password: string,
-                                      env: Record<string, string>,
-                                      snapshotId: string,
-                                      fileName: string) {
-    const res = await runCommandSync(
-        RESTIC_CMD,
-        [
-            '-r', url,
-            '--no-lock',
-            'dump',
-            snapshotId,
-            fileName,
-        ],
-        {
-            env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env },
-        },
-    );
-
-    return resticCommandToResult<string>(res, false);
-}
-
-
 export async function getRepositoryLocks(url: string,
                                          password: string,
                                          env: Record<string, string>): Promise<ResultAsync<ResticLock[], string>> {
@@ -329,4 +306,101 @@ export async function applyForgetPolicy(url: string,
     );
 
     return resticCommandToResult<ResticForget[]>(res, true, 1);
+}
+
+
+/**
+ * Stream the content of a file from a restic repository.
+ * This uses the `restic dump` command to stream the file content directly to the HTTP response.
+ * If the Restic download is faster than the user can read the data, it will buffer in memory.
+ * @param url URL to the restic repository
+ * @param password Repository password
+ * @param env Additional environment variables to set
+ * @param snapshotId Snapshot ID to download the file from
+ * @param fileName Name of the file to download from the snapshot
+ * @return A ReadableStream that streams the file content, and a Promise that resolves when the process exits.
+ */
+export async function streamFileContent(url: string,
+                                        password: string,
+                                        env: Record<string, string>,
+                                        snapshotId: string,
+                                        fileName: string) {
+    // Spawn restic dump and stream stdout directly to the HTTP response to avoid buffering the whole file in memory.
+    const subprocess = Bun.spawn([
+        RESTIC_CMD,
+        '-r', url,
+        '--no-lock',
+        'dump',
+        snapshotId,
+        fileName,
+    ], {
+        env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env },
+        stdout: 'pipe',
+        stderr: 'pipe',
+    });
+
+    const stdoutReader = subprocess.stdout.getReader();
+    const stderrReader = subprocess.stderr.getReader();
+    const stderrChunks: Uint8Array[] = [];
+
+    // Collect stderr asynchronously (without blocking streaming of stdout)
+    void (async () => {
+        try {
+            while (true) {
+                const { done, value } = await stderrReader.read();
+                if (done) break;
+                if (value) stderrChunks.push(value);
+            }
+        } finally {
+            try {
+                stderrReader.releaseLock();
+            } catch (e) {
+                logger.warn(e, 'Failed to release stderr reader lock');
+            }
+        }
+    })();
+
+    const stream = new ReadableStream<Uint8Array>({
+        async pull(controller) {
+            const { done, value } = await stdoutReader.read();
+            if (done) {
+                try {
+                    stdoutReader.releaseLock();
+                } catch (e) {
+                    logger.warn(e, 'Failed to release stdout reader lock');
+                }
+                controller.close();
+                return;
+            }
+            if (value) controller.enqueue(value);
+        },
+        cancel() {
+            try {
+                subprocess.kill();
+            } catch {
+                /* ignore */
+            }
+        },
+    });
+
+    // Promise resolves when process exits; if non-zero we format error message
+    const exitPromise = (async (): Promise<Result<void, ResticError>> => {
+        const exitCode = await subprocess.exited;
+        if (exitCode !== 0) {
+            // Attempt to parse stderr as restic JSON error, else fallback to raw text
+            const stderrText = (await new Blob(stderrChunks).text()).trim();
+            try {
+                return err(JSON.parse(stderrText));
+            } catch {
+                return err({
+                    message_type: 'unknown',
+                    code: exitCode,
+                    message: stderrText,
+                } as ResticError);
+            }
+        }
+        return ok();
+    })();
+
+    return { stream, exitPromise };
 }

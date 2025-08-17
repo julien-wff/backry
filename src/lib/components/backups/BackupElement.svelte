@@ -46,17 +46,19 @@
 
 
 {#snippet secondaryBtns()}
-    {#if !backup.error && backup.dumpSize && backup.dumpSize < 10e6 && !backup.prunedAt}
-        <a download href="/api/backups/{backup.id}/download" class="btn btn-sm btn-success btn-soft">
-            <FileDown class="w-4 h-4"/>
-            Download
-        </a>
-    {:else if !backup.error && backup.dumpSize && !backup.prunedAt}
-        <div class="tooltip tooltip-error" data-tip="Cannot download dumps larger than 10MB">
-            <button class="btn btn-sm btn-success btn-soft w-full" disabled>
+    {#if !backup.error && backup.dumpSize && !backup.prunedAt}
+        {@const isBigFile = backup.dumpSize > 1e8}
+        <div class="tooltip-warning"
+             class:tooltip={isBigFile}
+             data-tip="Big file: Backry's RAM usage will increase during download.">
+            <a download={backup.fileName}
+               href="/api/backups/{backup.id}/download"
+               class="btn btn-sm btn-soft w-full"
+               class:btn-success={!isBigFile}
+               class:btn-warning={isBigFile}>
                 <FileDown class="w-4 h-4"/>
                 Download
-            </button>
+            </a>
         </div>
     {/if}
 
