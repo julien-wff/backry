@@ -14,8 +14,10 @@ export const GET: RequestHandler = async () => {
 
     logger.info(`Heap snapshot created in ${formatDuration((Date.now() - start) / 1000)}`);
 
-    // @ts-expect-error ReadableStream of Response BodyInit is not the same as ReadableStream from Readable.toWeb
-    return new Response(Readable.toWeb(snapshot), {
+    // ReadableStream of Response BodyInit is not the same as ReadableStream from Readable.toWeb
+    const stream = Readable.toWeb(snapshot) as unknown as ReadableStream;
+
+    return new Response(stream, {
         headers: {
             'Content-Type': 'application/octet-stream',
             'Content-Disposition': `attachment; filename="backry-heap-snapshot.heapsnapshot"`,
