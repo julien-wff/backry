@@ -92,6 +92,7 @@ the database URL or the CLI tools commands.
 | `BACKRY_STORAGE_CHECK_CRON`  | Ping storage backends and fetch basic stats | `*/10 * * * *` (every 10 minutes)                      |
 | `BACKRY_DATABASE_CHECK_CRON` | Ping databases                              | `*/10 * * * *` (every 10 minutes)                      |
 | `BACKRY_STORAGE_HEALTH_CRON` | Advanced checks for storage backends health | `5,35 * * * *` (every 30 minutes, offset by 5 minutes) |
+| `BACKRY_DB_MAINTENANCE_CRON` | Backry's database maintenance operations    | `30 4 * * *` (daily at 04:30)                          |
 
 ### CLI tools commands
 

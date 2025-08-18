@@ -1,7 +1,7 @@
 import { logger } from '$lib/server/services/logger';
 import { CronJob, validateCronExpression } from 'cron';
 
-type SystemCronId = `system:${'check-dbs' | 'check-storages' | 'update-storages-health'}`;
+type SystemCronId = `system:${'check-dbs' | 'check-storages' | 'update-storages-health' | 'db-maintenance'}`;
 type JobCronId = `job:${number}`;
 export type CronId = SystemCronId | JobCronId;
 
