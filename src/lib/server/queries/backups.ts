@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db';
 import { backups, databases, jobDatabases, jobs, storages } from '$lib/server/db/schema';
-import { and, desc, eq, inArray, isNotNull, isNull, sql } from 'drizzle-orm';
+import { and, desc, eq, inArray, isNotNull, isNull, lt, sql } from 'drizzle-orm';
 
 export const backupsListFull = async () => db.query.backups.findMany({
     orderBy: [ desc(backups.startedAt) ],
@@ -157,3 +157,23 @@ export const setBackupsToPrunedById = (backupIds: number[]) =>
         )
         .returning()
         .execute();
+
+
+/**
+ * Delete backups were pruned more than a given number of days ago.
+ * @param days Number of days to keep backups
+ * @return Array of deleted backups IDs
+ */
+export const deleteOldPrunedBackups = (days: number) => db
+    .delete(backups)
+    .where(
+        and(
+            isNotNull(backups.prunedAt),
+            isNull(backups.error),
+            // @formatter:off
+            lt(backups.prunedAt, sql`date('now',${`-${days} day`})`),
+            // @formatter:on
+        ),
+    )
+    .returning({ id: backups.id })
+    .execute();

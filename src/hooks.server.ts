@@ -10,6 +10,7 @@ import { checkAllActiveRepositories } from '$lib/server/storages/checks';
 import { updateAllStoragesHealth } from '$lib/server/storages/health';
 import type { ServerInit } from '@sveltejs/kit';
 import { migrate } from 'drizzle-orm/bun-sql/migrator';
+import { executeDatabaseMaintenance } from '$lib/server/db/maintenance';
 
 export const init: ServerInit = async () => {
     logger.info('Applying database migrations...');
@@ -34,6 +35,12 @@ export const init: ServerInit = async () => {
         'system:update-storages-health',
         validCronOrDefault(process.env.BACKRY_STORAGE_HEALTH_CRON, '5,35 * * * *', 'storage health'),
         () => updateAllStoragesHealth(),
+    );
+
+    addOrUpdateCronJob(
+        'system:db-maintenance',
+        validCronOrDefault(process.env.BACKRY_DB_MAINTENANCE_CRON, '30 4 * * *', 'database maintenance'),
+        () => executeDatabaseMaintenance(),
     );
 
     await setUnfinishedBackupsToError();

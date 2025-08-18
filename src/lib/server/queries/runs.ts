@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db';
 import { backups, databases, jobDatabases, jobs, RUN_ORIGIN, runs } from '$lib/server/db/schema';
-import { and, desc, eq, isNotNull, isNull, lt, type SQL } from 'drizzle-orm';
+import { and, desc, eq, inArray, isNotNull, isNull, lt, sql, type SQL } from 'drizzle-orm';
 
 /**
  * Create a new run in the database.
@@ -166,3 +166,24 @@ export const getRunFull = (id: number) => db.query.runs.findFirst({
  * @return The deleted run object.
  */
 export const deleteRun = (id: number) => db.delete(runs).where(eq(runs.id, id)).returning().get();
+
+/**
+ * Delete runs that have no backups associated to them anymore, because they were deleted.
+ * @return Array of deleted run IDs.
+ */
+export const deleteRunsWithNoBackups = () => db
+    .delete(runs)
+    .where(
+        and(
+            lt(runs.updatedAt, sql`date('now', '-1 day')`),
+            inArray(
+                runs.id,
+                db.select({ id: runs.id })
+                    .from(runs)
+                    .leftJoin(backups, eq(runs.id, backups.runId))
+                    .where(isNull(backups.id)),
+            ),
+        ),
+    )
+    .returning({ id: runs.id })
+    .execute();
