@@ -10,6 +10,7 @@
         type DockerHostnamesCheckResponse,
     } from '$lib/server/schemas/api';
     import type { ContainerInspectInfo, ImageInspectInfo } from 'dockerode';
+    import type { ModalControls } from '$lib/helpers/modal';
 
     interface Props {
         container: ContainerInspectInfo;
@@ -24,14 +25,14 @@
     );
     let canBeAdded = $derived(container.State.Running);
 
-    let addDialog = $state<HTMLDialogElement | null>(null);
+    let addModalControls = $state<ModalControls>();
     let loading = $state(false);
     let error = $state<string | null>(null);
     let hostnameScanResult = $state<DockerHostnamesCheckResponse['ips'] | null>(null);
     let selectedHostName = $state<string | null>(null);
 
-    async function showDialog() {
-        addDialog?.showModal();
+    async function showAddModal() {
+        addModalControls?.open();
         loading = true;
         error = null;
         selectedHostName = null;
@@ -103,7 +104,7 @@
 
     {#if canBeAdded}
         <div class="flex items-center">
-            <button class="btn btn-primary btn-soft btn-square" onclick={showDialog}>
+            <button class="btn btn-primary btn-soft btn-square" onclick={showAddModal}>
                 <CirclePlus class="h-6 w-6"/>
             </button>
         </div>
@@ -112,7 +113,7 @@
 
 
 {#if canBeAdded}
-    <Modal bind:modal={addDialog} title="Add {container.Name.slice(1)} to databases">
+    <Modal bind:controls={addModalControls} title="Add {container.Name.slice(1)} to databases">
         {#if loading}
             <div role="alert" class="alert alert-soft">
                 <span class="loading loading-spinner loading-sm"></span>

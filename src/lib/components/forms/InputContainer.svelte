@@ -2,6 +2,7 @@
     import Modal from '$lib/components/common/Modal.svelte';
     import { CircleHelp, Hammer } from '$lib/components/icons';
     import type { Snippet } from 'svelte';
+    import type { ModalControls } from '$lib/helpers/modal';
 
     interface Props {
         children: Snippet;
@@ -25,13 +26,13 @@
         editorModalWidth,
     }: Props = $props();
 
-    let helpModal = $state<HTMLDialogElement | undefined>();
-    let editorModal = $state<HTMLDialogElement | undefined>();
+    let helpModalControls = $state<ModalControls>();
+    let editorModalControls = $state<ModalControls>();
 
     let editorModalOpened = $state(false);
 
     function showEditorModal() {
-        editorModal?.showModal();
+        editorModalControls?.open();
         editorModalOpened = true;
     }
 </script>
@@ -54,7 +55,7 @@
             {#if helpContent}
                 <button class="cursor-pointer rounded-full p-1 hover:bg-base-content/10"
                         type="button"
-                        onclick={() => helpModal?.showModal()}>
+                        onclick={() => helpModalControls?.open()}>
                     <CircleHelp size="16"/>
                 </button>
             {/if}
@@ -71,7 +72,7 @@
 
 
 {#if helpContent}
-    <Modal bind:modal={helpModal} title={label}>
+    <Modal bind:controls={helpModalControls} title={label}>
         {@render helpContent()}
 
         <div class="modal-action">
@@ -84,7 +85,7 @@
 
 
 {#if editorContent}
-    <Modal bind:modal={editorModal}
+    <Modal bind:controls={editorModalControls}
            onclose={() => (editorModalOpened = false)}
            title={editorTitle ?? `${label} editor`}
            width={editorModalWidth}>

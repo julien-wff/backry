@@ -18,6 +18,7 @@
     } from '$lib/server/schemas/api';
     import { tick } from 'svelte';
     import type { PageProps } from './$types';
+    import type { ModalControls } from '$lib/helpers/modal';
 
     let { data }: PageProps = $props();
 
@@ -45,7 +46,7 @@
         }
     });
 
-    let repoModeSwitchModal = $state<HTMLDialogElement | null>(null);
+    let repoModeSwitchModalControls = $state<ModalControls>();
 
     /**
      * Switches the repository mode between existing and new. If existing is true, it will prompt the user with
@@ -59,7 +60,7 @@
         }
 
         if (existing && !force) {
-            repoModeSwitchModal?.showModal();
+            repoModeSwitchModalControls?.open();
         } else {
             arePreChecksValid = false;
             error = null;
@@ -247,4 +248,4 @@
 </ElementForm>
 
 
-<ExistingRepoModal bind:modal={repoModeSwitchModal} oncontinue={() => handleRepoModeSwitch(true, true)}/>
+<ExistingRepoModal bind:controls={repoModeSwitchModalControls} oncontinue={() => handleRepoModeSwitch(true, true)}/>

@@ -11,6 +11,7 @@
     import dayjs from 'dayjs';
     import { fade } from 'svelte/transition';
     import type { databases, jobs } from '$lib/server/db/schema';
+    import type { ModalControls } from '$lib/helpers/modal';
 
     type Run = Awaited<ReturnType<typeof getRunsWithBackupFilter>>['runs'][number];
 
@@ -24,7 +25,7 @@
 
     let { run, job, databases: databasesMap, onrundeleted, onbackupdeleted }: Props = $props();
 
-    let deleteDialog = $state<HTMLDialogElement>();
+    let deleteModalControls = $state<ModalControls>();
     let loading = $state(false);
 
     // We deduplicated backups because when a page data run is deleted, the invalidateAll() will fetch one or more backups
@@ -45,7 +46,7 @@
         if (ev.shiftKey) {
             deleteRun();
         } else {
-            deleteDialog?.showModal();
+            deleteModalControls?.open();
         }
     }
 
@@ -101,7 +102,7 @@
 </div>
 
 
-<Modal bind:modal={deleteDialog} title="Are you sure?">
+<Modal bind:controls={deleteModalControls} title="Are you sure?">
     <p class="mb-1">Are you sure to delete run #{run.id}?</p>
     <p>
         The {run.backups.length > 1 ? `${run.backups.length} backups` : 'backup'} and the associated
