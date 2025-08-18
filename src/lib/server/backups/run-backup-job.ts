@@ -40,6 +40,10 @@ export async function runBackupJob(jobId: number, forcedDatabases: number[] | nu
 
         const res = await jobDatabaseBackup(job, i, run.id, forcedDatabases !== null);
 
+        if (res.isOk() && res.value[0] === null) {
+            continue; // Skip if the database was disabled in the job
+        }
+
         totalBackupsCount++;
         if (res.isOk()) {
             successfulBackupsCount++;
