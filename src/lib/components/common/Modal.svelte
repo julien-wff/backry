@@ -106,7 +106,6 @@ Finally, if you've read this far... I'm sorry.
 
         if (mountedModalIndex === instanceModalIndex) {
             // If this is the mounted modal, cleanup
-            instanceModalElement?.removeEventListener('close', handleMountedModalClose);
             instanceModalElement?.remove();
             // Set the mounted modal index to the last one in the list, or -1 if none left
             mountedModalIndex = modalInstancesIndexes.length > 0
@@ -121,13 +120,12 @@ Finally, if you've read this far... I'm sorry.
             mountedModalElement = instanceModalElement;
             instanceModalElement.parentElement?.removeChild(instanceModalElement);
             document.body.appendChild(instanceModalElement);
-            instanceModalElement.addEventListener('close', handleMountedModalClose);
         }
     });
 </script>
 
 {#if mountedModalIndex === instanceModalIndex}
-    <dialog class="modal" bind:this={instanceModalElement} {onclose}>
+    <dialog class="modal" bind:this={instanceModalElement} onclose={handleMountedModalClose}>
         <form class="modal-box"
               class:max-w-2xl={mountedModalWidth === 'large'}
               method="dialog">
