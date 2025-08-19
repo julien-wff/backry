@@ -13,6 +13,8 @@
     import { type jobRequest, type JobResponse } from '$lib/server/schemas/api';
     import { sendAt, validateCronExpression } from 'cron';
     import type { PageData } from './$types';
+    import Modal from '$lib/components/common/Modal.svelte';
+    import type { ModalControls } from '$lib/helpers/modal';
 
     interface Props {
         data: PageData;
@@ -66,6 +68,23 @@
 
         await goto('/jobs');
     }
+
+    let storageChangeModalControls = $state<ModalControls>();
+    let changedStorageBackend = $state(-1);
+
+    function handleStorageChange() {
+        if (data.isNew || storageBackend === data.job?.storageId) {
+            return;
+        }
+
+        changedStorageBackend = storageBackend;
+        storageBackend = data.job?.storageId ?? -1;
+        storageChangeModalControls?.open();
+    }
+
+    function handleApplySelectedStorage() {
+        storageBackend = changedStorageBackend;
+    }
 </script>
 
 
@@ -105,11 +124,10 @@
         <input bind:value={jobName} class="w-full input" id="job-name" required>
     </InputContainer>
 
-
     <SlugInput baseValue={jobName} bind:slug disabled={!!data.job} source="job"/>
 
     <InputContainer for="backend" label="Storage backend">
-        <select bind:value={storageBackend} class="w-full select" id="backend" required>
+        <select bind:value={storageBackend} class="w-full select" id="backend" onchange={handleStorageChange} required>
             {#each data.storages as storage (storage.id)}
                 <option value={storage.id} disabled={!['active', 'unhealthy'].includes(storage.status)}>
                     {storage.name}
@@ -128,3 +146,30 @@
 
     <button class="btn btn-primary" disabled={isLoading || selectedDatabases.length === 0}>Save</button>
 </ElementForm>
+
+
+<Modal bind:controls={storageChangeModalControls} title="Changing storage backend">
+    <p class="mb-1">
+        Changing the storage backend is not a recommended operation. If you save the change:
+    </p>
+
+    <ul class="list-disc pl-6 mb-2">
+        <li class="mb-0.5">Existing backups will not be moved from the current Restic repository to the new one.</li>
+        <li class="mb-0.5">Downloading or restoring backups via Backry's interface will not be possible anymore.</li>
+        <li>
+            Both the current and the new storage backend will become unhealthy (can be fixed, but will permanently
+            delete your backups inside the repository).
+        </li>
+    </ul>
+
+    <p class="mb-4">
+        Change the storage at your own risk.
+    </p>
+
+    <div class="modal-action">
+        <button class="btn" type="submit">Cancel</button>
+        <button class="btn btn-warning" onclick={handleApplySelectedStorage} type="submit">
+            Change to {data.storages.find(s => s.id === changedStorageBackend)?.name ?? '<ERROR>'} anyway
+        </button>
+    </div>
+</Modal>
