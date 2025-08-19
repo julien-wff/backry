@@ -47,7 +47,7 @@ export const jobs = sqliteTable('jobs', {
     status: text('status', { enum: ELEMENT_STATUS }).notNull().default('active'),
     createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`),
     updatedAt: text('updated_at').default(sql`(CURRENT_TIMESTAMP)`).$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
-    storageId: integer('storage_id').notNull().references(() => storages.id, { onDelete: 'cascade' }),
+    storageId: integer('storage_id').notNull().references(() => storages.id),
     cron: text('cron').notNull(),
     prunePolicy: text('prune_policy'),
 });
