@@ -8,6 +8,7 @@
     import type { jobsListFull } from '$lib/server/queries/jobs';
     import { type jobPatchRequest, type JobResponse, type jobRunRequest } from '$lib/server/schemas/api';
     import { addToast } from '$lib/stores/toasts.svelte';
+    import type { ModalControls } from '$lib/helpers/modal';
 
     interface Props {
         job: Awaited<ReturnType<typeof jobsListFull>>[number];
@@ -17,7 +18,7 @@
     let { job, nextExecution }: Props = $props();
     let loading = $state(false);
 
-    let jobRunPopup = $state<HTMLDialogElement | null>(null);
+    let jobRunModalControls = $state<ModalControls>();
     let jobRunDatabases = $state<number[]>([]);
 
     let databaseListFormatted = $derived(job.jobsDatabases.map(db => ({
@@ -36,7 +37,7 @@
 
     function handleRunJobPopup() {
         jobRunDatabases = [];
-        jobRunPopup?.showModal();
+        jobRunModalControls?.open();
     }
 
     async function handleRunJob() {
@@ -122,7 +123,7 @@
 </BaseListElement>
 
 
-<Modal bind:modal={jobRunPopup} title="Run {job.name} now">
+<Modal bind:controls={jobRunModalControls} title="Run {job.name} now">
     <div>Select databases to backup:</div>
     <div class="mt-1 flex flex-col gap-1">
         {#each job.jobsDatabases as db}

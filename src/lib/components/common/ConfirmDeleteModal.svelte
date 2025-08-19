@@ -1,16 +1,17 @@
 <script lang="ts">
     import Modal from '$lib/components/common/Modal.svelte';
+    import type { ModalControls } from '$lib/helpers/modal';
 
     interface Props {
-        dialog?: HTMLDialogElement;
+        controls: ModalControls | undefined;
         ondelete?: () => void;
         deleteConfirmationMessage?: string;
     }
 
-    let { dialog = $bindable(), ondelete, deleteConfirmationMessage }: Props = $props();
+    let { controls = $bindable(), ondelete, deleteConfirmationMessage }: Props = $props();
 </script>
 
-<Modal bind:modal={dialog} title="Are you sure?">
+<Modal bind:controls title="Are you sure?">
     <p class="pb-4">
         {#if deleteConfirmationMessage}
             {deleteConfirmationMessage}

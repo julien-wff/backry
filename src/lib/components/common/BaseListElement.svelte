@@ -4,6 +4,7 @@
     import { CopyPlus, EllipsisVertical, Pencil, Play, Power, PowerOff, Trash2 } from '$lib/components/icons';
     import { type BACKUP_STATUS, type ELEMENT_STATUS } from '$lib/server/db/schema';
     import type { Snippet } from 'svelte';
+    import type { ModalControls } from '$lib/helpers/modal';
 
     interface Props {
         status?: typeof ELEMENT_STATUS[number] | typeof BACKUP_STATUS[number];
@@ -37,13 +38,13 @@
         secondaryBtns,
     }: Props = $props();
 
-    let deleteDialog = $state<HTMLDialogElement>();
+    let deleteModalControls = $state<ModalControls>();
 
     function handleDelete(ev: MouseEvent) {
         if (ev.shiftKey) {
             ondelete?.();
         } else {
-            deleteDialog?.showModal();
+            deleteModalControls?.open();
         }
     }
 </script>
@@ -119,4 +120,4 @@
 </div>
 
 
-<ConfirmDeleteModal bind:dialog={deleteDialog} {deleteConfirmationMessage} {ondelete}/>
+<ConfirmDeleteModal bind:controls={deleteModalControls} {deleteConfirmationMessage} {ondelete}/>

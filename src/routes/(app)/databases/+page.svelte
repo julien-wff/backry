@@ -7,6 +7,7 @@
     import DatabaseFilterModalContent from '$lib/components/databases/DatabaseFilterModalContent.svelte';
     import { Database } from '$lib/components/icons';
     import type { PageData } from './$types';
+    import type { ModalControls } from '$lib/helpers/modal';
 
     interface Props {
         data: PageData;
@@ -14,7 +15,7 @@
 
     let { data }: Props = $props();
 
-    let filterModal = $state<HTMLDialogElement>();
+    let filterModalControls = $state<ModalControls>();
     let filterCount = $derived(page.url.searchParams.get('engines')?.split(',').length ?? 0);
 </script>
 
@@ -22,7 +23,7 @@
 
 <PageContentHeader buttonType="new"
                    icon={Database}
-                   onsecondarybuttonclick={() => filterModal?.showModal()}
+                   onsecondarybuttonclick={() => filterModalControls?.open()}
                    secondaryButtonText={filterCount > 0 ? `Filter (${filterCount})` : undefined}
                    secondaryButtonType="filter">
     Databases
@@ -34,6 +35,6 @@
     {/each}
 </div>
 
-<Modal bind:modal={filterModal} title="Filter databases">
+<Modal bind:controls={filterModalControls} title="Filter databases">
     <DatabaseFilterModalContent/>
 </Modal>

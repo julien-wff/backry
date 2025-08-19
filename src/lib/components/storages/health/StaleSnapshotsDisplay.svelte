@@ -10,6 +10,7 @@
     } from '$lib/server/schemas/api';
     import type { ResticSnapshot } from '$lib/types/restic';
     import { onMount } from 'svelte';
+    import type { ModalControls } from '$lib/helpers/modal';
 
     interface Props {
         healthy?: boolean;
@@ -28,9 +29,9 @@
     });
 
     let snapshotsToDelete = $state<string[]>([]);
-    let deleteConfirmDialog = $state<HTMLDialogElement | null>(null);
+    let deleteConfirmModalControls = $state<ModalControls>();
 
-    function handleDelectCheckboxChange(ev: Event & { currentTarget: EventTarget & HTMLInputElement }) {
+    function handleDeleteCheckboxChange(ev: Event & { currentTarget: EventTarget & HTMLInputElement }) {
         if (ev.currentTarget.checked) {
             snapshotsToDelete.push(ev.currentTarget.value);
         } else {
@@ -45,6 +46,7 @@
     async function fetchStaleSnapshots() {
         error = null;
         loading = true;
+        snapshotsToDelete = [];
 
         const res = await fetchApi<StorageStaleSnapshotsResponse>('GET', `/api/storages/${page.params['id']}/stale-snapshots`, null);
         if (res.isErr()) {
@@ -58,7 +60,7 @@
     }
 
     async function deleteSnapshots() {
-        deleteConfirmDialog?.close();
+        deleteConfirmModalControls?.close();
         loading = true;
 
         const res = await fetchApi<{}, typeof storageStaleSnapshotsDeleteRequest>(
@@ -123,13 +125,13 @@
                     <input type="checkbox"
                            checked={snapshotsToDelete.includes(snapshot.id)}
                            value={snapshot.id}
-                           onchange={handleDelectCheckboxChange}
+                           onchange={handleDeleteCheckboxChange}
                            class="checkbox checkbox-sm checkbox-error"/>
                 </div>
             {/each}
 
             <button class="w-full btn btn-error btn-sm btn-soft"
-                    onclick={() => deleteConfirmDialog?.showModal()}
+                    onclick={() => deleteConfirmModalControls?.open()}
                     disabled={loading || snapshotsToDelete.length === 0}>
                 <Trash2 class="h-4 w-4"/>
                 Delete snapshots
@@ -138,7 +140,7 @@
     {/if}
 {/if}
 
-<Modal bind:modal={deleteConfirmDialog}
+<Modal bind:controls={deleteConfirmModalControls}
        title="Delete {snapshotsToDelete.length} snapshot{snapshotsToDelete.length > 1 ? 's' : ''} from repository">
     <div>
         These snapshots and the files they contain will be deleted from the repository. This action cannot

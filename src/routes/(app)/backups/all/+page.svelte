@@ -14,6 +14,7 @@
     import type { RunsQueryResult } from '$lib/server/schemas/api';
     import { onMount } from 'svelte';
     import NoBackupWithFiltersAlert from '$lib/components/backups/NoBackupWithFiltersAlert.svelte';
+    import type { ModalControls } from '$lib/helpers/modal';
 
     dayjs.extend(relativeTime);
     dayjs.extend(utc);
@@ -29,7 +30,7 @@
     let runsData = $derived(mergeData(data.runsData, apiData));
     let isLoadingMore = $state(false);
 
-    let filterModal = $state<HTMLDialogElement>();
+    let filterModalControls = $state<ModalControls>();
     let filterCount = $derived(
         Number(page.url.searchParams.has('job'))
         + Number(page.url.searchParams.has('database'))
@@ -154,7 +155,7 @@
 <PageContentHeader buttonText="Back to live backups"
                    buttonType="back"
                    icon={ListCheck}
-                   onsecondarybuttonclick={() => filterModal?.showModal()}
+                   onsecondarybuttonclick={() => filterModalControls?.open()}
                    secondaryButtonText={filterCount > 0 ? `Filters (${filterCount})` : undefined}
                    secondaryButtonType="filter">
     All backups
@@ -183,6 +184,6 @@
     <NoBackupWithFiltersAlert {filterCount}/>
 {/if}
 
-<Modal bind:modal={filterModal} title="Filter backups">
+<Modal bind:controls={filterModalControls} title="Filter backups">
     <BackupFilterModalContent databases={data.databases} jobs={data.jobs} onfilterschange={resetApiData}/>
 </Modal>

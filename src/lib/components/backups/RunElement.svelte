@@ -11,6 +11,7 @@
     import dayjs from 'dayjs';
     import { fade } from 'svelte/transition';
     import type { databases, jobs } from '$lib/server/db/schema';
+    import type { ModalControls } from '$lib/helpers/modal';
 
     type Run = Awaited<ReturnType<typeof getRunsWithBackupFilter>>['runs'][number];
 
@@ -24,7 +25,7 @@
 
     let { run, job, databases: databasesMap, onrundeleted, onbackupdeleted }: Props = $props();
 
-    let deleteDialog = $state<HTMLDialogElement>();
+    let deleteModalControls = $state<ModalControls>();
     let loading = $state(false);
 
     // We deduplicated backups because when a page data run is deleted, the invalidateAll() will fetch one or more backups
@@ -45,7 +46,7 @@
         if (ev.shiftKey) {
             deleteRun();
         } else {
-            deleteDialog?.showModal();
+            deleteModalControls?.open();
         }
     }
 
@@ -68,7 +69,7 @@
     <div class="flex justify-between items-center">
         <div class="flex gap-2 text-sm align-center">
             <RunOriginIndicator origin={run.origin}/>
-            Run #{run.id} - {job?.name || '<ERROR_UNKONWN_JOB>'} - {dayjs.utc(run.createdAt).fromNow()}
+            Run #{run.id} - {job?.name || '<ERROR_UNKNOWN_JOB>'} - {dayjs.utc(run.createdAt).fromNow()}
         </div>
 
         <div class="dropdown dropdown-end">
@@ -101,11 +102,11 @@
 </div>
 
 
-<Modal bind:modal={deleteDialog} title="Are you sure?">
-    <p class="mb-1">Are you sure to delete run #{run.id}?</p>
+<Modal bind:controls={deleteModalControls} title="Are you sure?">
+    <p class="mb-1">Are you sure you want to delete run #{run.id}?</p>
     <p>
-        The {run.backups.length > 1 ? `${run.backups.length} backups` : 'backup'} and the associated
-        file{run.backups.length > 1 ? 's' : ''} stored in the Restic repository will be deleted as well.
+        The {run.backups.length > 1 ? `${run.backups.length} backups and their` : 'backup and its'} associated
+        file{run.backups.length > 1 ? 's' : ''} stored in the Restic repository will also be deleted.
     </p>
 
     <div class="modal-action">
