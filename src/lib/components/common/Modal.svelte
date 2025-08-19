@@ -73,7 +73,11 @@ Finally, if you've read this far... I'm sorry.
             mountedModalContentIndex = instanceModalIndex!;
             openSequence++;
 
-            tick().then(() => mountedModalElement?.showModal());
+            if (mountedModalElement?.open) {
+                mountedModalElement.focus();
+            } else {
+                tick().then(() => mountedModalElement?.showModal());
+            }
         }
 
         close() {
