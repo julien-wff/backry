@@ -1,5 +1,5 @@
 import { db } from '$lib/server/db';
-import { storages } from '$lib/server/db/schema';
+import { jobs, storages } from '$lib/server/db/schema';
 import type { StorageRequest } from '$lib/server/schemas/api';
 import { eq } from 'drizzle-orm';
 
@@ -55,3 +55,16 @@ export const deleteStorage = (id: number) =>
         .where(eq(storages.id, id))
         .returning()
         .get();
+
+/**
+ * Checks by how many jobs a storage is used.
+ * @param id Storage ID.
+ * @return Promise resolving to the count of jobs using the storage.
+ */
+export const storageUseCount = (id: number) => db
+    .select({ id: jobs.id })
+    .from(jobs)
+    .where(eq(jobs.storageId, id))
+    .limit(1)
+    .execute()
+    .then(rows => rows.length);
