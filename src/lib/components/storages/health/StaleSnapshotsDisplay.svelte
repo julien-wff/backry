@@ -46,6 +46,7 @@
     async function fetchStaleSnapshots() {
         error = null;
         loading = true;
+        snapshotsToDelete = [];
 
         const res = await fetchApi<StorageStaleSnapshotsResponse>('GET', `/api/storages/${page.params['id']}/stale-snapshots`, null);
         if (res.isErr()) {
