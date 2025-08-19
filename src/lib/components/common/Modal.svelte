@@ -52,7 +52,7 @@ Finally, if you've read this far... I'm sorry.
 
 <script lang="ts">
     import { onDestroy, onMount, tick } from 'svelte';
-    import { ModalControls as AbstractModalControls } from '$lib/helpers/modal';
+    import type { ModalControls as AbstractModalControls } from '$lib/helpers/modal';
 
     interface Props {
         controls: AbstractModalControls | undefined;
