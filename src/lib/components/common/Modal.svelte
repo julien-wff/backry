@@ -4,12 +4,12 @@ This component is a mess, but there are reasons.
 I need the modal to be on the root of the document body, because it uses forms, and forms cannot be nested (or it can cause weird behaviors)
 Svelte doesn't support portals, so I have to move the node manually, once mounted.
 
-I also want ony one modal mounted at a time, otherwise it can cause performance issues with hundreds of them,
+I also want only one modal mounted at a time; otherwise it can cause performance issues with hundreds of them,
 like in the all backups page.
 To do that, I allow only the first modal to be instantiated to be mounted on the body. Every time a modal is shown,
 being the mounted one or not, the properties (content, title...) of this mounted modal is updated.
-Why don't I mount the modal only when controls.show() is called? Because if I do so, the open animation is weird, idk why.
-A fix I found would be to set an arbitrary delay before the mount and the opening, like 50ms, but I don't like that.
+Why don't I mount the modal only when controls.open() is called? Because doing so causees a weird open animation, idk why.
+A workaround would be to add an arbitrary delay between mounting and opening, like 50ms, but I don't like that.
 And of course, if the mounted modal component is destroyed, I have to set another one as mounted.
 
 Finally, if you've read this far... I'm sorry.
