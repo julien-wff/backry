@@ -56,6 +56,7 @@ export const DELETE: RequestHandler = async ({ params }) => {
     if (storageUsageCount > 0) {
         return apiError(
             `Storage is used by ${storageUsageCount} job${storageUsageCount === 1 ? '' : 's'} and cannot be deleted`,
+            409,
         );
     }
 
