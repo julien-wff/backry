@@ -1,5 +1,5 @@
 import { apiError, apiSuccess } from '$lib/server/api/responses';
-import { deleteStorage, updateStorage } from '$lib/server/queries/storages';
+import { deleteStorage, storageUseCount, updateStorage } from '$lib/server/queries/storages';
 import { parseRequestBody } from '$lib/server/schemas';
 import { storagePatchRequest, storageRequest, type StorageResponse } from '$lib/server/schemas/api';
 import { type RequestHandler } from '@sveltejs/kit';
@@ -49,6 +49,15 @@ export const DELETE: RequestHandler = async ({ params }) => {
     const storageId = parseInt(params.id || '');
     if (isNaN(storageId) || storageId < 0) {
         return apiError('Invalid storage ID');
+    }
+
+    // Check that the storage is not used by any jobs
+    const storageUsageCount = await storageUseCount(storageId);
+    if (storageUsageCount > 0) {
+        return apiError(
+            `Storage is used by ${storageUsageCount} job${storageUsageCount === 1 ? '' : 's'} and cannot be deleted`,
+            409,
+        );
     }
 
     // Delete from database

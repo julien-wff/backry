@@ -18,6 +18,9 @@ export const init: ServerInit = async () => {
     // @ts-expect-error
     await migrate(db, { migrationsFolder: './drizzle' });
 
+    // Enable foreign key constraints
+    db.$client.exec('PRAGMA foreign_keys = ON;');
+
     logger.info('Migrations applied successfully, starting up Backry...');
 
     addOrUpdateCronJob('system:check-storages',
