@@ -39,7 +39,7 @@
 
 
 <BaseListElement
-        deleteConfirmationMessage={`The storage "${storage.name}" will be deleted from Backry. The Restic repository will stay intact.`}
+        deleteConfirmationMessage={`The storage "${storage.name}" will be removed from Backry. The Restic repository will stay intact.`}
         disabled={loading}
         editHref={`/storages/${storage.id}`}
         error={storage.error}
