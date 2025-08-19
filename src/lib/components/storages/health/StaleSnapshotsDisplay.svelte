@@ -31,7 +31,7 @@
     let snapshotsToDelete = $state<string[]>([]);
     let deleteConfirmModalControls = $state<ModalControls>();
 
-    function handleDelectCheckboxChange(ev: Event & { currentTarget: EventTarget & HTMLInputElement }) {
+    function handleDeleteCheckboxChange(ev: Event & { currentTarget: EventTarget & HTMLInputElement }) {
         if (ev.currentTarget.checked) {
             snapshotsToDelete.push(ev.currentTarget.value);
         } else {
@@ -125,7 +125,7 @@
                     <input type="checkbox"
                            checked={snapshotsToDelete.includes(snapshot.id)}
                            value={snapshot.id}
-                           onchange={handleDelectCheckboxChange}
+                           onchange={handleDeleteCheckboxChange}
                            class="checkbox checkbox-sm checkbox-error"/>
                 </div>
             {/each}
