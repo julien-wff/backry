@@ -4,7 +4,7 @@
     import {
         CopyPlus,
         EllipsisVertical,
-        FolderHeart,
+        HeartPulse,
         Pencil,
         Play,
         Power,
@@ -102,7 +102,7 @@
 
             {#if healthBtnMessage && healthBtnHref}
                 <a class="btn btn-success btn-sm" href={healthBtnHref}>
-                    <FolderHeart class="w-4 h-4"/>
+                    <HeartPulse class="w-4 h-4"/>
                     {healthBtnMessage}
                 </a>
             {/if}

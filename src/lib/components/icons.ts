@@ -20,12 +20,12 @@ import ExternalLink from '@lucide/svelte/icons/external-link';
 import FileChartPie from '@lucide/svelte/icons/file-chart-pie';
 import FileCheck from '@lucide/svelte/icons/file-check';
 import FileDown from '@lucide/svelte/icons/file-down';
-import FolderHeart from '@lucide/svelte/icons/folder-heart';
 import Funnel from '@lucide/svelte/icons/funnel';
 import Hammer from '@lucide/svelte/icons/hammer';
 import HardDrive from '@lucide/svelte/icons/hard-drive';
 import HardDriveDownload from '@lucide/svelte/icons/hard-drive-download';
 import HeartCrack from '@lucide/svelte/icons/heart-crack';
+import HeartPulse from '@lucide/svelte/icons/heart-pulse';
 import History from '@lucide/svelte/icons/history';
 import Info from '@lucide/svelte/icons/info';
 import LayoutDashboard from '@lucide/svelte/icons/layout-dashboard';
@@ -70,12 +70,12 @@ export {
     FileChartPie,
     FileCheck,
     FileDown,
-    FolderHeart,
     Funnel,
     Hammer,
     HardDrive,
     HardDriveDownload,
     HeartCrack,
+    HeartPulse,
     History,
     Info,
     LayoutDashboard,

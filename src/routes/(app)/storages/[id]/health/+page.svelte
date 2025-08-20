@@ -4,7 +4,7 @@
     import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
     import ElementForm from '$lib/components/forms/ElementForm.svelte';
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
-    import { FolderHeart } from '$lib/components/icons';
+    import { HeartPulse } from '$lib/components/icons';
     import LocksDisplay from '$lib/components/storages/health/LocksDisplay.svelte';
     import PruneDesyncDisplay from '$lib/components/storages/health/PruneDesyncDisplay.svelte';
     import StaleSnapshotsDisplay from '$lib/components/storages/health/StaleSnapshotsDisplay.svelte';
@@ -47,7 +47,7 @@
 
 <Head title="{data.storage.name} repository health"/>
 
-<PageContentHeader buttonType="back" icon={FolderHeart}>
+<PageContentHeader buttonType="back" icon={HeartPulse}>
     {data.storage.name} Repository health
 </PageContentHeader>
 
