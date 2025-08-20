@@ -1,7 +1,16 @@
 <script lang="ts">
     import ConfirmDeleteModal from '$lib/components/common/ConfirmDeleteModal.svelte';
     import StatusIndicator from '$lib/components/common/StatusIndicator.svelte';
-    import { CopyPlus, EllipsisVertical, Pencil, Play, Power, PowerOff, Trash2 } from '$lib/components/icons';
+    import {
+        CopyPlus,
+        EllipsisVertical,
+        FolderHeart,
+        Pencil,
+        Play,
+        Power,
+        PowerOff,
+        Trash2,
+    } from '$lib/components/icons';
     import { type BACKUP_STATUS, type ELEMENT_STATUS } from '$lib/server/db/schema';
     import type { Snippet } from 'svelte';
     import type { ModalControls } from '$lib/helpers/modal';
@@ -19,6 +28,8 @@
         onrun?: () => void;
         disabled?: boolean;
         error?: string | null;
+        healthBtnMessage?: string;
+        healthBtnHref?: string;
         secondaryBtns?: Snippet;
     }
 
@@ -35,6 +46,8 @@
         onrun,
         disabled,
         error,
+        healthBtnMessage,
+        healthBtnHref,
         secondaryBtns,
     }: Props = $props();
 
@@ -85,6 +98,13 @@
                     <Play class="h-4 w-4"/>
                     Run now
                 </button>
+            {/if}
+
+            {#if healthBtnMessage && healthBtnHref}
+                <a class="btn btn-success btn-sm" href={healthBtnHref}>
+                    <FolderHeart class="w-4 h-4"/>
+                    {healthBtnMessage}
+                </a>
             {/if}
 
             {#if onduplicate || ondelete || secondaryBtns}

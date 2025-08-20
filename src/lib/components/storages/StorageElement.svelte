@@ -1,7 +1,7 @@
 <script lang="ts">
     import { invalidateAll } from '$app/navigation';
     import BaseListElement from '$lib/components/common/BaseListElement.svelte';
-    import { FolderHeart, HardDrive, Link } from '$lib/components/icons';
+    import { HardDrive, Link } from '$lib/components/icons';
     import { fetchApi } from '$lib/helpers/fetch';
     import { formatSize } from '$lib/helpers/format';
     import { type storages } from '$lib/server/db/schema';
@@ -30,21 +30,14 @@
 </script>
 
 
-{#snippet secondaryButtons()}
-    <a class="btn btn-success btn-sm btn-soft" href="/storages/{storage.id}/health">
-        <FolderHeart class="w-4 h-4"/>
-        Repository health
-    </a>
-{/snippet}
-
-
 <BaseListElement
         deleteConfirmationMessage={`The storage "${storage.name}" will be removed from Backry. The Restic repository will stay intact.`}
         disabled={loading}
         editHref={`/storages/${storage.id}`}
         error={storage.error}
+        healthBtnHref="/storages/{storage.id}/health"
+        healthBtnMessage="Repository health"
         ondelete={deleteStorage}
-        secondaryBtns={secondaryButtons}
         status={storage.status}
         title={storage.name}>
     <div class="flex items-center gap-1">
