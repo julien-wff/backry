@@ -100,10 +100,10 @@
                 </button>
             {/if}
 
-            {#if healthBtnMessage && healthBtnHref}
-                <a class="btn btn-success btn-sm" href={healthBtnHref}>
+            {#if healthBtnHref}
+                <a class="btn btn-success btn-sm" href={healthBtnHref} class:btn-disabled={disabled}>
                     <HeartPulse class="w-4 h-4"/>
-                    {healthBtnMessage}
+                    {healthBtnMessage ?? 'Health'}
                 </a>
             {/if}
 
