@@ -1,7 +1,16 @@
 <script lang="ts">
     import ConfirmDeleteModal from '$lib/components/common/ConfirmDeleteModal.svelte';
     import StatusIndicator from '$lib/components/common/StatusIndicator.svelte';
-    import { CopyPlus, EllipsisVertical, Pencil, Play, Power, PowerOff, Trash2 } from '$lib/components/icons';
+    import {
+        CopyPlus,
+        EllipsisVertical,
+        HeartPulse,
+        Pencil,
+        Play,
+        Power,
+        PowerOff,
+        Trash2,
+    } from '$lib/components/icons';
     import { type BACKUP_STATUS, type ELEMENT_STATUS } from '$lib/server/db/schema';
     import type { Snippet } from 'svelte';
     import type { ModalControls } from '$lib/helpers/modal';
@@ -19,6 +28,8 @@
         onrun?: () => void;
         disabled?: boolean;
         error?: string | null;
+        healthBtnMessage?: string;
+        healthBtnHref?: string;
         secondaryBtns?: Snippet;
     }
 
@@ -35,6 +46,8 @@
         onrun,
         disabled,
         error,
+        healthBtnMessage,
+        healthBtnHref,
         secondaryBtns,
     }: Props = $props();
 
@@ -60,11 +73,9 @@
 
         <div class="flex gap-2">
             {#if editHref}
-                <a href={disabled ? null : editHref}>
-                    <button {disabled} class="btn btn-sm btn-primary">
-                        <Pencil class="h-4 w-4"/>
-                        Edit
-                    </button>
+                <a href={disabled ? null : editHref} class="btn btn-sm btn-primary" class:btn-disabled={disabled}>
+                    <Pencil class="h-4 w-4"/>
+                    Edit
                 </a>
             {/if}
 
@@ -85,6 +96,13 @@
                     <Play class="h-4 w-4"/>
                     Run now
                 </button>
+            {/if}
+
+            {#if healthBtnHref}
+                <a class="btn btn-success btn-sm" href={healthBtnHref} class:btn-disabled={disabled}>
+                    <HeartPulse class="w-4 h-4"/>
+                    {healthBtnMessage ?? 'Health'}
+                </a>
             {/if}
 
             {#if onduplicate || ondelete || secondaryBtns}
