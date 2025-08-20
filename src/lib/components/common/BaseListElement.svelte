@@ -73,11 +73,9 @@
 
         <div class="flex gap-2">
             {#if editHref}
-                <a href={disabled ? null : editHref}>
-                    <button {disabled} class="btn btn-sm btn-primary">
-                        <Pencil class="h-4 w-4"/>
-                        Edit
-                    </button>
+                <a href={disabled ? null : editHref} class="btn btn-sm btn-primary" class:btn-disabled={disabled}>
+                    <Pencil class="h-4 w-4"/>
+                    Edit
                 </a>
             {/if}
 
