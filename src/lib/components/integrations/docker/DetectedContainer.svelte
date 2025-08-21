@@ -11,6 +11,7 @@
     } from '$lib/server/schemas/api';
     import type { ContainerInspectInfo, ImageInspectInfo } from 'dockerode';
     import type { ModalControls } from '$lib/helpers/modal';
+    import { capitalizeFirstLetter } from '$lib/helpers/format';
 
     interface Props {
         container: ContainerInspectInfo;
@@ -72,7 +73,7 @@
 
         const params = new URLSearchParams({
             engine: engineId,
-            name: name.slice(0, 1).toUpperCase() + name.slice(1),
+            name: capitalizeFirstLetter(name),
         });
 
         if (connectionString) {

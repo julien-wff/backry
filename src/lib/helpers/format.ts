@@ -69,3 +69,12 @@ export const slugify = (text: string) =>
         .toLowerCase()
         .replace(/[^0-9a-z-]/g, '-')
         .replace(/-+/g, '-');
+
+
+/**
+ * Capitalize the first letter of a string.
+ * @param text The string to capitalize
+ * @returns The string with the first letter capitalized
+ */
+export const capitalizeFirstLetter = (text: string) =>
+    text.charAt(0).toUpperCase() + text.slice(1);

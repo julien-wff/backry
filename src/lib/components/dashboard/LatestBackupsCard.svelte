@@ -1,6 +1,6 @@
 <script lang="ts">
     import { FileCheck } from '$lib/components/icons';
-    import { formatDuration, formatSize } from '$lib/helpers/format.js';
+    import { capitalizeFirstLetter, formatDuration, formatSize } from '$lib/helpers/format.js';
     import type { getDashboardStats } from '$lib/server/queries/shared';
     import dayjs from 'dayjs';
     import relativeTime from 'dayjs/plugin/relativeTime';
@@ -27,13 +27,11 @@
 
     <div class="flex flex-col gap-2 mt-4">
         {#each backups as backup (backup.id)}
-            {@const backupDate = dayjs.utc(backup.finishedAt).fromNow()}
-
             <div class="flex items-center justify-between gap-2 bg-base-200 py-2 px-3 rounded-box">
                 <div class="flex flex-col">
                     <span>{backup.jobDatabase.job.name} - {backup.jobDatabase.database.name}</span>
                     <span class="text-sm text-base-content/50 line-clamp-1">
-                        {backupDate.slice(0, 1).toUpperCase()}{backupDate.slice(1)} -
+                        {capitalizeFirstLetter(dayjs.utc(backup.finishedAt).fromNow())} -
                         {#if backup.error}
                             <span class="text-error/80">
                                 {backup.error}
