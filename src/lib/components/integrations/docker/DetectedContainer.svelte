@@ -30,7 +30,7 @@
     let selectedHostName = $state<string | null>(null);
 
     let selectedHostNameUnreachable = $derived(
-        hostnameScanResult?.find(h => `${h.host}:${h.port}` === selectedHostName && !h.reachable) ?? false,
+        hostnameScanResult?.some(h => `${h.host}:${h.port}` === selectedHostName && !h.reachable),
     );
 
     async function showAddModal() {

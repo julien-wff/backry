@@ -38,7 +38,7 @@
                     <span>No container found</span>
                 </div>
             {:else}
-                {#each containers as container}
+                {#each containers as container (container.id)}
                     <DetectedContainer {container}
                                        image={data.images[container.image]}
                                        {engineId}
