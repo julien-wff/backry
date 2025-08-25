@@ -29,6 +29,7 @@ export const databaseRequest = z.object({
     name: z.string().min(2),
     slug: z.string().min(2).regex(/^[a-z0-9-]+$/),
     connectionString: z.string().min(2),
+    containerName: z.string().trim().regex(/[a-zA-Z0-9][a-zA-Z0-9_.-]*/).max(63).optional().nullable(),
     status: z.enum(DATABASE_ALLOWED_STATUSES).optional(),
     error: z.string().min(2).nullable().optional(),
 });

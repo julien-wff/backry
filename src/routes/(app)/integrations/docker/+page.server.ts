@@ -1,12 +1,23 @@
-import { getContainersByEngines, getImagesFromContainers } from '$lib/server/services/docker';
-import type { ContainerInspectInfo, ImageInspectInfo } from 'dockerode';
+import {
+    getContainersByEngines,
+    getImagesFromContainers,
+    processContainerForClient,
+    processImageForClient,
+} from '$lib/server/services/docker';
+import type { ContainerInspectInfo } from 'dockerode';
+import { DATABASE_ENGINES } from '$lib/server/db/schema';
+import { getDatabasesWithContainer } from '$lib/server/queries/databases';
+
+type FormattedContainers = Record<typeof DATABASE_ENGINES[number], ReturnType<typeof processContainerForClient>[]>;
+type FormattedImages = Record<string, ReturnType<typeof processImageForClient>>;
 
 export const load = async () => {
     const containersByEngine = await getContainersByEngines();
     if (containersByEngine.isErr()) {
         return {
-            containers: [],
-            images: {} as Record<string, ImageInspectInfo>,
+            containers: {} as FormattedContainers,
+            images: {} as FormattedImages,
+            databases: [],
             error: containersByEngine.error,
         };
     }
@@ -17,9 +28,23 @@ export const load = async () => {
     ], [] as ContainerInspectInfo[]);
     const images = await getImagesFromContainers(containers);
 
+    const containersByEngineFormatted: Record<string, ReturnType<typeof processContainerForClient>[]> = {};
+    for (const [ engine, containers ] of Object.entries(containersByEngine.value)) {
+        containersByEngineFormatted[engine as typeof DATABASE_ENGINES[number]] = containers.map(processContainerForClient);
+    }
+
+    const imagesFormatted: FormattedImages = {};
+    for (const [ imageId, image ] of Object.entries(images.isOk() ? images.value : {})) {
+        imagesFormatted[imageId] = processImageForClient(image);
+    }
+
+    // Associated databases
+    const databases = await getDatabasesWithContainer();
+
     return {
-        containers: containersByEngine.value,
-        images: images.isOk() ? images.value : {},
+        containers: containersByEngineFormatted as FormattedContainers,
+        images: imagesFormatted,
+        databases,
         error: images.isErr() ? images.error : null,
     };
 };

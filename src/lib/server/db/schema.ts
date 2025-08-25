@@ -17,6 +17,7 @@ export const databases = sqliteTable('databases', {
     createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`),
     updatedAt: text('updated_at').default(sql`(CURRENT_TIMESTAMP)`).$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
     connectionString: text('connection_string').notNull(),
+    containerName: text('container_name'),
 });
 
 export const databasesRelations = relations(databases, ({ many }) => ({

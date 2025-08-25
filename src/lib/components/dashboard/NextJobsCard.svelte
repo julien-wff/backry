@@ -3,6 +3,7 @@
     import type { getDashboardStats } from '$lib/server/queries/shared';
     import dayjs from 'dayjs';
     import relativeTime from 'dayjs/plugin/relativeTime';
+    import { capitalizeFirstLetter } from '$lib/helpers/format';
 
     dayjs.extend(relativeTime);
 
@@ -24,8 +25,6 @@
 
     <div class="flex flex-col gap-2 mt-4">
         {#each jobs as job}
-            {@const timeBeforeNextRun = dayjs(job.nextDate).fromNow()}
-
             <div class="flex items-center justify-between gap-2 bg-base-200 py-2 px-3 rounded-box">
                 <div class="flex flex-col">
                     <span>
@@ -33,7 +32,7 @@
                         database{(job.jobsDatabases?.length ?? 0) > 1 ? 's' : ''}
                     </span>
                     <span class="text-sm text-base-content/50 line-clamp-1">
-                        {timeBeforeNextRun.slice(0, 1).toUpperCase()}{timeBeforeNextRun.slice(1)} -
+                        {capitalizeFirstLetter(dayjs(job.nextDate).fromNow())} -
                         to {job.storage?.name}
                     </span>
                 </div>

@@ -37,6 +37,8 @@
         (selectedEngine && ENGINES_META[selectedEngine].connectionStringPlaceholder) || '',
     );
 
+    let containerName = $state(data.database?.containerName ?? searchParams.get('container') ?? '');
+
     let isConnectionTesting = $state(false);
     let databaseConnectionStatus = $state<'untested' | 'success' | 'error'>('untested');
     let isFormSubmitting = $state(false);
@@ -113,6 +115,7 @@
                 slug,
                 engine: selectedEngine,
                 connectionString,
+                containerName: containerName || null,
                 status: databaseStatus,
                 error: databaseError,
             },
@@ -138,7 +141,7 @@
              title="{data.database ? 'Edit' : 'Add new'} database connection">
     <InputContainer label="Engine">
         <div class="flex gap-2">
-            {#each ENGINE_META_ENTRIES as [engineId, engine] (engineId)}
+            {#each ENGINE_META_ENTRIES as [ engineId, engine ] (engineId)}
                 <div class="w-32 gap-2 px-4 py-2 flex flex-col items-center bg-base-300 justify-center rounded-lg cursor-pointer border-2"
                      class:border-primary={selectedEngine === engineId}
                      class:border-transparent={selectedEngine !== engineId}
@@ -175,6 +178,19 @@
                name="connectionString"
                placeholder={connectionStringPlaceholder}
                required>
+    </InputContainer>
+
+    <InputContainer for="container-name" label="Docker container name (if any)">
+        <input autocapitalize="off"
+               autocomplete="off"
+               bind:value={containerName}
+               class="input w-full"
+               id="container-name"
+               inputmode="text"
+               maxlength="63"
+               name="containerName"
+               pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]*"
+               spellcheck="false">
     </InputContainer>
 
     <div class="flex gap-2">

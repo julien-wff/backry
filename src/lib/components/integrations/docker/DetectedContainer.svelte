@@ -1,7 +1,7 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
     import Modal from '$lib/components/common/Modal.svelte';
-    import { CirclePlus, OctagonAlert } from '$lib/components/icons';
+    import { CircleArrowRight, CirclePlus, OctagonAlert } from '$lib/components/icons';
     import { fetchApi } from '$lib/helpers/fetch';
     import type { DATABASE_ENGINES } from '$lib/server/db/schema';
     import {
@@ -9,21 +9,19 @@
         type DockerConnectionStringResponse,
         type DockerHostnamesCheckResponse,
     } from '$lib/server/schemas/api';
-    import type { ContainerInspectInfo, ImageInspectInfo } from 'dockerode';
+    import type { processContainerForClient, processImageForClient } from '$lib/server/services/docker';
     import type { ModalControls } from '$lib/helpers/modal';
+    import { capitalizeFirstLetter } from '$lib/helpers/format';
+    import type { getDatabasesWithContainer } from '$lib/server/queries/databases';
 
     interface Props {
-        container: ContainerInspectInfo;
-        image?: ImageInspectInfo;
+        container: ReturnType<typeof processContainerForClient>;
+        image?: ReturnType<typeof processImageForClient>;
         engineId: string;
+        databases: Awaited<ReturnType<typeof getDatabasesWithContainer>>;
     }
 
-    let { container, image, engineId }: Props = $props();
-
-    let composeName = $derived(
-        container.Config.Labels?.['com.docker.compose.project'] || container.Config.Labels?.['com.docker.compose.service'],
-    );
-    let canBeAdded = $derived(container.State.Running);
+    let { container, image, engineId, databases }: Props = $props();
 
     let addModalControls = $state<ModalControls>();
     let loading = $state(false);
@@ -31,13 +29,17 @@
     let hostnameScanResult = $state<DockerHostnamesCheckResponse['ips'] | null>(null);
     let selectedHostName = $state<string | null>(null);
 
+    let selectedHostNameUnreachable = $derived(
+        hostnameScanResult?.some(h => `${h.host}:${h.port}` === selectedHostName && !h.reachable),
+    );
+
     async function showAddModal() {
         addModalControls?.open();
         loading = true;
         error = null;
         selectedHostName = null;
 
-        const res = await fetchApi<DockerHostnamesCheckResponse>('GET', `/api/integrations/docker/hostnames/${container.Id}`, null);
+        const res = await fetchApi<DockerHostnamesCheckResponse>('GET', `/api/integrations/docker/hostnames/${container.id}`, null);
         loading = false;
 
         if (res.isErr()) {
@@ -51,10 +53,10 @@
     async function getConnectionString() {
         const res = await fetchApi<DockerConnectionStringResponse, typeof dockerConnectionStringRequest>(
             'POST',
-            `/api/integrations/docker/connection-string/${container.Id}`,
+            `/api/integrations/docker/connection-string/${container.id}`,
             {
                 engine: engineId as typeof DATABASE_ENGINES[number],
-                hostname: selectedHostName ? selectedHostName.split(':')[0] : 'hostname',
+                hostname: selectedHostName ? selectedHostName.split(':')[0] : 'HOSTNAME',
                 port: selectedHostName ? parseInt(selectedHostName.split(':')[1]) : undefined,
             },
         );
@@ -67,12 +69,13 @@
     }
 
     async function redirectToNewDatabase() {
-        const name = container.Name.slice(1).replace(/[-_]/g, ' ').replace(/ +/g, ' ').trim();
+        const name = container.name.replace(/[-_]/g, ' ').replace(/ +/g, ' ').trim();
         const connectionString = await getConnectionString();
 
         const params = new URLSearchParams({
             engine: engineId,
-            name: name.slice(0, 1).toUpperCase() + name.slice(1),
+            name: capitalizeFirstLetter(name),
+            container: container.name,
         });
 
         if (connectionString) {
@@ -87,83 +90,125 @@
     <div class="flex-1">
         <div class="flex flex-row items-center gap-2">
             <div class="capitalize badge badge-sm"
-                 class:badge-error={container.State.Error}
-                 class:badge-neutral={!container.State.Running && !container.State.Error}
-                 class:badge-success={container.State.Running}>
-                {container.State.Status}
+                 class:badge-error={container.state.Error}
+                 class:badge-neutral={!container.state.Running && !container.state.Error}
+                 class:badge-success={container.state.Running}>
+                {container.state.Status}
             </div>
             <span>
-                {composeName ? `${composeName} >` : ''} {container.Name.slice(1)} ({container.Id.slice(0, 12)})
+                {container.composeStackName ? `${container.composeStackName} >` : ''} {container.name}
+                ({container.id.slice(0, 12)})
             </span>
         </div>
 
         <div class="text-sm">
-            Image: {image?.RepoTags[0] ?? '<unknown>'}
+            Image: {image?.tagName ?? '<unknown>'}
         </div>
     </div>
 
-    {#if canBeAdded}
-        <div class="flex items-center">
-            <button class="btn btn-primary btn-soft btn-square" onclick={showAddModal}>
+    <div class="flex items-center">
+        {#if databases.length === 0}
+            <button class="btn btn-sm btn-primary btn-soft btn-square" onclick={showAddModal} aria-label="Add database">
                 <CirclePlus class="h-6 w-6"/>
             </button>
-        </div>
-    {/if}
+        {:else if databases.length === 1}
+            <a href="/databases/{databases[0].id}"
+               class="btn btn-sm btn-success btn-soft btn-square"
+               aria-label="View database">
+                <CircleArrowRight class="h-6 w-6"/>
+            </a>
+        {:else}
+            <div class="dropdown dropdown-end">
+                <div tabindex="0" class="btn btn-sm btn-success btn-soft btn-square" role="button">
+                    <CircleArrowRight class="h-6 w-6"/>
+                </div>
+                <ul class="dropdown-content menu bg-base-200 rounded-box z-1 w-48 p-2 shadow-sm gap-2">
+                    {#each databases as db}
+                        <li>
+                            <a href="/databases/{db.id}" class="btn btn-sm">
+                                {db.name}
+                            </a>
+                        </li>
+                    {/each}
+                </ul>
+            </div>
+        {/if}
+    </div>
 </div>
 
 
-{#if canBeAdded}
-    <Modal bind:controls={addModalControls} title="Add {container.Name.slice(1)} to databases">
-        {#if loading}
-            <div role="alert" class="alert alert-soft">
-                <span class="loading loading-spinner loading-sm"></span>
-                <span>Finding reachable hostnames...</span>
-            </div>
-        {:else if error}
-            <div role="alert" class="alert alert-error alert-soft">
+<Modal bind:controls={addModalControls} title="Add {container.name} to databases">
+    {#if loading}
+        <div role="alert" class="alert alert-soft">
+            <span class="loading loading-spinner loading-sm"></span>
+            <span>Finding reachable hostnames...</span>
+        </div>
+    {:else if error}
+        <div role="alert" class="alert alert-error alert-soft">
+            <OctagonAlert class="h-4 w-4"/>
+            <span>{error}</span>
+        </div>
+    {:else if hostnameScanResult}
+
+        {#if !container.state.Running}
+            <div role="alert" class="alert alert-warning alert-soft mb-4">
                 <OctagonAlert class="h-4 w-4"/>
-                <span>{error}</span>
-            </div>
-        {:else if hostnameScanResult}
-            <div>Select the container hostname and port:</div>
-            <div class="mt-2 flex flex-col gap-2">
-                {#each hostnameScanResult as hostname}
-                    <label class="flex items-center gap-2">
-                        <input type="radio"
-                               name="hostname"
-                               class="radio radio-sm"
-                               class:radio-primary={hostname.reachable}
-                               class:radio-error={!hostname.reachable}
-                               bind:group={selectedHostName}
-                               value="{hostname.host}:{hostname.port}"
-                               disabled={!hostname.reachable}>
-                        <span class:opacity-70={!hostname.reachable}>
-                                {hostname.host}:{hostname.port}
-                            {#if !hostname.reachable}
-                                    (unreachable)
-                                {/if}
-                            </span>
-                    </label>
-                {/each}
-                <label class="flex items-center gap-2">
-                    <input type="radio"
-                           bind:group={selectedHostName}
-                           name="hostname"
-                           class="radio radio-sm radio-primary"
-                           value="">
-                    Manually input at next step
-                </label>
+                <span>
+                    Container is not running. It is highly recommended to start the container, refresh this page and
+                    try again.
+                </span>
             </div>
         {/if}
 
-        <div class="modal-action">
-            <button class="btn">Cancel</button>
-            <button class="btn btn-primary"
-                    type="button"
-                    onclick={redirectToNewDatabase}
-                    disabled={loading || selectedHostName === null}>
-                Continue
-            </button>
+        {#if selectedHostNameUnreachable}
+            <div role="alert" class="alert alert-warning alert-soft mb-4">
+                <OctagonAlert class="h-4 w-4"/>
+                <span>
+                    In the current state, selecting an unreachable hostname will lead to a failed connection.
+                </span>
+            </div>
+        {/if}
+
+        <div>Select the preferred container hostname and port:</div>
+        <div class="mt-2 flex flex-col gap-2">
+            {#each hostnameScanResult as hostname}
+                <label class="flex items-center gap-2">
+                    <input type="radio"
+                           name="hostname"
+                           class="radio radio-sm"
+                           class:radio-primary={hostname.reachable}
+                           class:radio-warning={!hostname.reachable}
+                           bind:group={selectedHostName}
+                           value="{hostname.host}:{hostname.port}">
+                    <span>
+                        {hostname.host}:{hostname.port}
+                        {#if !hostname.reachable}
+                            (unreachable)
+                        {/if}
+                    </span>
+                </label>
+            {/each}
+
+            <label class="flex items-center gap-2">
+                <input type="radio"
+                       bind:group={selectedHostName}
+                       name="hostname"
+                       class="radio radio-sm radio-primary"
+                       value="">
+                Manually input at next step
+            </label>
         </div>
-    </Modal>
-{/if}
+    {/if}
+
+    <div class="modal-action">
+        <button class="btn">Cancel</button>
+        <button class="btn"
+                class:btn-primary={!selectedHostNameUnreachable}
+                class:btn-warning={selectedHostNameUnreachable}
+                disabled={loading || selectedHostName === null}
+                onclick={redirectToNewDatabase}
+                type="button">
+            Continue
+        </button>
+    </div>
+</Modal>

@@ -12,7 +12,10 @@ export const GET: RequestHandler = async ({ params }) => {
         return apiError(containerInfos.error, 500);
     }
 
-    const internalPorts = Object.keys(containerInfos.value.NetworkSettings.Ports)
+    const internalPorts = [ ...new Set([
+        ...Object.keys(containerInfos.value.NetworkSettings?.Ports ?? {}),
+        ...Object.keys(containerInfos.value.Config?.ExposedPorts ?? {}),
+    ]) ]
         .map(p => parseInt(p.split('/')[0]))
         .filter(p => !isNaN(p));
     const internalHostNames = [

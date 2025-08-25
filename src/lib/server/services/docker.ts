@@ -91,3 +91,26 @@ export async function getImagesFromContainers(containers: ContainerInspectInfo[]
         return err(error instanceof Error ? error.message : 'Unknown error');
     }
 }
+
+/**
+ * Filter out unnecessary properties from ContainerInspectInfo for client-side use
+ * @param container ContainerInspectInfo object
+ * @returns Object with only the necessary properties for client-side use
+ */
+export const processContainerForClient = (container: ContainerInspectInfo) => ({
+    id: container.Id,
+    name: container.Name.slice(1),
+    image: container.Image,
+    state: container.State,
+    composeStackName: container.Config.Labels?.['com.docker.compose.project'] || container.Config.Labels?.['com.docker.compose.service'] || null,
+});
+
+/**
+ * Filter out unnecessary properties from ImageInspectInfo for client-side use
+ * @param image ImageInspectInfo object
+ * @returns Object with only the necessary properties for client-side use
+ */
+export const processImageForClient = (image: ImageInspectInfo) => ({
+    id: image.Id,
+    tagName: image.RepoTags?.[0] || `<none> (${image.Id.replace(/^sha256:/, '').slice(0, 12)})`,
+});
