@@ -130,9 +130,7 @@
                     <label class="flex items-center gap-2">
                         <input type="radio"
                                name="hostname"
-                               class="radio radio-sm"
-                               class:radio-primary={hostname.reachable}
-                               class:radio-error={!hostname.reachable}
+                               class="radio radio-primary radio-sm"
                                bind:group={selectedHostName}
                                value="{hostname.host}:{hostname.port}"
                                disabled={!hostname.reachable}>
