@@ -143,7 +143,7 @@
             </div>
         {/if}
 
-        <div>Select the container hostname and port:</div>
+        <div>Select the preferred container hostname and port:</div>
         <div class="mt-2 flex flex-col gap-2">
             {#each hostnameScanResult as hostname}
                 <label class="flex items-center gap-2">
