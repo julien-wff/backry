@@ -39,7 +39,7 @@
                 </div>
             {:else}
                 {#each containers as container}
-                    <DetectedContainer {container} image={data.images[container.Image]} {engineId}/>
+                    <DetectedContainer {container} image={data.images[container.image]} {engineId}/>
                 {/each}
             {/if}
         </div>

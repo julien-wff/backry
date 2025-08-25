@@ -9,22 +9,19 @@
         type DockerConnectionStringResponse,
         type DockerHostnamesCheckResponse,
     } from '$lib/server/schemas/api';
-    import type { ContainerInspectInfo, ImageInspectInfo } from 'dockerode';
+    import type { processContainerForClient, processImageForClient } from '$lib/server/services/docker';
     import type { ModalControls } from '$lib/helpers/modal';
     import { capitalizeFirstLetter } from '$lib/helpers/format';
 
     interface Props {
-        container: ContainerInspectInfo;
-        image?: ImageInspectInfo;
+        container: ReturnType<typeof processContainerForClient>;
+        image?: ReturnType<typeof processImageForClient>;
         engineId: string;
     }
 
     let { container, image, engineId }: Props = $props();
 
-    let composeName = $derived(
-        container.Config.Labels?.['com.docker.compose.project'] || container.Config.Labels?.['com.docker.compose.service'],
-    );
-    let canBeAdded = $derived(container.State.Running);
+    let canBeAdded = $derived(container.state.Running);
 
     let addModalControls = $state<ModalControls>();
     let loading = $state(false);
@@ -38,7 +35,7 @@
         error = null;
         selectedHostName = null;
 
-        const res = await fetchApi<DockerHostnamesCheckResponse>('GET', `/api/integrations/docker/hostnames/${container.Id}`, null);
+        const res = await fetchApi<DockerHostnamesCheckResponse>('GET', `/api/integrations/docker/hostnames/${container.id}`, null);
         loading = false;
 
         if (res.isErr()) {
@@ -52,7 +49,7 @@
     async function getConnectionString() {
         const res = await fetchApi<DockerConnectionStringResponse, typeof dockerConnectionStringRequest>(
             'POST',
-            `/api/integrations/docker/connection-string/${container.Id}`,
+            `/api/integrations/docker/connection-string/${container.id}`,
             {
                 engine: engineId as typeof DATABASE_ENGINES[number],
                 hostname: selectedHostName ? selectedHostName.split(':')[0] : 'hostname',
@@ -68,7 +65,7 @@
     }
 
     async function redirectToNewDatabase() {
-        const name = container.Name.slice(1).replace(/[-_]/g, ' ').replace(/ +/g, ' ').trim();
+        const name = container.name.replace(/[-_]/g, ' ').replace(/ +/g, ' ').trim();
         const connectionString = await getConnectionString();
 
         const params = new URLSearchParams({
@@ -88,18 +85,19 @@
     <div class="flex-1">
         <div class="flex flex-row items-center gap-2">
             <div class="capitalize badge badge-sm"
-                 class:badge-error={container.State.Error}
-                 class:badge-neutral={!container.State.Running && !container.State.Error}
-                 class:badge-success={container.State.Running}>
-                {container.State.Status}
+                 class:badge-error={container.state.Error}
+                 class:badge-neutral={!container.state.Running && !container.state.Error}
+                 class:badge-success={container.state.Running}>
+                {container.state.Status}
             </div>
             <span>
-                {composeName ? `${composeName} >` : ''} {container.Name.slice(1)} ({container.Id.slice(0, 12)})
+                {container.composeStackName ? `${container.composeStackName} >` : ''} {container.name}
+                ({container.id.slice(0, 12)})
             </span>
         </div>
 
         <div class="text-sm">
-            Image: {image?.RepoTags[0] ?? '<unknown>'}
+            Image: {image?.tagName ?? '<unknown>'}
         </div>
     </div>
 
@@ -114,7 +112,7 @@
 
 
 {#if canBeAdded}
-    <Modal bind:controls={addModalControls} title="Add {container.Name.slice(1)} to databases">
+    <Modal bind:controls={addModalControls} title="Add {container.name} to databases">
         {#if loading}
             <div role="alert" class="alert alert-soft">
                 <span class="loading loading-spinner loading-sm"></span>
