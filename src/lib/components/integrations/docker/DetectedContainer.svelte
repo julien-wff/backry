@@ -75,6 +75,7 @@
         const params = new URLSearchParams({
             engine: engineId,
             name: capitalizeFirstLetter(name),
+            container: container.name,
         });
 
         if (connectionString) {
