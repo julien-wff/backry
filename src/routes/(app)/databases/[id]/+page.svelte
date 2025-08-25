@@ -182,10 +182,15 @@
 
     <InputContainer for="container-name" label="Docker container name (if any)">
         <input autocapitalize="off"
+               autocomplete="off"
                bind:value={containerName}
                class="input w-full"
                id="container-name"
-               name="containerName">
+               inputmode="text"
+               maxlength="63"
+               name="containerName"
+               pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]*"
+               spellcheck="false">
     </InputContainer>
 
     <div class="flex gap-2">
