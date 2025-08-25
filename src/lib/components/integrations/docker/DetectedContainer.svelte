@@ -52,7 +52,7 @@
             `/api/integrations/docker/connection-string/${container.id}`,
             {
                 engine: engineId as typeof DATABASE_ENGINES[number],
-                hostname: selectedHostName ? selectedHostName.split(':')[0] : 'hostname',
+                hostname: selectedHostName ? selectedHostName.split(':')[0] : 'HOSTNAME',
                 port: selectedHostName ? parseInt(selectedHostName.split(':')[1]) : undefined,
             },
         );
@@ -101,66 +101,74 @@
         </div>
     </div>
 
-    {#if canBeAdded}
-        <div class="flex items-center">
-            <button class="btn btn-primary btn-soft btn-square" onclick={showAddModal}>
-                <CirclePlus class="h-6 w-6"/>
-            </button>
-        </div>
-    {/if}
+    <div class="flex items-center">
+        <button class="btn btn-sm btn-primary btn-soft btn-square" onclick={showAddModal}>
+            <CirclePlus class="h-6 w-6"/>
+        </button>
+    </div>
 </div>
 
 
-{#if canBeAdded}
-    <Modal bind:controls={addModalControls} title="Add {container.name} to databases">
-        {#if loading}
-            <div role="alert" class="alert alert-soft">
-                <span class="loading loading-spinner loading-sm"></span>
-                <span>Finding reachable hostnames...</span>
-            </div>
-        {:else if error}
-            <div role="alert" class="alert alert-error alert-soft">
+<Modal bind:controls={addModalControls} title="Add {container.name} to databases">
+    {#if loading}
+        <div role="alert" class="alert alert-soft">
+            <span class="loading loading-spinner loading-sm"></span>
+            <span>Finding reachable hostnames...</span>
+        </div>
+    {:else if error}
+        <div role="alert" class="alert alert-error alert-soft">
+            <OctagonAlert class="h-4 w-4"/>
+            <span>{error}</span>
+        </div>
+    {:else if hostnameScanResult}
+
+        {#if !container.state.Running}
+            <div role="alert" class="alert alert-warning alert-soft mb-4">
                 <OctagonAlert class="h-4 w-4"/>
-                <span>{error}</span>
-            </div>
-        {:else if hostnameScanResult}
-            <div>Select the container hostname and port:</div>
-            <div class="mt-2 flex flex-col gap-2">
-                {#each hostnameScanResult as hostname}
-                    <label class="flex items-center gap-2">
-                        <input type="radio"
-                               name="hostname"
-                               class="radio radio-primary radio-sm"
-                               bind:group={selectedHostName}
-                               value="{hostname.host}:{hostname.port}"
-                               disabled={!hostname.reachable}>
-                        <span class:opacity-70={!hostname.reachable}>
-                                {hostname.host}:{hostname.port}
-                            {#if !hostname.reachable}
-                                    (unreachable)
-                                {/if}
-                            </span>
-                    </label>
-                {/each}
-                <label class="flex items-center gap-2">
-                    <input type="radio"
-                           bind:group={selectedHostName}
-                           name="hostname"
-                           class="radio radio-sm radio-primary"
-                           value="">
-                    Manually input at next step
-                </label>
+                <span>
+                    Container is not running. It is highly recommended to start the container, refresh this page and
+                    try again.
+                </span>
             </div>
         {/if}
 
-        <div class="modal-action">
-            <button class="btn">Cancel</button>
-            <button class="btn btn-primary"
-                    type="button"
-                    onclick={redirectToNewDatabase}
-                    disabled={loading || selectedHostName === null}>
-                Continue
-            </button>
+        <div>Select the container hostname and port:</div>
+        <div class="mt-2 flex flex-col gap-2">
+            {#each hostnameScanResult as hostname}
+                <label class="flex items-center gap-2">
+                    <input type="radio"
+                           name="hostname"
+                           class="radio radio-primary radio-sm"
+                           bind:group={selectedHostName}
+                           value="{hostname.host}:{hostname.port}"
+                           disabled={!hostname.reachable}>
+                    <span class:opacity-70={!hostname.reachable}>
+                        {hostname.host}:{hostname.port}
+                        {#if !hostname.reachable}
+                            (unreachable)
+                        {/if}
+                    </span>
+                </label>
+            {/each}
+
+            <label class="flex items-center gap-2">
+                <input type="radio"
+                       bind:group={selectedHostName}
+                       name="hostname"
+                       class="radio radio-sm radio-primary"
+                       value="">
+                Manually input at next step
+            </label>
         </div>
-    </Modal>
-{/if}
+    {/if}
+
+    <div class="modal-action">
+        <button class="btn">Cancel</button>
+        <button class="btn btn-primary"
+                disabled={loading || selectedHostName === null}
+                onclick={redirectToNewDatabase}
+                type="button">
+            Continue
+        </button>
+    </div>
+</Modal>
