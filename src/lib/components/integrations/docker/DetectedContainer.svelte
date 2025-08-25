@@ -1,7 +1,7 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
     import Modal from '$lib/components/common/Modal.svelte';
-    import { CirclePlus, OctagonAlert } from '$lib/components/icons';
+    import { CircleArrowRight, CirclePlus, OctagonAlert } from '$lib/components/icons';
     import { fetchApi } from '$lib/helpers/fetch';
     import type { DATABASE_ENGINES } from '$lib/server/db/schema';
     import {
@@ -12,14 +12,16 @@
     import type { processContainerForClient, processImageForClient } from '$lib/server/services/docker';
     import type { ModalControls } from '$lib/helpers/modal';
     import { capitalizeFirstLetter } from '$lib/helpers/format';
+    import type { getDatabasesWithContainer } from '$lib/server/queries/databases';
 
     interface Props {
         container: ReturnType<typeof processContainerForClient>;
         image?: ReturnType<typeof processImageForClient>;
         engineId: string;
+        databases: Awaited<ReturnType<typeof getDatabasesWithContainer>>;
     }
 
-    let { container, image, engineId }: Props = $props();
+    let { container, image, engineId, databases }: Props = $props();
 
     let addModalControls = $state<ModalControls>();
     let loading = $state(false);
@@ -104,9 +106,32 @@
     </div>
 
     <div class="flex items-center">
-        <button class="btn btn-sm btn-primary btn-soft btn-square" onclick={showAddModal}>
-            <CirclePlus class="h-6 w-6"/>
-        </button>
+        {#if databases.length === 0}
+            <button class="btn btn-sm btn-primary btn-soft btn-square" onclick={showAddModal}>
+                <CirclePlus class="h-6 w-6"/>
+            </button>
+        {:else if databases.length === 1}
+            <a href="/databases/{databases[0].id}"
+               class="btn btn-sm btn-success btn-soft btn-square"
+               aria-label="View database">
+                <CircleArrowRight class="h-6 w-6"/>
+            </a>
+        {:else}
+            <div class="dropdown dropdown-end">
+                <div tabindex="0" class="btn btn-sm btn-success btn-soft btn-square" role="button">
+                    <CircleArrowRight class="h-6 w-6"/>
+                </div>
+                <ul class="dropdown-content menu bg-base-200 rounded-box z-1 w-48 p-2 shadow-sm gap-2">
+                    {#each databases as db}
+                        <li>
+                            <a href="/databases/{db.id}" class="btn btn-sm">
+                                {db.name}
+                            </a>
+                        </li>
+                    {/each}
+                </ul>
+            </div>
+        {/if}
     </div>
 </div>
 

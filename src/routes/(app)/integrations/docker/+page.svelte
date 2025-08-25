@@ -24,7 +24,7 @@
         </div>
     {/if}
 
-    {#each Object.entries(data.containers) as [engineId, containers]}
+    {#each Object.entries(data.containers) as [ engineId, containers ]}
         {@const engine = ENGINES_META[engineId as keyof typeof ENGINES_META]}
 
         <div>
@@ -39,7 +39,10 @@
                 </div>
             {:else}
                 {#each containers as container}
-                    <DetectedContainer {container} image={data.images[container.image]} {engineId}/>
+                    <DetectedContainer {container}
+                                       image={data.images[container.image]}
+                                       {engineId}
+                                       databases={data.databases.filter(d => d.containerName === container.name)}/>
                 {/each}
             {/if}
         </div>

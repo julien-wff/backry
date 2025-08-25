@@ -6,15 +6,18 @@ import {
 } from '$lib/server/services/docker';
 import type { ContainerInspectInfo } from 'dockerode';
 import { DATABASE_ENGINES } from '$lib/server/db/schema';
+import { getDatabasesWithContainer } from '$lib/server/queries/databases';
 
 type FormattedContainers = Record<typeof DATABASE_ENGINES[number], ReturnType<typeof processContainerForClient>[]>;
+type FormattedImages = Record<string, ReturnType<typeof processImageForClient>>;
 
 export const load = async () => {
     const containersByEngine = await getContainersByEngines();
     if (containersByEngine.isErr()) {
         return {
             containers: {} as FormattedContainers,
-            images: {},
+            images: {} as FormattedImages,
+            databases: [],
             error: containersByEngine.error,
         };
     }
@@ -30,14 +33,18 @@ export const load = async () => {
         containersByEngineFormatted[engine as typeof DATABASE_ENGINES[number]] = containers.map(processContainerForClient);
     }
 
-    const imagesFormatted: Record<string, ReturnType<typeof processImageForClient>> = {};
+    const imagesFormatted: FormattedImages = {};
     for (const [ imageId, image ] of Object.entries(images.isOk() ? images.value : {})) {
         imagesFormatted[imageId] = processImageForClient(image);
     }
 
+    // Associated databases
+    const databases = await getDatabasesWithContainer();
+
     return {
         containers: containersByEngineFormatted as FormattedContainers,
         images: imagesFormatted,
+        databases,
         error: images.isErr() ? images.error : null,
     };
 };

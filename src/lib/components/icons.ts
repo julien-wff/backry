@@ -5,6 +5,7 @@ import ArrowUp from '@lucide/svelte/icons/arrow-up';
 import Bell from '@lucide/svelte/icons/bell';
 import Blocks from '@lucide/svelte/icons/blocks';
 import ChevronLeft from '@lucide/svelte/icons/chevron-left';
+import CircleArrowRight from '@lucide/svelte/icons/circle-arrow-right';
 import CircleCheck from '@lucide/svelte/icons/circle-check';
 import CircleHelp from '@lucide/svelte/icons/circle-help';
 import CirclePlay from '@lucide/svelte/icons/circle-play';
@@ -55,6 +56,7 @@ export {
     Bell,
     Blocks,
     ChevronLeft,
+    CircleArrowRight,
     CircleCheck,
     CircleHelp,
     CirclePlay,
