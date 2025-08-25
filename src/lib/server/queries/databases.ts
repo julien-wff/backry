@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db';
 import { DATABASE_ENGINES, databases } from '$lib/server/db/schema';
-import { eq, inArray } from 'drizzle-orm';
+import { eq, inArray, isNotNull } from 'drizzle-orm';
 
 /**
  * Fetches a complete list of all databases with all fields.
@@ -67,3 +67,13 @@ export const updateDatabase = (id: number, values: typeof databases.$inferInsert
  */
 export const deleteDatabase = (id: number) =>
     db.delete(databases).where(eq(databases.id, id)).returning().get();
+
+/**
+ * Get databases that have a container name set (linked to a Docker container).
+ * @returns A list of databases with their ID, name, and container name.
+ */
+export const getDatabasesWithContainer = () => db
+    .select({ id: databases.id, name: databases.name, containerName: databases.containerName })
+    .from(databases)
+    .where(isNotNull(databases.containerName))
+    .execute();
