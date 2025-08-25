@@ -70,4 +70,11 @@
             <CollapsableElementList elements={jobListFormatted}/>
         {/if}
     </div>
+
+    {#if database.containerName}
+        <div class="flex items-center gap-1">
+            <img alt="Docker" class="w-4 h-4" src="/icons/docker.svg"/>
+            {database.containerName}
+        </div>
+    {/if}
 </BaseListElement>
