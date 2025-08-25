@@ -108,7 +108,7 @@
 
     <div class="flex items-center">
         {#if databases.length === 0}
-            <button class="btn btn-sm btn-primary btn-soft btn-square" onclick={showAddModal}>
+            <button class="btn btn-sm btn-primary btn-soft btn-square" onclick={showAddModal} aria-label="Add database">
                 <CirclePlus class="h-6 w-6"/>
             </button>
         {:else if databases.length === 1}
