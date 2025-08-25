@@ -112,5 +112,5 @@ export const processContainerForClient = (container: ContainerInspectInfo) => ({
  */
 export const processImageForClient = (image: ImageInspectInfo) => ({
     id: image.Id,
-    tagName: image.RepoTags?.[0] || `<none> (${image.Id.slice(0, 12)})`,
+    tagName: image.RepoTags?.[0] || `<none> (${image.Id.replace(/^sha256:/, '').slice(0, 12)})`,
 });
