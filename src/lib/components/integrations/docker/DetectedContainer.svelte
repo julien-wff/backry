@@ -21,13 +21,15 @@
 
     let { container, image, engineId }: Props = $props();
 
-    let canBeAdded = $derived(container.state.Running);
-
     let addModalControls = $state<ModalControls>();
     let loading = $state(false);
     let error = $state<string | null>(null);
     let hostnameScanResult = $state<DockerHostnamesCheckResponse['ips'] | null>(null);
     let selectedHostName = $state<string | null>(null);
+
+    let selectedHostNameUnreachable = $derived(
+        hostnameScanResult?.find(h => `${h.host}:${h.port}` === selectedHostName && !h.reachable) ?? false,
+    );
 
     async function showAddModal() {
         addModalControls?.open();
@@ -132,17 +134,27 @@
             </div>
         {/if}
 
+        {#if selectedHostNameUnreachable}
+            <div role="alert" class="alert alert-warning alert-soft mb-4">
+                <OctagonAlert class="h-4 w-4"/>
+                <span>
+                    In the current state, selecting an unreachable hostname will lead to a failed connection.
+                </span>
+            </div>
+        {/if}
+
         <div>Select the container hostname and port:</div>
         <div class="mt-2 flex flex-col gap-2">
             {#each hostnameScanResult as hostname}
                 <label class="flex items-center gap-2">
                     <input type="radio"
                            name="hostname"
-                           class="radio radio-primary radio-sm"
+                           class="radio radio-sm"
+                           class:radio-primary={hostname.reachable}
+                           class:radio-warning={!hostname.reachable}
                            bind:group={selectedHostName}
-                           value="{hostname.host}:{hostname.port}"
-                           disabled={!hostname.reachable}>
-                    <span class:opacity-70={!hostname.reachable}>
+                           value="{hostname.host}:{hostname.port}">
+                    <span>
                         {hostname.host}:{hostname.port}
                         {#if !hostname.reachable}
                             (unreachable)
@@ -164,7 +176,9 @@
 
     <div class="modal-action">
         <button class="btn">Cancel</button>
-        <button class="btn btn-primary"
+        <button class="btn"
+                class:btn-primary={!selectedHostNameUnreachable}
+                class:btn-warning={selectedHostNameUnreachable}
                 disabled={loading || selectedHostName === null}
                 onclick={redirectToNewDatabase}
                 type="button">
