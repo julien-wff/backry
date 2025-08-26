@@ -22,7 +22,8 @@ export const postgresqlMethods = {
         return [ this.dumpCommand, ...additionalArgs, connectionString ];
     },
 
-    async checkConnection(connectionString): Promise<ResultAsync<void, string>> {
+    async checkConnection(connectionString): Promise<ResultAsync<string, string>> {
+        // If no database is specified, update the connection string to use the current one.
         let con: SQL;
         try {
             con = new SQL({
@@ -35,10 +36,22 @@ export const postgresqlMethods = {
 
         try {
             await con.connect();
-            await con.close();
-            return ok();
+            const url = new URL(connectionString);
+
+            if (!url.pathname || url.pathname === '/') {
+                const dbName = await con`SELECT current_database()`.then(res => res[0]?.current_database);
+                if (!dbName) {
+                    throw new Error('Could not retrieve database name');
+                }
+
+                url.pathname = `/${dbName}`;
+            }
+
+            return ok(url.toString());
         } catch (e) {
             return err(e instanceof Error ? e.message : 'Error connecting to database');
+        } finally {
+            await con.close();
         }
     },
 

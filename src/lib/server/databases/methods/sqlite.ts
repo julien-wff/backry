@@ -17,7 +17,8 @@ export const sqliteMethods = {
         return ok(res.value.text().trim());
     },
 
-    async checkConnection(connectionString: string): Promise<ResultAsync<void, string>> {
+    async checkConnection(connectionString: string): Promise<ResultAsync<string, string>> {
+        // No need to specify the database
         try {
             const con = new Database(connectionString, { readonly: true, create: false });
             con.close();
@@ -28,7 +29,7 @@ export const sqliteMethods = {
             return err(`Unknown error: ${JSON.stringify(e)}`);
         }
 
-        return ok();
+        return ok(connectionString);
     },
 
     getDumpCommand(connectionString: string, additionalArgs?: string[]): string[] {

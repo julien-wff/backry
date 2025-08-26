@@ -41,6 +41,11 @@ export const databasesCheckRequest = z.object({
     engine: z.enum(DATABASE_ENGINES),
 });
 
+/** `POST /api/databases/check` */
+export interface DatabaseCheckResponse {
+    connectionString: string;
+}
+
 /**
  * `POST /api/databases`
  * `PUT /api/databases/[id]`

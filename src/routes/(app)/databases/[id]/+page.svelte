@@ -13,11 +13,13 @@
     import type { DATABASE_ENGINES } from '$lib/server/db/schema';
     import type {
         DATABASE_ALLOWED_STATUSES,
+        DatabaseCheckResponse,
         databaseRequest,
         DatabaseResponse,
         databasesCheckRequest,
     } from '$lib/server/schemas/api';
     import type { PageProps } from './$types';
+    import { tick } from 'svelte';
 
     let { data }: PageProps = $props();
     const { searchParams } = page.url;
@@ -70,7 +72,7 @@
         error = null;
         isConnectionTesting = true;
 
-        const res = await fetchApi<{}, typeof databasesCheckRequest>(
+        const res = await fetchApi<DatabaseCheckResponse, typeof databasesCheckRequest>(
             'POST',
             '/api/databases/check',
             {
@@ -85,6 +87,8 @@
             error = res.error;
             databaseConnectionStatus = 'error';
         } else {
+            connectionString = res.value.connectionString;
+            await tick(); // Wait for the connection string to update, to not trigger the reset effect
             error = null;
             databaseConnectionStatus = 'success';
         }

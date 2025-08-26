@@ -80,9 +80,10 @@ export interface EngineMethods {
     /**
      * Check the connection to the database.
      * @param connectionString Full connection string to the database.
-     * @returns Empty ok or error message.
+     * @returns On success, the connection string (potentially updated to apply fixes, like add the database name).
+     *          On failure, the error message.
      */
-    checkConnection(connectionString: string): Promise<ResultAsync<void, string>>;
+    checkConnection(connectionString: string): Promise<ResultAsync<string, string>>;
 
     /**
      * Determine if the Docker container compatible with the engine.

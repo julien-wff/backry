@@ -78,7 +78,17 @@ export const mysqlMethods = {
         };
     },
 
-    async checkConnection(connectionString): Promise<ResultAsync<void, string>> {
+    async checkConnection(connectionString): Promise<ResultAsync<string, string>> {
+        // A database name is required for MySQL connections. However, there is no "default database" like with PostgreSQL.
+        const url = URL.parse(connectionString);
+        if (!url) {
+            return err('Invalid connection string');
+        }
+
+        if (!url.pathname || url.pathname === '/') {
+            return err('Database name is required in the connection string');
+        }
+
         const res = await runCommandSync(
             this.checkCommand!,
             [
@@ -88,7 +98,7 @@ export const mysqlMethods = {
             ],
             {
                 env: {
-                    MYSQL_PWD: URL.parse(connectionString)?.password ?? '',
+                    MYSQL_PWD: url.password ?? '',
                 },
             },
         );
@@ -96,7 +106,7 @@ export const mysqlMethods = {
             return err(res.error.stderr.toString().trim());
         }
 
-        return ok(undefined);
+        return ok(connectionString);
     },
 
     isDockerContainerFromEngine(container: ContainerInspectInfo): boolean {
