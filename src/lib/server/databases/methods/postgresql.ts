@@ -23,6 +23,7 @@ export const postgresqlMethods = {
     },
 
     async checkConnection(connectionString): Promise<ResultAsync<string, string>> {
+        // If no database is specified, update the connection string to use the current one.
         let con: SQL;
         try {
             con = new SQL({

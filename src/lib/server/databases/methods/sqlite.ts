@@ -18,6 +18,7 @@ export const sqliteMethods = {
     },
 
     async checkConnection(connectionString: string): Promise<ResultAsync<string, string>> {
+        // No need to specify the database
         try {
             const con = new Database(connectionString, { readonly: true, create: false });
             con.close();

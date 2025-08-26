@@ -79,6 +79,7 @@ export const mysqlMethods = {
     },
 
     async checkConnection(connectionString): Promise<ResultAsync<string, string>> {
+        // A database name is required for MySQL connections. However, there is no "default database" like with PostgreSQL.
         const url = URL.parse(connectionString);
         if (!url) {
             return err('Invalid connection string');

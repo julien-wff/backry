@@ -24,6 +24,7 @@ export const mongodbMethods = {
     },
 
     async checkConnection(connectionString): Promise<ResultAsync<string, string>> {
+        // Connection string doesn't need a database specified. No db = backup all databases.
         try {
             const client = new MongoClient(connectionString, {
                 connectTimeoutMS: 3000,
