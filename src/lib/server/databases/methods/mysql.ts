@@ -98,7 +98,7 @@ export const mysqlMethods = {
             ],
             {
                 env: {
-                    MYSQL_PWD: URL.parse(connectionString)?.password ?? '',
+                    MYSQL_PWD: url.password ?? '',
                 },
             },
         );
