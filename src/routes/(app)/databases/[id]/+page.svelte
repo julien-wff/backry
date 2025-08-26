@@ -213,7 +213,9 @@
             {/if}
         </button>
 
-        <button class="btn btn-primary flex-1" disabled={isFormSubmitting} type="submit">
+        <button class="btn btn-primary flex-1"
+                disabled={isFormSubmitting || databaseConnectionStatus === 'untested'}
+                type="submit">
             Save {databaseConnectionStatus === 'error' ? 'anyway' : ''}
         </button>
     </div>
