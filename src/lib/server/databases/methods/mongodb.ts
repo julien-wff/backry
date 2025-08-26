@@ -23,7 +23,7 @@ export const mongodbMethods = {
         return [ this.dumpCommand, '--uri', connectionString, '--archive', '--quiet', ...additionalArgs ];
     },
 
-    async checkConnection(connectionString): Promise<ResultAsync<void, string>> {
+    async checkConnection(connectionString): Promise<ResultAsync<string, string>> {
         try {
             const client = new MongoClient(connectionString, {
                 connectTimeoutMS: 3000,
@@ -37,7 +37,7 @@ export const mongodbMethods = {
         } catch (e) {
             return err(e instanceof Error ? e.message : 'Unknown error');
         }
-        return ok();
+        return ok(connectionString);
     },
 
     isDockerContainerFromEngine(container: ContainerInspectInfo): boolean {
