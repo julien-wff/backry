@@ -1,7 +1,15 @@
 <script lang="ts">
     import { invalidateAll } from '$app/navigation';
     import BaseListElement from '$lib/components/common/BaseListElement.svelte';
-    import { Clock, ExternalLink, FileChartPie, FileDown, HardDriveDownload, Timer } from '$lib/components/icons';
+    import {
+        Clock,
+        ExternalLink,
+        FileChartPie,
+        FileDown,
+        HardDriveDownload,
+        History,
+        Timer,
+    } from '$lib/components/icons';
     import type { BACKUP_STATUS, backups, databases } from '$lib/server/db/schema';
     import type { BackupResponse } from '$lib/server/schemas/api';
     import { addToast } from '$lib/stores/toasts.svelte';
@@ -60,6 +68,12 @@
                 Download
             </a>
         </div>
+
+        <a href="/restores/new/{backup.id}"
+           class="btn btn-warning btn-sm btn-soft w-full">
+            <History class="w-4 h-4"/>
+            Restore
+        </a>
     {/if}
 
     {#if database}
