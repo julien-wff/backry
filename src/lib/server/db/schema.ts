@@ -5,6 +5,8 @@ export const ELEMENT_STATUS = [ 'active', 'inactive', 'error', 'unhealthy' ] as 
 export const DATABASE_ENGINES = [ 'postgresql', 'sqlite', 'mysql', 'mongodb' ] as const;
 export const BACKUP_STATUS = [ 'running', 'success', 'error', 'pruned' ] as const;
 export const RUN_ORIGIN = [ 'manual', 'scheduled' ] as const;
+export const RESTORE_DESTINATION = [ 'current', 'other' ] as const;
+export const RESTORE_STEPS = [ 'check_backup', 'check_destination', 'drop_db', 'restore' ] as const;
 export const NOTIFICATION_TRIGGER = [ 'run_finished', 'run_error' ] as const;
 
 export const databases = sqliteTable('databases', {
@@ -121,7 +123,7 @@ export const backups = sqliteTable('backups', {
     prunedAt: text('pruned_at'),
 });
 
-export const backupsRelations = relations(backups, ({ one }) => ({
+export const backupsRelations = relations(backups, ({ one, many }) => ({
     jobDatabase: one(jobDatabases, {
         fields: [ backups.jobDatabaseId ],
         references: [ jobDatabases.id ],
@@ -129,6 +131,28 @@ export const backupsRelations = relations(backups, ({ one }) => ({
     run: one(runs, {
         fields: [ backups.runId ],
         references: [ runs.id ],
+    }),
+    restores: many(restores),
+}));
+
+export const restores = sqliteTable('restores', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    backupId: integer('backup_id').references(() => backups.id, { onDelete: 'set null' }),
+    error: text('error'),
+    createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`),
+    updatedAt: text('updated_at').default(sql`(CURRENT_TIMESTAMP)`).$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
+    finishedAt: text('finished_at'),
+    destination: text('destination', { enum: RESTORE_DESTINATION }).notNull(),
+    connectionString: text('connection_string').notNull(),
+    dropDatabase: integer('drop_database').$type<0 | 1>().notNull().default(0),
+    currentStep: text('current_step', { enum: RESTORE_STEPS }).notNull().default('check_backup'),
+    restoreLogs: text('restore_logs'),
+});
+
+export const restoresRelations = relations(restores, ({ one }) => ({
+    backup: one(backups, {
+        fields: [ restores.backupId ],
+        references: [ backups.id ],
     }),
 }));
 

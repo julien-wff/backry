@@ -1,4 +1,4 @@
-import { runCommandStream, runCommandSync, type StreamCommandOptions } from '$lib/server/services/cmd';
+import { pipeCommandSync, runCommandStream, runCommandSync, type StreamCommandOptions } from '$lib/server/services/cmd';
 import { logger } from '$lib/server/services/logger';
 import type {
     ResticBackupStatus,
@@ -7,6 +7,7 @@ import type {
     ResticForget,
     ResticInit,
     ResticLock,
+    ResticNode,
     ResticSnapshot,
     ResticStats,
 } from '$lib/types/restic';
@@ -306,6 +307,28 @@ export async function applyForgetPolicy(url: string,
     );
 
     return resticCommandToResult<ResticForget[]>(res, true, 1);
+}
+
+
+export async function listSnapshotFiles(url: string,
+                                        password: string,
+                                        env: Record<string, string>,
+                                        snapshotId: string) {
+    const res = await runCommandSync(
+        RESTIC_CMD,
+        [
+            '-r', url,
+            'ls',
+            snapshotId,
+            '--json',
+            '--no-lock',
+        ],
+        {
+            env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env },
+        },
+    );
+
+    return resticCommandToResult<ResticSnapshot | ResticNode>(res);
 }
 
 

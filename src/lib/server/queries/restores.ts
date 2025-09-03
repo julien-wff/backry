@@ -1,0 +1,23 @@
+import { db } from '$lib/server/db';
+import { restores } from '$lib/server/db/schema';
+import { eq, sql } from 'drizzle-orm';
+
+export const createRestore = (val: typeof restores.$inferInsert) => db
+    .insert(restores)
+    .values(val)
+    .returning()
+    .get();
+
+export const updateRestore = (id: number, val: Partial<typeof restores.$inferInsert>) => db
+    .update(restores)
+    .set(val)
+    .where(eq(restores.id, id))
+    .returning()
+    .get();
+
+export const setRestoreToFinished = (id: number, logs: string | null = null) => db
+    .update(restores)
+    .set({ finishedAt: sql`(CURRENT_TIMESTAMP)`, restoreLogs: logs })
+    .where(eq(restores.id, id))
+    .returning()
+    .get();
