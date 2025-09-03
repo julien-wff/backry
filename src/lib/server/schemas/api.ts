@@ -6,6 +6,7 @@ import {
     jobs,
     NOTIFICATION_TRIGGER,
     notifications,
+    RESTORE_DESTINATION,
     runs,
     storages,
 } from '$lib/server/db/schema';
@@ -225,6 +226,16 @@ export interface DockerHostnamesCheckResponse {
         reachable: boolean;
     }[];
 }
+
+// RESTORES
+
+/** `POST /api/restores` */
+export const restoreRequest = z.object({
+    backupId: z.number().positive(),
+    destination: z.enum(RESTORE_DESTINATION),
+    otherConnectionString: z.string().optional().nullable().default(() => null),
+    dropDatabase: z.boolean().optional().default(() => false),
+});
 
 // SETTINGS
 

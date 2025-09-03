@@ -3,6 +3,8 @@
     import type { ModalControls } from '$lib/helpers/modal';
     import type { getBackup } from '$lib/server/queries/backups';
     import RestoreRecap from '$lib/components/restores/RestoreRecap.svelte';
+    import { fetchApi } from '$lib/helpers/fetch';
+    import type { restoreRequest } from '$lib/server/schemas/api';
 
     interface Props {
         controls: ModalControls | undefined;
@@ -13,6 +15,17 @@
     }
 
     let { controls = $bindable(), backup, selectedDestination, otherConnectionString, dropDatabase }: Props = $props();
+
+    async function handleStartRestore(e: Event) {
+        e.preventDefault();
+
+        await fetchApi<object, typeof restoreRequest>('POST', '/api/restores', {
+            backupId: backup.id,
+            dropDatabase,
+            destination: selectedDestination,
+            otherConnectionString: selectedDestination === 'other' ? otherConnectionString : null,
+        });
+    }
 </script>
 
 <Modal bind:controls title="Restore recap">
@@ -28,6 +41,6 @@
 
     <div class="modal-action">
         <button class="btn" onclick={() => controls?.close()}>Back</button>
-        <button class="btn btn-warning">Start restore</button>
+        <button class="btn btn-warning" onclick={handleStartRestore}>Start restore</button>
     </div>
 </Modal>
