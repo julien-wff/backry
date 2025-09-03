@@ -112,4 +112,20 @@ export interface EngineMethods {
      * @return Connection string with the password hidden.
      */
     hidePasswordInConnectionString(connectionString: string): string;
+
+    /**
+     * Recreate the database, by dropping it if it exists, and creating a new one.
+     * If the engine does not support this operation, this method can be omitted.
+     * @param connectionString Full connection string to the database.
+     * @returns Nothing on success, error message on failure.
+     */
+    recreateDatabase?(connectionString: string): Promise<Result<void, string>>;
+
+    /**
+     * Get the command to restore a backup. The content of the backup will be piped to the command's stdin.
+     * If the engine does not support this operation, this method can be omitted.
+     * @param connectionString Full connection string to the database.
+     * @returns Full command to run the restore.
+     */
+    getRestoreBackupFromStdinCommand?(connectionString: string): string[];
 }
