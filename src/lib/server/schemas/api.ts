@@ -7,6 +7,7 @@ import {
     NOTIFICATION_TRIGGER,
     notifications,
     RESTORE_DESTINATION,
+    restores,
     runs,
     storages,
 } from '$lib/server/db/schema';
@@ -236,6 +237,8 @@ export const restoreRequest = z.object({
     otherConnectionString: z.string().optional().nullable().default(() => null),
     dropDatabase: z.boolean().optional().default(() => false),
 });
+
+export type RestoreResponse = typeof restores.$inferSelect;
 
 // SETTINGS
 

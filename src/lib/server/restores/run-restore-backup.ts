@@ -11,6 +11,7 @@ interface RunRestoreBackupArgs {
     selectedDestination: typeof RESTORE_DESTINATION[number];
     otherConnectionString?: string | null;
     dropDatabase: boolean;
+    onRestoreCreated?: (restore: typeof restores.$inferSelect) => void;
 }
 
 function restoreFailed(restore: typeof restores.$inferSelect, error: string) {
@@ -24,6 +25,7 @@ export async function runRestoreBackup({
                                            selectedDestination,
                                            otherConnectionString,
                                            dropDatabase,
+                                           onRestoreCreated,
                                        }: RunRestoreBackupArgs): Promise<Result<void, string>> {
     const connectionString = otherConnectionString ?? backup.jobDatabase.database.connectionString;
     const restore = createRestore({
@@ -32,6 +34,7 @@ export async function runRestoreBackup({
         destination: selectedDestination,
         dropDatabase: dropDatabase ? 1 : 0,
     });
+    onRestoreCreated?.(restore);
 
     const engineMethods = ENGINES_METHODS[backup.jobDatabase.database.engine];
 
