@@ -7,6 +7,7 @@ import Blocks from '@lucide/svelte/icons/blocks';
 import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 import CircleArrowRight from '@lucide/svelte/icons/circle-arrow-right';
 import CircleCheck from '@lucide/svelte/icons/circle-check';
+import CircleDot from '@lucide/svelte/icons/circle-dot';
 import CircleHelp from '@lucide/svelte/icons/circle-help';
 import CirclePlay from '@lucide/svelte/icons/circle-play';
 import CirclePlus from '@lucide/svelte/icons/circle-plus';
@@ -33,6 +34,7 @@ import Info from '@lucide/svelte/icons/info';
 import LayoutDashboard from '@lucide/svelte/icons/layout-dashboard';
 import Link from '@lucide/svelte/icons/link';
 import ListCheck from '@lucide/svelte/icons/list-check';
+import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 import LockKeyholeOpen from '@lucide/svelte/icons/lock-keyhole-open';
 import OctagonAlert from '@lucide/svelte/icons/octagon-alert';
 import PackageOpen from '@lucide/svelte/icons/package-open';
@@ -59,6 +61,7 @@ export {
     ChevronLeft,
     CircleArrowRight,
     CircleCheck,
+    CircleDot,
     CircleHelp,
     CirclePlay,
     CirclePlus,
@@ -85,6 +88,7 @@ export {
     LayoutDashboard,
     Link,
     ListCheck,
+    LoaderCircle,
     LockKeyholeOpen,
     OctagonAlert,
     PackageOpen,

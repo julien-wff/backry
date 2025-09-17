@@ -2,6 +2,25 @@ import { db } from '$lib/server/db';
 import { restores } from '$lib/server/db/schema';
 import { eq, sql } from 'drizzle-orm';
 
+export const getRestoreFull = (id: number) => db
+    .query
+    .restores
+    .findFirst({
+        with: {
+            backup: {
+                with: {
+                    jobDatabase: {
+                        with: {
+                            job: true,
+                            database: true,
+                        },
+                    },
+                },
+            },
+        },
+        where: eq(restores.id, id),
+    });
+
 export const createRestore = (val: typeof restores.$inferInsert) => db
     .insert(restores)
     .values(val)

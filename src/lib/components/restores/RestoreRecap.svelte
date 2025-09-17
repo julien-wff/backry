@@ -8,14 +8,15 @@
         selectedDestination: 'current' | 'other';
         otherConnectionString: string;
         dropDatabase: boolean;
+        contrasted?: boolean;
     }
 
-    let { backup, selectedDestination, otherConnectionString, dropDatabase }: Props = $props();
+    let { backup, selectedDestination, otherConnectionString, dropDatabase, contrasted = false }: Props = $props();
 
     const engineMeta = $derived(ENGINES_META[backup.jobDatabase.database.engine]);
 </script>
 
-<div class="alert mb-2" role="alert">
+<div class="alert mb-2" class:bg-base-100={contrasted} role="alert">
     <div>
         <h3 class="font-bold">Source</h3>
         <div>Job: {backup.jobDatabase.job.name}</div>
@@ -27,7 +28,7 @@
     </div>
 </div>
 
-<div class="alert" role="alert">
+<div class="alert" class:bg-base-100={contrasted} role="alert">
     <div>
         <h3 class="font-bold">Destination</h3>
         <div>
