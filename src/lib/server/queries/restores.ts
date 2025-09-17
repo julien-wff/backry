@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db';
 import { restores } from '$lib/server/db/schema';
-import { eq, sql } from 'drizzle-orm';
+import { desc, eq, sql } from 'drizzle-orm';
 
 export const getRestoreFull = (id: number) => db
     .query
@@ -19,6 +19,25 @@ export const getRestoreFull = (id: number) => db
             },
         },
         where: eq(restores.id, id),
+    });
+
+export const getAllRestoresFull = () => db
+    .query
+    .restores
+    .findMany({
+        orderBy: desc(restores.createdAt),
+        with: {
+            backup: {
+                with: {
+                    jobDatabase: {
+                        with: {
+                            job: true,
+                            database: true,
+                        },
+                    },
+                },
+            },
+        },
     });
 
 export const createRestore = (val: typeof restores.$inferInsert) => db
