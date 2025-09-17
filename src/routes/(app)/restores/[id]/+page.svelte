@@ -12,7 +12,7 @@
 
 <Head title="Restore backup"/>
 
-<PageContentHeader buttonText="Cancel" buttonType="back" icon={History}>
+<PageContentHeader buttonText="Back" buttonType="back" icon={History}>
     Restore backup
 </PageContentHeader>
 
