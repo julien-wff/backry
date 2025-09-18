@@ -6,7 +6,6 @@ import {
     jobs,
     NOTIFICATION_TRIGGER,
     notifications,
-    RESTORE_DESTINATION,
     restores,
     runs,
     storages,
@@ -16,6 +15,7 @@ import type { ResticError, ResticInit, ResticLock, ResticSnapshot } from '$lib/t
 import { validateCronExpression } from 'cron';
 import { z } from 'zod';
 import type { getRunsWithBackupFilter } from '$lib/server/queries/runs';
+import { RESTORE_DESTINATION } from '$lib/common/constants';
 
 export const DATABASE_ALLOWED_STATUSES = [ 'active', 'error' ] as const satisfies readonly typeof ELEMENT_STATUS[number][];
 export const STORAGE_ALLOWED_STATUSES = [ 'active', 'unhealthy' ] as const satisfies readonly typeof ELEMENT_STATUS[number][];

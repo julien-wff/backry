@@ -19,7 +19,7 @@
 
 <ElementForm title="{data.restore.backup?.jobDatabase.database.name} backup restore">
     <div>
-        <RestoreRecap backup={data.restore.backup!}
+        <RestoreRecap backup={data.restore.backup}
                       contrasted
                       dropDatabase={Boolean(data.restore.dropDatabase)}
                       otherConnectionString={data.restore.connectionString}

@@ -1,10 +1,11 @@
 import type { getBackup } from '$lib/server/queries/backups';
-import { backups, DATABASE_ENGINES, type RESTORE_DESTINATION, restores } from '$lib/server/db/schema';
+import { DATABASE_ENGINES, restores } from '$lib/server/db/schema';
 import { logger } from '$lib/server/services/logger';
 import { listSnapshotFiles, pipeFileContentToCommand } from '$lib/server/services/restic';
 import { err, ok, type Result } from 'neverthrow';
 import { createRestore, setRestoreToFinished, updateRestore } from '$lib/server/queries/restores';
 import { ENGINES_METHODS } from '$lib/server/databases/engines-methods';
+import type { RESTORE_DESTINATION } from '$lib/common/constants';
 
 interface RunRestoreBackupArgs {
     backup: NonNullable<Awaited<ReturnType<typeof getBackup>>>;

@@ -11,7 +11,11 @@ export const getRestoreFull = (id: number) => db
                 with: {
                     jobDatabase: {
                         with: {
-                            job: true,
+                            job: {
+                                with: {
+                                    storage: true,
+                                },
+                            },
                             database: true,
                         },
                     },
@@ -31,7 +35,11 @@ export const getAllRestoresFull = () => db
                 with: {
                     jobDatabase: {
                         with: {
-                            job: true,
+                            job: {
+                                with: {
+                                    storage: true,
+                                },
+                            },
                             database: true,
                         },
                     },
