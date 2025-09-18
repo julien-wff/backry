@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db';
 import { restores } from '$lib/server/db/schema';
-import { desc, eq, sql } from 'drizzle-orm';
+import { desc, eq, isNull, sql } from 'drizzle-orm';
 
 export const getRestoreFull = (id: number) => db
     .query
@@ -65,5 +65,15 @@ export const setRestoreToFinished = (id: number, logs: string | null = null) => 
     .update(restores)
     .set({ finishedAt: sql`(CURRENT_TIMESTAMP)`, restoreLogs: logs })
     .where(eq(restores.id, id))
+    .returning()
+    .get();
+
+export const setUnfinishedRestoresToError = async () => db
+    .update(restores)
+    .set({
+        error: 'Restore interrupted by Backry shutdown',
+        finishedAt: sql`(CURRENT_TIMESTAMP)`,
+    })
+    .where(isNull(restores.finishedAt))
     .returning()
     .get();
