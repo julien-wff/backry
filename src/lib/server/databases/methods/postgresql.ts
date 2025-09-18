@@ -8,6 +8,7 @@ import dayjs from 'dayjs';
 
 export const postgresqlMethods = {
     dumpCommand: process.env.BACKRY_POSTGRES_DUMP_CMD ?? 'pg_dump',
+    restoreCommand: process.env.BACKRY_POSTGRES_RESTORE_CMD ?? 'psql',
     dumpFileExtension: 'sql',
 
     async getDumpCmdVersion(): Promise<ResultAsync<string, string>> {
@@ -168,6 +169,6 @@ export const postgresqlMethods = {
     },
 
     getRestoreBackupFromStdinCommand(connectionString: string): string[] {
-        return [ 'psql', connectionString ];
+        return [ this.restoreCommand, connectionString ];
     },
 } satisfies EngineMethods;

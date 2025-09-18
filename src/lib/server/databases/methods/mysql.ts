@@ -46,8 +46,9 @@ function connectionStringToOptions(str: string, databaseWithFlag = true): string
 }
 
 export const mysqlMethods = {
-    checkCommand: process.env.BACKRY_MYSQL_CHECK_CMD ?? 'mysql',
+    checkCommand: process.env.BACKRY_MYSQL_CHECK_CMD ?? process.env.BACKRY_MYSQL_RESTORE_CMD ?? 'mysql',
     dumpCommand: process.env.BACKRY_MYSQL_DUMP_CMD ?? 'mysqldump',
+    restoreCommand: process.env.BACKRY_MYSQL_RESTORE_CMD ?? process.env.BACKRY_MYSQL_CHECK_CMD ?? 'mysql',
     dumpFileExtension: 'sql',
 
     async getDumpCmdVersion(): Promise<ResultAsync<string, string>> {
@@ -150,5 +151,55 @@ export const mysqlMethods = {
             url.password = '***';
         }
         return url.toString();
+    },
+
+    async recreateDatabase(connectionString: string): Promise<Result<void, string>> {
+        const url = URL.parse(connectionString);
+        if (!url) {
+            return err('Invalid connection string');
+        }
+
+        if (!url.pathname || url.pathname === '/') {
+            return err('Database name is required in the connection string');
+        }
+        // Remove leading slash and escape backticks
+        const dbName = url.pathname.slice(1).replace(/`/g, '``');
+
+        if ([ 'mysql', 'information_schema', 'performance_schema', 'sys' ].includes(dbName)) {
+            return err(`Refusing to drop and recreate system database "${dbName}"`);
+        }
+
+        // Connect to the default database so we can drop and recreate the target database.
+        url.pathname = '/mysql';
+
+        const res = await runCommandSync(
+            this.restoreCommand,
+            [
+                '--connect-timeout=3',
+                ...connectionStringToOptions(url.toString()),
+                `--execute=DROP DATABASE IF EXISTS \`${dbName}\`; CREATE DATABASE \`${dbName}\`;`,
+            ],
+            {
+                env: {
+                    MYSQL_PWD: url.password ?? '',
+                },
+            },
+        );
+        if (res.isErr()) {
+            return err(res.error.stderr.toString().trim());
+        }
+
+        return ok();
+    },
+
+    getRestoreBackupFromStdinCommand(connectionString: string): string[] {
+        return [ this.restoreCommand, ...connectionStringToOptions(connectionString) ];
+    },
+
+    getRestoreEnv(connectionString: string): Record<string, string> {
+        const url = URL.parse(connectionString);
+        return {
+            MYSQL_PWD: url?.password ?? '',
+        };
     },
 } satisfies EngineMethods;

@@ -35,9 +35,14 @@ export interface EngineMeta {
  */
 export interface EngineMethods {
     /**
-     * Engine dump command
+     * Engine dump command.
      */
     dumpCommand: string;
+
+    /**
+     * Engine restore command.
+     */
+    restoreCommand: string;
 
     /**
      * Command to ping the database.
@@ -125,7 +130,16 @@ export interface EngineMethods {
      * Get the command to restore a backup. The content of the backup will be piped to the command's stdin.
      * If the engine does not support this operation, this method can be omitted.
      * @param connectionString Full connection string to the database.
+     * @param drop Some engines, like mongo, take the option to drop existing data before restoring directly in the
+     *             restore command. Default is false.
      * @returns Full command to run the restore.
      */
-    getRestoreBackupFromStdinCommand?(connectionString: string): string[];
+    getRestoreBackupFromStdinCommand?(connectionString: string, drop?: boolean): string[];
+
+    /**
+     * Get the environment variables to use for the restore command, if any.
+     * @param connectionString Full connection string to the database.
+     * @returns Environment variables.
+     */
+    getRestoreEnv?(connectionString: string): Record<string, string>;
 }

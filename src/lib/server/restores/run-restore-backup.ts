@@ -127,13 +127,17 @@ export async function runRestoreBackup({
 
     logger.info(`Running restore command for restore #${restore.id}...`);
 
+    const restoreEnv: Record<string, string> = 'getRestoreEnv' in engineMethods && typeof engineMethods.getRestoreEnv === 'function'
+        ? engineMethods.getRestoreEnv(connectionString)
+        : {};
+
     const restoreRes = await pipeFileContentToCommand(
         storage.url,
         storage.password!,
-        storage.env,
+        { ...storage.env, ...restoreEnv },
         backup.snapshotId!,
         backup.fileName,
-        engineMethods.getRestoreBackupFromStdinCommand(connectionString),
+        engineMethods.getRestoreBackupFromStdinCommand(connectionString, dropDatabase),
     );
     if (restoreRes.isErr()) {
         return restoreFailed(restore, `Failed to restore backup: ${restoreRes.error.message}`);
@@ -159,7 +163,13 @@ export async function runRestoreBackup({
  * @returns True if the error can be ignored, false otherwise
  */
 function ignoreDbPingError(engine: typeof DATABASE_ENGINES[number], error: string, recreateDb: boolean) {
+    // For PostgreSQL, ignore "database does not exist" error if we plan to recreate it
     if (engine === 'postgresql' && recreateDb && error.match(/database ".+" does not exist/)) {
+        return true;
+    }
+
+    // For SQLite, if the file doesn't exist, it will be created on connection, so ignore that error
+    if (engine === 'sqlite') {
         return true;
     }
 
