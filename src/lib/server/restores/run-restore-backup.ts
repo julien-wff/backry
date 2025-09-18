@@ -3,9 +3,10 @@ import { DATABASE_ENGINES, restores } from '$lib/server/db/schema';
 import { logger } from '$lib/server/services/logger';
 import { listSnapshotFiles, pipeFileContentToCommand } from '$lib/server/services/restic';
 import { err, ok, type Result } from 'neverthrow';
-import { createRestore, setRestoreToFinished, updateRestore } from '$lib/server/queries/restores';
+import { createRestore, setRestoreToFinished, updateRestore as updateRestoreDb } from '$lib/server/queries/restores';
 import { ENGINES_METHODS } from '$lib/server/databases/engines-methods';
 import type { RESTORE_DESTINATION } from '$lib/common/constants';
+import { restoreEmitter } from '$lib/server/shared/events';
 
 interface RunRestoreBackupArgs {
     backup: NonNullable<Awaited<ReturnType<typeof getBackup>>>;
@@ -15,12 +16,39 @@ interface RunRestoreBackupArgs {
     onRestoreCreated?: (restore: typeof restores.$inferSelect) => void;
 }
 
+/**
+ * Emit restore update event and update restore in DB
+ * @param id Restore ID
+ * @param payload Partial restore data to update
+ * @returns Updated restore from DB
+ */
+function updateRestore(id: number, payload: Partial<typeof restores.$inferSelect>) {
+    restoreEmitter.emit('update', { id, ...payload });
+    return updateRestoreDb(id, payload);
+}
+
+/**
+ * Handle restore failure: update restore in DB, log error, and return err result
+ * @param restore Restore object
+ * @param error Error message
+ * @returns Err result with error message
+ */
 function restoreFailed(restore: typeof restores.$inferSelect, error: string) {
     updateRestore(restore.id, { error, finishedAt: new Date().toISOString() });
     logger.error(`Restore #${restore.id} failed: ${error}`);
     return err(error);
 }
 
+/**
+ * Run the restore process for a given backup.
+ * @param backup Backup to restore
+ * @param selectedDestination Destination type for the restore (current, other)
+ * @param otherConnectionString Connection string if destination is 'other'
+ * @param dropDatabase Whether to drop the existing database before restoring
+ * @param onRestoreCreated Callback when the restore is initially created in the DB, so it can be returned to the client
+ *                         immediately, and then updated via events
+ * @returns Result of the restore operation
+ */
 export async function runRestoreBackup({
                                            backup,
                                            selectedDestination,
@@ -115,7 +143,8 @@ export async function runRestoreBackup({
 
     // DONE
 
-    setRestoreToFinished(restore.id, restoreRes.value);
+    const finishedRestore = setRestoreToFinished(restore.id, restoreRes.value);
+    restoreEmitter.emit('update', finishedRestore);
     logger.info(`Restore #${restore.id} completed successfully`);
 
     return ok();
