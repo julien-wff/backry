@@ -96,15 +96,19 @@ the database URL or the CLI tools commands.
 
 ### CLI tools commands
 
-| Environment variable       | Description               | Default value |
-|----------------------------|---------------------------|---------------|
-| `BACKRY_SQLITE_DUMP_CMD`   | Dump SQLite3 databases    | `sqlite3`     |
-| `BACKRY_POSTGRES_DUMP_CMD` | Dump PostgreSQL databases | `pg_dump`     |
-| `BACKRY_MYSQL_DUMP_CMD`    | Dump MySQL databases      | `mysqldump`   |
-| `BACKRY_MYSQL_CHECK_CMD`   | Check MySQL connection    | `mysql`       |
-| `BACKRY_MONGO_DUMP_CMD`    | Dump MongoDB databases    | `mongodump`   |
-| `BACKRY_RESTIC_CMD`        | Restic command            | `restic`      |
-| `BACKRY_SHOUTRR_CMD`       | Shoutrrr command          | `shoutrrr`    |
+| Environment variable          | Description               | Default value  |
+|-------------------------------|---------------------------|----------------|
+| `BACKRY_SQLITE_DUMP_CMD`      | Dump SQLite3 databases    | `sqlite3`      |
+| `BACKRY_SQLITE_RESTORE_CMD`   | Restore SQLite3 dumps     | `sqlite3`      |
+| `BACKRY_POSTGRES_DUMP_CMD`    | Dump PostgreSQL databases | `pg_dump`      |
+| `BACKRY_POSTGRES_RESTORE_CMD` | Restore PostgreSQL dumps  | `psql`         |
+| `BACKRY_MYSQL_DUMP_CMD`       | Dump MySQL databases      | `mysqldump`    |
+| `BACKRY_MYSQL_RESTORE_CMD`    | Restore MySQL dumps       | `mysql`        |
+| `BACKRY_MYSQL_CHECK_CMD`      | Check MySQL connection    | `mysql`        |
+| `BACKRY_MONGO_DUMP_CMD`       | Dump MongoDB databases    | `mongodump`    |
+| `BACKRY_MONGO_RESTORE_CMD`    | Restore MongoDB dumps     | `mongorestore` |
+| `BACKRY_RESTIC_CMD`           | Restic command            | `restic`       |
+| `BACKRY_SHOUTRR_CMD`          | Shoutrrr command          | `shoutrrr`     |
 
 ## Why Restic?
 
