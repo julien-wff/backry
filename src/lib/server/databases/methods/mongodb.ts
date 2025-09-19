@@ -86,7 +86,7 @@ export const mongodbMethods = {
     },
 
     getRestoreBackupFromStdinCommand(connectionString, drop): string[] {
-        return [ this.restoreCommand, '--uri', connectionString, '--archive', ...(drop ? [ '--drop' ] : []) ];
+        return [ this.restoreCommand, '--uri', connectionString, '--archive', '--verbose', ...(drop ? [ '--drop' ] : []) ];
     },
 
     async recreateDatabase(_connectionString): Promise<Result<void, string>> {

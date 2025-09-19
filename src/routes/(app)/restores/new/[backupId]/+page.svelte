@@ -33,6 +33,8 @@
 
 {#if selectedDestination}
     <RestoreConfirmModal backup={data.backup}
+                         sourceDatabase={data.backup.jobDatabase.database}
+                         sourceJobName={data.backup.jobDatabase.job.name}
                          bind:controls={modalControls}
                          {selectedDestination}
                          {otherConnectionString}
@@ -50,7 +52,8 @@
 
     <InputContainer label="Destination">
         <div class="flex gap-2">
-            <button class="flex-1 gap-2 px-4 py-2 flex flex-col items-center bg-base-300 justify-center rounded-lg cursor-pointer border-2"
+            <button aria-pressed={selectedDestination === 'current'}
+                    class="flex-1 gap-2 px-4 py-2 flex flex-col items-center bg-base-300 justify-center rounded-lg cursor-pointer border-2"
                     class:border-primary={selectedDestination === 'current'}
                     class:border-transparent={selectedDestination !== 'current'}
                     onclick={() => {
@@ -61,7 +64,8 @@
                 {data.backup.jobDatabase.database.name}
             </button>
 
-            <button class="flex-1 gap-2 px-4 py-2 flex flex-col items-center bg-base-300 justify-center rounded-lg cursor-pointer border-2"
+            <button aria-pressed={selectedDestination === 'other'}
+                    class="flex-1 gap-2 px-4 py-2 flex flex-col items-center bg-base-300 justify-center rounded-lg cursor-pointer border-2"
                     class:border-primary={selectedDestination === 'other'}
                     class:border-transparent={selectedDestination !== 'other'}
                     onclick={() => {

@@ -47,8 +47,10 @@ export const init: ServerInit = async () => {
         () => executeDatabaseMaintenance(),
     );
 
-    await setUnfinishedBackupsToError();
-    await setUnfinishedRestoresToError();
+    await Promise.all([
+        setUnfinishedBackupsToError(),
+        setUnfinishedRestoresToError(),
+    ]);
 
     const jobs = await getJobsToRun();
     for (const job of jobs) {

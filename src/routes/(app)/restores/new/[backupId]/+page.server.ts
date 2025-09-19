@@ -9,7 +9,7 @@ export const load: PageServerLoad = async ({ params }) => {
         return error(400, 'Invalid backup ID');
     }
 
-    let backup = await getBackup(id);
+    const backup = await getBackup(id);
     if (!backup) {
         return error(404, 'Backup not found');
     }

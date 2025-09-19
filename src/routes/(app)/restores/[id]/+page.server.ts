@@ -9,7 +9,7 @@ export const load: PageServerLoad = async ({ params }) => {
         return error(400, 'Invalid restore ID');
     }
 
-    let restore = await getRestoreFull(id);
+    const restore = await getRestoreFull(id);
     if (!restore) {
         return error(404, 'Restore not found');
     }

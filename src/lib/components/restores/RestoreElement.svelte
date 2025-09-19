@@ -30,7 +30,6 @@
         <Database class="w-4 h-4"/>
         <span>
             Destination: {restore.destination === 'current' ? dbName : 'Other database'}
-            <span class="font-mono"></span>
         </span>
     </div>
 </BaseListElement>

@@ -61,7 +61,7 @@ export async function runRestoreBackup({
         backupId: backup.id,
         connectionString,
         destination: selectedDestination,
-        dropDatabase: dropDatabase ? 1 : 0,
+        dropDatabase,
     });
     onRestoreCreated?.(restore);
 
@@ -170,7 +170,7 @@ function ignoreDbPingError(engine: typeof DATABASE_ENGINES[number], error: strin
 
     // For SQLite, if the file doesn't exist, it will be created on connection, so ignore that error
     if (engine === 'sqlite') {
-        return true;
+        return /no such file|cannot open|unable to open/i.test(error);
     }
 
     return false;

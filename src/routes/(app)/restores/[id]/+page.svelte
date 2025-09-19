@@ -33,13 +33,15 @@
 </PageContentHeader>
 
 
-<ElementForm title="{restore.backup?.jobDatabase.database.name} backup restore">
+<ElementForm title="{restore.backup?.jobDatabase.database.name ?? 'Unknown'} backup restore">
     <div>
         <RestoreRecap backup={restore.backup}
                       contrasted
-                      dropDatabase={Boolean(restore.dropDatabase)}
+                      dropDatabase={restore.dropDatabase}
                       otherConnectionString={restore.connectionString}
-                      selectedDestination={restore.destination}/>
+                      selectedDestination={restore.destination}
+                      sourceDatabase={restore.backup?.jobDatabase.database ?? null}
+                      sourceJobName={restore.backup?.jobDatabase.job.name}/>
     </div>
 
     <div class="flex flex-col gap-1">

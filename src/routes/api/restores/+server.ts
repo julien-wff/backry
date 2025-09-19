@@ -29,5 +29,5 @@ export const POST: RequestHandler = async ({ request }) => {
         onRestoreCreated: resolve,
     }));
 
-    return apiSuccess<RestoreResponse>(restore);
+    return apiSuccess<RestoreResponse>(restore, 201);
 };

@@ -1,33 +1,45 @@
 <script lang="ts">
-    import type { getBackup } from '$lib/server/queries/backups';
     import { ENGINES_META } from '$lib/common/engines-meta';
-    import { formatSize } from '$lib/helpers/format';
+    import { formatSize, formatUtcDate } from '$lib/helpers/format';
+    import type { backups, databases } from '$lib/server/db/schema';
 
     interface Props {
-        backup: Awaited<ReturnType<typeof getBackup>> | null;
+        backup: Pick<typeof backups.$inferSelect, 'fileName' | 'dumpSize' | 'snapshotId' | 'finishedAt'> | null;
+        sourceDatabase: Pick<typeof databases.$inferSelect, 'name' | 'engine'> | null;
+        sourceJobName?: string;
         selectedDestination: 'current' | 'other';
         otherConnectionString: string;
         dropDatabase: boolean;
         contrasted?: boolean;
     }
 
-    let { backup, selectedDestination, otherConnectionString, dropDatabase, contrasted = false }: Props = $props();
+    let {
+        backup,
+        sourceDatabase,
+        sourceJobName,
+        selectedDestination,
+        otherConnectionString,
+        dropDatabase,
+        contrasted = false,
+    }: Props = $props();
 
-    const engineMeta = $derived(backup ? ENGINES_META[backup.jobDatabase.database.engine] : null);
+    const engineMeta = $derived(sourceDatabase ? ENGINES_META[sourceDatabase.engine] : null);
 </script>
 
 {#if backup && engineMeta}
     <div class="alert mb-2" class:bg-base-100={contrasted} role="alert">
         <div>
             <h3 class="font-bold">Source</h3>
-            <div>Job: {backup.jobDatabase.job.name}</div>
-            <div>Database: {backup.jobDatabase.database.name} ({engineMeta.displayName})</div>
-            <div>Backup date: {new Date(backup.finishedAt ?? '').toLocaleString()}</div>
+            <div>Job: {sourceJobName}</div>
+            <div>Database: {sourceDatabase?.name ?? 'Unknown'} ({engineMeta.displayName})</div>
+            <div>Backup date: {formatUtcDate(backup.finishedAt ?? '')}</div>
             <div>
                 Restic snapshot:
                 {backup.fileName},
                 {formatSize(backup.dumpSize ?? 0)}
-                ({backup.snapshotId?.slice(0, 12)})
+                {#if backup.snapshotId}
+                    ({backup.snapshotId.slice(0, 12)})
+                {/if}
             </div>
         </div>
     </div>
@@ -40,8 +52,8 @@
             Target:
             {#if selectedDestination === 'current'}
                 same database
-                {#if backup}
-                    ({backup.jobDatabase.database.name})
+                {#if sourceDatabase}
+                    ({sourceDatabase.name})
                 {/if}
             {:else}
                 other database ({otherConnectionString})

@@ -234,8 +234,22 @@ export interface DockerHostnamesCheckResponse {
 export const restoreRequest = z.object({
     backupId: z.number().positive(),
     destination: z.enum(RESTORE_DESTINATION),
-    otherConnectionString: z.string().optional().nullable().default(() => null),
+    otherConnectionString: z.string().trim().optional().nullable().default(() => null),
     dropDatabase: z.boolean().optional().default(() => false),
+}).superRefine((data, ctx) => {
+    if (data.destination === 'other' && !data.otherConnectionString) {
+        ctx.addIssue({
+            code: 'custom',
+            message: 'otherConnectionString is required when destination is "other"',
+            path: [ 'otherConnectionString' ],
+        });
+    } else if (data.destination === 'current' && data.otherConnectionString) {
+        ctx.addIssue({
+            code: 'custom',
+            message: 'otherConnectionString must be null when destination is "current"',
+            path: [ 'otherConnectionString' ],
+        });
+    }
 });
 
 export type RestoreResponse = typeof restores.$inferSelect;

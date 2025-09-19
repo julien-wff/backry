@@ -8,15 +8,17 @@ export const getRestoreFull = (id: number) => db
     .findFirst({
         with: {
             backup: {
+                columns: { id: true, fileName: true, dumpSize: true, snapshotId: true, finishedAt: true },
                 with: {
                     jobDatabase: {
+                        columns: {},
                         with: {
                             job: {
-                                with: {
-                                    storage: true,
-                                },
+                                columns: { name: true },
                             },
-                            database: true,
+                            database: {
+                                columns: { name: true, engine: true },
+                            },
                         },
                     },
                 },
@@ -32,15 +34,17 @@ export const getAllRestoresFull = () => db
         orderBy: desc(restores.createdAt),
         with: {
             backup: {
+                columns: { id: true, fileName: true, dumpSize: true, snapshotId: true, finishedAt: true },
                 with: {
                     jobDatabase: {
+                        columns: {},
                         with: {
                             job: {
-                                with: {
-                                    storage: true,
-                                },
+                                columns: { name: true },
                             },
-                            database: true,
+                            database: {
+                                columns: { name: true, engine: true },
+                            },
                         },
                     },
                 },
@@ -75,5 +79,4 @@ export const setUnfinishedRestoresToError = async () => db
         finishedAt: sql`(CURRENT_TIMESTAMP)`,
     })
     .where(isNull(restores.finishedAt))
-    .returning()
-    .get();
+    .execute();

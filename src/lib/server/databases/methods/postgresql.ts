@@ -148,8 +148,11 @@ export const postgresqlMethods = {
             // Recreate the database.
             await con`CREATE DATABASE ${con(dbToRecreate)}`;
 
+        } catch (e) {
+            return err(e instanceof Error ? e.message : 'Error recreating database');
+        } finally {
             // Delete temp admin DB if needed.
-            if (tempAdminDb) {
+            if (tempAdminDb && con) {
                 // Close connection to temp DB and drop it.
                 await con.close();
                 con = new SQL({
@@ -159,9 +162,7 @@ export const postgresqlMethods = {
                 await con.connect();
                 await con`DROP DATABASE IF EXISTS ${con(tempAdminDb)}`;
             }
-        } catch (e) {
-            return err(e instanceof Error ? e.message : 'Error recreating database');
-        } finally {
+
             await con?.close();
         }
 

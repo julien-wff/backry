@@ -165,6 +165,10 @@ export const mysqlMethods = {
         // Remove leading slash and escape backticks
         const dbName = url.pathname.slice(1).replace(/`/g, '``');
 
+        if (!/^[A-Za-z0-9_\-$]+$/.test(dbName)) {
+            return err('Unsupported database name. Allowed: letters, digits, _, -, $');
+        }
+
         if ([ 'mysql', 'information_schema', 'performance_schema', 'sys' ].includes(dbName)) {
             return err(`Refusing to drop and recreate system database "${dbName}"`);
         }
@@ -193,7 +197,7 @@ export const mysqlMethods = {
     },
 
     getRestoreBackupFromStdinCommand(connectionString: string): string[] {
-        return [ this.restoreCommand, ...connectionStringToOptions(connectionString) ];
+        return [ this.restoreCommand, ...connectionStringToOptions(connectionString), '--batch' ];
     },
 
     getRestoreEnv(connectionString: string): Record<string, string> {

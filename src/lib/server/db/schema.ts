@@ -143,7 +143,7 @@ export const restores = sqliteTable('restores', {
     finishedAt: text('finished_at'),
     destination: text('destination', { enum: RESTORE_DESTINATION }).notNull(),
     connectionString: text('connection_string').notNull(),
-    dropDatabase: integer('drop_database').$type<0 | 1>().notNull().default(0),
+    dropDatabase: integer('drop_database', { mode: 'boolean' }).notNull().default(false),
     currentStep: text('current_step', { enum: RESTORE_STEPS }).notNull().default('check_backup'),
     restoreLogs: text('restore_logs'),
 });
