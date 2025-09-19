@@ -68,6 +68,15 @@ export function getNextJobs(count = 3) {
 }
 
 /**
+ * Get the next N execution dates for a given cron job.
+ * @param id Cron internal ID.
+ * @param count Number of execution dates to return.
+ * @returns Array of Date objects. If the job is not found, returns an empty array.
+ */
+export const cronNextExecutions = (id: CronId, count = 1) =>
+    (cronJobs.get(id)?.nextDates(count) ?? []).map(d => d.toJSDate());
+
+/**
  * Parse cron from user input / env variable, and if undefined or invalid, uses fallback
  * @param cron Unsafe cron
  * @param fallback Fallback cron expression

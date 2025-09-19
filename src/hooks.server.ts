@@ -4,7 +4,7 @@ import { db } from '$lib/server/db';
 import { setUnfinishedBackupsToError } from '$lib/server/queries/backups';
 import { getJobsToRun } from '$lib/server/queries/jobs';
 import { logger } from '$lib/server/services/logger';
-import { addOrUpdateCronJob, validCronOrDefault } from '$lib/server/shared/cron';
+import { addOrUpdateCronJob, cronNextExecutions, validCronOrDefault } from '$lib/server/shared/cron';
 import { computeToolChecksSuccess } from '$lib/server/shared/tool-checks';
 import { checkAllActiveRepositories } from '$lib/server/storages/checks';
 import { updateAllStoragesHealth } from '$lib/server/storages/health';
@@ -12,6 +12,7 @@ import type { ServerInit } from '@sveltejs/kit';
 import { migrate } from 'drizzle-orm/bun-sql/migrator';
 import { executeDatabaseMaintenance } from '$lib/server/db/maintenance';
 import { setUnfinishedRestoresToError } from '$lib/server/queries/restores';
+import dayjs from 'dayjs';
 
 export const init: ServerInit = async () => {
     logger.info('Applying database migrations...');
@@ -62,6 +63,21 @@ export const init: ServerInit = async () => {
     }
 
     await computeToolChecksSuccess();
+
+    // For health checks are in more than 30 secs, run them now in the background
+    void (async () => {
+        if (dayjs(cronNextExecutions('system:check-storages')[0]).diff(dayjs(), 'second') > 30) {
+            await checkAllActiveRepositories();
+        }
+
+        if (dayjs(cronNextExecutions('system:check-dbs')[0]).diff(dayjs(), 'second') > 30) {
+            await checkAllActiveDatabases();
+        }
+
+        if (dayjs(cronNextExecutions('system:update-storages-health')[0]).diff(dayjs(), 'second') > 30) {
+            await updateAllStoragesHealth();
+        }
+    })();
 
     logger.info('Backry started successfully');
 };
