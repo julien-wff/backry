@@ -6,6 +6,7 @@ import {
     jobs,
     NOTIFICATION_TRIGGER,
     notifications,
+    restores,
     runs,
     storages,
 } from '$lib/server/db/schema';
@@ -14,6 +15,7 @@ import type { ResticError, ResticInit, ResticLock, ResticSnapshot } from '$lib/t
 import { validateCronExpression } from 'cron';
 import { z } from 'zod';
 import type { getRunsWithBackupFilter } from '$lib/server/queries/runs';
+import { RESTORE_DESTINATION } from '$lib/common/constants';
 
 export const DATABASE_ALLOWED_STATUSES = [ 'active', 'error' ] as const satisfies readonly typeof ELEMENT_STATUS[number][];
 export const STORAGE_ALLOWED_STATUSES = [ 'active', 'unhealthy' ] as const satisfies readonly typeof ELEMENT_STATUS[number][];
@@ -225,6 +227,32 @@ export interface DockerHostnamesCheckResponse {
         reachable: boolean;
     }[];
 }
+
+// RESTORES
+
+/** `POST /api/restores` */
+export const restoreRequest = z.object({
+    backupId: z.number().positive(),
+    destination: z.enum(RESTORE_DESTINATION),
+    otherConnectionString: z.string().trim().optional().nullable().default(() => null),
+    dropDatabase: z.boolean().optional().default(() => false),
+}).superRefine((data, ctx) => {
+    if (data.destination === 'other' && !data.otherConnectionString) {
+        ctx.addIssue({
+            code: 'custom',
+            message: 'otherConnectionString is required when destination is "other"',
+            path: [ 'otherConnectionString' ],
+        });
+    } else if (data.destination === 'current' && data.otherConnectionString) {
+        ctx.addIssue({
+            code: 'custom',
+            message: 'otherConnectionString must be null when destination is "current"',
+            path: [ 'otherConnectionString' ],
+        });
+    }
+});
+
+export type RestoreResponse = typeof restores.$inferSelect;
 
 // SETTINGS
 

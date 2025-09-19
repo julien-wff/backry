@@ -80,6 +80,32 @@ export interface ResticSnapshot {
     short_id: string,
 }
 
+interface ResticNodeCommon {
+    message_type: 'node',
+    struct_type: 'node'
+    name: string,
+    path: string,
+    uid: number,
+    gid: number,
+    mode: number,
+    permissions: string,
+    mtime: string,
+    atime: string,
+    ctime: string,
+    inode: number,
+}
+
+interface ResticNodeDir {
+    type: 'dir',
+}
+
+interface ResticNodeFile {
+    type: 'file',
+    size: number,
+}
+
+export type ResticNode = ResticNodeCommon & (ResticNodeDir | ResticNodeFile);
+
 export interface ResticLock {
     time: string,
     exclusive: boolean,

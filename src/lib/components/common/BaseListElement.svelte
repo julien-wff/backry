@@ -2,6 +2,7 @@
     import ConfirmDeleteModal from '$lib/components/common/ConfirmDeleteModal.svelte';
     import StatusIndicator from '$lib/components/common/StatusIndicator.svelte';
     import {
+        CircleArrowRight,
         CopyPlus,
         EllipsisVertical,
         HeartPulse,
@@ -22,6 +23,7 @@
         deleteConfirmationMessage?: string;
         children?: Snippet;
         editHref?: string;
+        detailsHref?: string;
         onduplicate?: () => void;
         onstatuschange?: () => void;
         ondelete?: () => void;
@@ -40,6 +42,7 @@
         deleteConfirmationMessage,
         children,
         editHref,
+        detailsHref,
         onduplicate,
         onstatuschange,
         ondelete,
@@ -73,9 +76,22 @@
 
         <div class="flex gap-2">
             {#if editHref}
-                <a href={disabled ? null : editHref} class="btn btn-sm btn-primary" class:btn-disabled={disabled}>
+                <a href={disabled ? null : editHref}
+                   class="btn btn-sm btn-primary"
+                   aria-disabled={disabled}
+                   class:btn-disabled={disabled}>
                     <Pencil class="h-4 w-4"/>
                     Edit
+                </a>
+            {/if}
+
+            {#if detailsHref}
+                <a href={disabled ? null : detailsHref}
+                   class="btn btn-sm btn-primary"
+                   aria-disabled={disabled}
+                   class:btn-disabled={disabled}>
+                    <CircleArrowRight class="h-4 w-4"/>
+                    Details
                 </a>
             {/if}
 

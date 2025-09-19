@@ -1,4 +1,4 @@
-import { runCommandStream, runCommandSync, type StreamCommandOptions } from '$lib/server/services/cmd';
+import { pipeCommandSync, runCommandStream, runCommandSync, type StreamCommandOptions } from '$lib/server/services/cmd';
 import { logger } from '$lib/server/services/logger';
 import type {
     ResticBackupStatus,
@@ -7,6 +7,7 @@ import type {
     ResticForget,
     ResticInit,
     ResticLock,
+    ResticNode,
     ResticSnapshot,
     ResticStats,
 } from '$lib/types/restic';
@@ -309,6 +310,28 @@ export async function applyForgetPolicy(url: string,
 }
 
 
+export async function listSnapshotFiles(url: string,
+                                        password: string,
+                                        env: Record<string, string>,
+                                        snapshotId: string) {
+    const res = await runCommandSync(
+        RESTIC_CMD,
+        [
+            '-r', url,
+            'ls',
+            snapshotId,
+            '--json',
+            '--no-lock',
+        ],
+        {
+            env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env },
+        },
+    );
+
+    return resticCommandToResult<ResticSnapshot | ResticNode>(res);
+}
+
+
 /**
  * Stream the content of a file from a restic repository.
  * This uses the `restic dump` command to stream the file content directly to the HTTP response.
@@ -403,4 +426,49 @@ export async function streamFileContent(url: string,
     })();
 
     return { stream, exitPromise };
+}
+
+
+/**
+ * Read the content of a file from a restic repository and pipe it to a command.
+ * The command output is collected and returned as a string.
+ * This can be used to e.g. pipe a SQL dump file to a database client command to restore it.
+ * @remarks
+ * The command is run synchronously and the full output is collected in memory.
+ * @param url URL to the restic repository
+ * @param password Repository password
+ * @param env Additional environment variables to set
+ * @param snapshotId Snapshot ID to download the file from
+ * @param fileName Name of the file to download from the snapshot
+ * @param command Command to run, with arguments as separate array elements
+ * @return The command output as a string, or a Restic error
+ */
+export async function pipeFileContentToCommand(url: string,
+                                               password: string,
+                                               env: Record<string, string>,
+                                               snapshotId: string,
+                                               fileName: string,
+                                               command: string[]): Promise<Result<string, ResticError>> {
+    const res = await pipeCommandSync(
+        RESTIC_CMD,
+        [
+            '-r', url,
+            '--no-lock',
+            '--quiet',
+            'dump',
+            snapshotId,
+            fileName,
+        ],
+        command[0],
+        command.slice(1),
+        {
+            env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env },
+        },
+    );
+
+    if (res.isErr()) {
+        return err(formatResticError(res.error));
+    }
+
+    return ok(res.value.text().trim());
 }

@@ -1,5 +1,5 @@
 import type { ApiResponse } from '$lib/server/api/responses';
-import type { BackupUpdateEventPayload } from '$lib/server/shared/events';
+import type { BackupUpdateEventPayload, RestoreUpdateEventPayload } from '$lib/server/shared/events';
 import { err, ok, ResultAsync } from 'neverthrow';
 import type { z, ZodType } from 'zod';
 
@@ -51,6 +51,7 @@ export async function fetchApi<R extends object, B extends ZodType | null = null
 
 
 export function subscribeApi<T extends BackupUpdateEventPayload>(endpoint: '/api/backups/subscribe', onChunk: (chunk: T) => void): () => void;
+export function subscribeApi<T extends RestoreUpdateEventPayload>(endpoint: `/api/restores/${number}/subscribe`, onChunk: (chunk: T) => void): () => void;
 export function subscribeApi<T>(endpoint: string, onChunk: (chunk: T) => void): () => void {
     const eventSource = new EventSource(endpoint);
 

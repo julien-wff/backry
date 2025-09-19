@@ -8,6 +8,7 @@ import { err, ok, Result, type ResultAsync } from 'neverthrow';
 
 export const mongodbMethods = {
     dumpCommand: process.env.BACKRY_MONGODB_DUMP_CMD ?? 'mongodump',
+    restoreCommand: process.env.BACKRY_MONGODB_RESTORE_CMD ?? 'mongorestore',
     dumpFileExtension: 'archive',
 
     async getDumpCmdVersion(): Promise<ResultAsync<string, string>> {
@@ -82,5 +83,14 @@ export const mongodbMethods = {
             url.password = '***';
         }
         return url.toString();
+    },
+
+    getRestoreBackupFromStdinCommand(connectionString, drop): string[] {
+        return [ this.restoreCommand, '--uri', connectionString, '--archive', '--verbose', ...(drop ? [ '--drop' ] : []) ];
+    },
+
+    async recreateDatabase(_connectionString): Promise<Result<void, string>> {
+        // Handled in getRestoreBackupFromStdinCommand with --drop option.
+        return ok();
     },
 } satisfies EngineMethods;

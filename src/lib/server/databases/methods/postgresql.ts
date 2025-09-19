@@ -4,9 +4,11 @@ import type { ConnectionStringParams, EngineMethods } from '$lib/types/engine';
 import { SQL } from 'bun';
 import { type ContainerInspectInfo } from 'dockerode';
 import { err, ok, Result, type ResultAsync } from 'neverthrow';
+import dayjs from 'dayjs';
 
 export const postgresqlMethods = {
     dumpCommand: process.env.BACKRY_POSTGRES_DUMP_CMD ?? 'pg_dump',
+    restoreCommand: process.env.BACKRY_POSTGRES_RESTORE_CMD ?? 'psql',
     dumpFileExtension: 'sql',
 
     async getDumpCmdVersion(): Promise<ResultAsync<string, string>> {
@@ -95,5 +97,79 @@ export const postgresqlMethods = {
             url.password = '***';
         }
         return url.toString();
+    },
+
+    async recreateDatabase(connectionString: string): Promise<Result<void, string>> {
+        // We cannot be connected to the database we are recreating. If the db in question is not 'postgres', we connect to it.
+        // If we are restoring the 'postgres' db, we need to connect to a temporary database 'backry-restore-tmp-[date]',
+        // That we create for this purpose, and then drop after the operation.
+        const url = new URL(connectionString);
+        if (!url.pathname || url.pathname === '/') {
+            return err('Database name is required in the connection string to recreate it');
+        }
+
+        const dbToRecreate = url.pathname.slice(1);
+
+        let tempAdminDb: string | null = null;
+        if (dbToRecreate === 'postgres') {
+            tempAdminDb = `backry-restore-tmp-${dayjs().format('YYYYMMDD-HHmmss')}`;
+        }
+        url.pathname = `/postgres`; // If temp DB: first connect to 'postgres' to create the temp db.
+
+        let con: SQL | null = null;
+        try {
+            con = new SQL({
+                url,
+                connectionTimeout: 3,
+            });
+            await con.connect();
+
+            if (tempAdminDb) {
+                // Create temp DB and switch to it
+                await con`CREATE DATABASE ${con(tempAdminDb)}`;
+                await con.close();
+                url.pathname = `/${tempAdminDb}`;
+                con = new SQL({
+                    url,
+                    connectionTimeout: 3,
+                });
+                await con.connect();
+            }
+
+            // Terminate all connections to the database.
+            await con`SELECT pg_terminate_backend(pg_stat_activity.pid)
+                      FROM pg_stat_activity
+                      WHERE pg_stat_activity.datname = ${dbToRecreate}
+                        AND pid <> pg_backend_pid()`;
+
+            // Drop the database.
+            await con`DROP DATABASE IF EXISTS ${con(dbToRecreate)}`;
+
+            // Recreate the database.
+            await con`CREATE DATABASE ${con(dbToRecreate)}`;
+
+        } catch (e) {
+            return err(e instanceof Error ? e.message : 'Error recreating database');
+        } finally {
+            // Delete temp admin DB if needed.
+            if (tempAdminDb && con) {
+                // Close connection to temp DB and drop it.
+                await con.close();
+                con = new SQL({
+                    url: url, // Still connected to temp db
+                    connectionTimeout: 3,
+                });
+                await con.connect();
+                await con`DROP DATABASE IF EXISTS ${con(tempAdminDb)}`;
+            }
+
+            await con?.close();
+        }
+
+        return ok(undefined);
+    },
+
+    getRestoreBackupFromStdinCommand(connectionString: string): string[] {
+        return [ this.restoreCommand, connectionString ];
     },
 } satisfies EngineMethods;

@@ -11,6 +11,7 @@ import { updateAllStoragesHealth } from '$lib/server/storages/health';
 import type { ServerInit } from '@sveltejs/kit';
 import { migrate } from 'drizzle-orm/bun-sql/migrator';
 import { executeDatabaseMaintenance } from '$lib/server/db/maintenance';
+import { setUnfinishedRestoresToError } from '$lib/server/queries/restores';
 
 export const init: ServerInit = async () => {
     logger.info('Applying database migrations...');
@@ -46,7 +47,10 @@ export const init: ServerInit = async () => {
         () => executeDatabaseMaintenance(),
     );
 
-    await setUnfinishedBackupsToError();
+    await Promise.all([
+        setUnfinishedBackupsToError(),
+        setUnfinishedRestoresToError(),
+    ]);
 
     const jobs = await getJobsToRun();
     for (const job of jobs) {

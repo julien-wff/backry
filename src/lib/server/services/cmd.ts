@@ -26,6 +26,35 @@ export async function runCommandSync(command: string, args: string[] = [], optio
 }
 
 
+/**
+ * Pipe the output of command1 to command2. Waits for both commands to finish to return the result.
+ * @param command1 First command
+ * @param args1 Arguments for the first command, escaped via Bun's `$.escape`
+ * @param command2 Second command
+ * @param args2 Arguments for the second command, escaped via Bun's `$.escape`
+ * @param options Options for the command
+ * @returns ResultAsync with ShellOutput on success, or ShellOutput on error
+ */
+export async function pipeCommandSync(command1: string, args1: string[] = [], command2: string, args2: string[] = [], options?: CommandOptions): Promise<ResultAsync<$.ShellOutput, $.ShellOutput>> {
+    const cmd = $`${command1} ${{ raw: args1.map($.escape).join(' ') }} | ${command2} ${{ raw: args2.map($.escape).join(' ') }}`
+        .env(options?.env)
+        .nothrow()
+        .quiet();
+
+    if (options?.cwd) {
+        cmd.cwd(options.cwd);
+    }
+
+    const res = await cmd;
+
+    if (res.exitCode !== 0) {
+        return err(res);
+    }
+
+    return ok(res);
+}
+
+
 export interface StreamCommandOptions<O, E> extends CommandOptions {
     json?: boolean;
     onStdout?: (data: O) => any;

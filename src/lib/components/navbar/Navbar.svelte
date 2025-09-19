@@ -1,5 +1,14 @@
 <script lang="ts">
-    import { Blocks, CloudUpload, Database, FileCheck, LayoutDashboard, Settings, Timer } from '$lib/components/icons';
+    import {
+        Blocks,
+        CloudUpload,
+        Database,
+        FileCheck,
+        History,
+        LayoutDashboard,
+        Settings,
+        Timer,
+    } from '$lib/components/icons';
     import NavbarElement from '$lib/components/navbar/NavbarElement.svelte';
 
     interface Props {
@@ -34,7 +43,7 @@
                        label="Storage"/>
         <NavbarElement href="/jobs" icon={Timer} label="Jobs"/>
         <NavbarElement hasError={errors.backups > 0} href="/backups" icon={FileCheck} label="Backups"/>
-        <!--        <NavbarElement href="/restore" icon={History} label="Restore"/>-->
+        <NavbarElement href="/restores" icon={History} label="Restores"/>
 
         <div class="flex flex-1 flex-col justify-end gap-4">
             <NavbarElement href="/integrations/docker" icon={Blocks} label="Integrations"/>
