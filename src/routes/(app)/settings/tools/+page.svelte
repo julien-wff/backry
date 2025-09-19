@@ -6,6 +6,7 @@
     import ToolVersion from '$lib/components/settings/tools/ToolVersion.svelte';
     import { onMount } from 'svelte';
     import type { PageProps } from './$types';
+    import ToolVersionCategory from '$lib/components/settings/tools/ToolVersionCategory.svelte';
 
     let { data }: PageProps = $props();
 
@@ -27,13 +28,31 @@
         Command line tools information
     </h2>
 
-    <ToolVersion {...data.bun} name="Bun"/>
-    <ToolVersion {...data.svelteKit} name="SvelteKit"/>
-    <ToolVersion {...data.restic} name="Restic"/>
-    <ToolVersion {...data.shoutrrr} name="Shoutrrr"/>
-    <ToolVersion {...data['postgresql:dump']} name="PGDump"/>
-    <ToolVersion {...data['mysql:check']} name="MySQL"/>
-    <ToolVersion {...data['mysql:dump']} name="MySQL Dump"/>
-    <ToolVersion {...data['sqlite:dump']} name="SQLite"/>
-    <ToolVersion {...data['mongodb:dump']} name="MongoDB Dump"/>
+    <ToolVersionCategory icon="/favicon.png" name="Common">
+        <ToolVersion {...data.bun} name="Bun"/>
+        <ToolVersion {...data.svelteKit} name="SvelteKit"/>
+        <ToolVersion {...data.restic} name="Restic"/>
+        <ToolVersion {...data.shoutrrr} name="Shoutrrr"/>
+    </ToolVersionCategory>
+
+    <ToolVersionCategory icon="/icons/postgres.svg" name="PostgreSQL">
+        <ToolVersion {...data['postgresql:restore']} name="PSQL"/>
+        <ToolVersion {...data['postgresql:dump']} name="PGDump"/>
+    </ToolVersionCategory>
+
+    <ToolVersionCategory icon="/icons/mysql.svg" name="MySQL">
+        <ToolVersion {...data['mysql:restore']} name="MySQL"/>
+        <ToolVersion {...data['mysql:check']} name="MySQL (check only)"/>
+        <ToolVersion {...data['mysql:dump']} name="MySQL Dump"/>
+    </ToolVersionCategory>
+
+    <ToolVersionCategory icon="/icons/sqlite.svg" name="SQLite">
+        <ToolVersion {...data['sqlite:dump']} name="SQLite"/>
+        <ToolVersion {...data['sqlite:restore']} name="SQLite (restore only)"/>
+    </ToolVersionCategory>
+
+    <ToolVersionCategory icon="/icons/mongodb.svg" name="MongoDB">
+        <ToolVersion {...data['mongodb:dump']} name="MongoDB Dump"/>
+        <ToolVersion {...data['mongodb:restore']} name="MongoDB Restore"/>
+    </ToolVersionCategory>
 </div>

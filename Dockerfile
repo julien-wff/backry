@@ -17,7 +17,7 @@ RUN apk add --no-cache \
     # Make bin folders to copy them all in "runtime" stage
     mkdir /app/bin && \
     # Copy binaries from packages
-    cp /usr/bin/mysqldump /usr/bin/mysql /usr/bin/mongodump ./bin && \
+    cp /usr/bin/mysqldump /usr/bin/mysql /usr/bin/mongodump /usr/bin/mongorestore ./bin && \
     # Restic \
     RESTIC_URL=https://github.com/restic/restic/releases/download/v${RESTIC_VERSION}/restic_${RESTIC_VERSION}_linux_${TARGETARCH}.bz2 && \
     wget ${RESTIC_URL} -O restic.bz2 && \
@@ -111,14 +111,6 @@ COPY --from=binaries /app/bin /usr/local/bin/
 COPY drizzle.config.ts ./
 COPY ./drizzle ./drizzle
 COPY --from=builder /app/build .
-
-# Database engines
-
-ENV BACKRY_SQLITE_DUMP_CMD="/usr/bin/sqlite3"
-ENV BACKRY_POSTGRES_DUMP_CMD="/usr/bin/pg_dump"
-ENV BACKRY_MYSQL_DUMP_CMD="/usr/local/bin/mysqldump"
-ENV BACKRY_MYSQL_CHECK_CMD="/usr/local/bin/mysql"
-ENV BACKRY_MONGODB_DUMP_CMD="/usr/local/bin/mongodump"
 
 # Metadata
 

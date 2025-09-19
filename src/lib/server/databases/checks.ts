@@ -5,6 +5,7 @@ import { DATABASE_ENGINES, databases } from '$lib/server/db/schema';
 import { logger } from '$lib/server/services/logger';
 import type { EngineMethods } from '$lib/types/engine';
 import { eq, or } from 'drizzle-orm';
+import { Result } from 'neverthrow';
 
 /**
  * Check if all active or errored databases are accessible and update their status accordingly.
@@ -66,53 +67,51 @@ export async function checkDatabase(database: typeof databases.$inferSelect) {
 }
 
 
-export async function getAllEnginesVersionsOrError() {
-    const result = {} as Record<
-        `${typeof DATABASE_ENGINES[number]}:${'dump' | 'check'}`,
-        { version: string | null; error: string | null, cmd: string, cmdResolved: string | null }
-    >;
+export type EngineCheckKey = `${typeof DATABASE_ENGINES[number]}:${'dump' | 'check' | 'restore'}`;
 
-    for (const [ engineId ] of ENGINE_META_ENTRIES) {
+export interface EngineCheckResult {
+    version: string | null;
+    error: string | null;
+    cmd: string;
+    cmdResolved: string | null;
+}
+
+/**
+ * Create a new EngineCheckResult object from a command and a Result.
+ * @param cmd The command that was checked.
+ * @param result The result of the command check.
+ * @returns An EngineCheckResult object.
+ */
+const newCheckResult = (cmd: string, result: Result<string, string>) => ({
+    version: result.isOk() ? result.value : null,
+    error: result.isErr() ? result.error : null,
+    cmd,
+    cmdResolved: Bun.which(cmd),
+}) satisfies EngineCheckResult;
+
+/**
+ * Get the versions of all database engines' commands or errors if they are not accessible.
+ * @returns A promise that resolves to a record of EngineCheckResult objects.
+ */
+export async function getAllEnginesVersionsOrError() {
+    const result = {} as Record<EngineCheckKey, EngineCheckResult>;
+
+    await Promise.all(ENGINE_META_ENTRIES.map(async ([ engineId ]) => {
         const engine: EngineMethods = ENGINES_METHODS[engineId];
 
-        const dumpVersion = await engine.getDumpCmdVersion();
-        if (dumpVersion.isOk()) {
-            result[`${engineId}:dump`] = {
-                version: dumpVersion.value,
-                error: null,
-                cmd: engine.dumpCommand,
-                cmdResolved: Bun.which(engine.dumpCommand),
-            };
-        } else {
-            result[`${engineId}:dump`] = {
-                version: null,
-                error: dumpVersion.error,
-                cmd: engine.dumpCommand,
-                cmdResolved: Bun.which(engine.dumpCommand),
-            };
+        // Dump command
+        result[`${engineId}:dump`] = newCheckResult(engine.dumpCommand, await engine.getDumpCmdVersion());
+
+        // Restore command (if different from dump)
+        if (engine.restoreCommand !== engine.dumpCommand) {
+            result[`${engineId}:restore`] = newCheckResult(engine.restoreCommand, await engine.getRestoreCmdVersion());
         }
 
-        if (!engine.checkCommand || !engine.getCheckCmdVersion) {
-            continue;
+        // Check command (if available and different from dump and restore)
+        if (engine.checkCommand && engine.getCheckCmdVersion && engine.checkCommand !== engine.dumpCommand && engine.checkCommand !== engine.restoreCommand) {
+            result[`${engineId}:check`] = newCheckResult(engine.checkCommand, await engine.getCheckCmdVersion());
         }
-
-        const checkVersion = await engine.getCheckCmdVersion();
-        if (checkVersion.isOk()) {
-            result[`${engineId}:check`] = {
-                version: checkVersion.value,
-                error: null,
-                cmd: engine.checkCommand,
-                cmdResolved: Bun.which(engine.checkCommand),
-            };
-        } else {
-            result[`${engineId}:check`] = {
-                version: null,
-                error: checkVersion.error,
-                cmd: engine.checkCommand,
-                cmdResolved: Bun.which(engine.checkCommand),
-            };
-        }
-    }
+    }));
 
     return result;
 }
