@@ -3,10 +3,10 @@ import { apiError, apiSuccess } from '$lib/server/api/responses';
 import { deleteNotification, updateNotification } from '$lib/server/queries/notifications';
 import { parseRequestBody } from '$lib/server/schemas';
 import { notificationPatchRequest, notificationRequest, type NotificationResponse } from '$lib/server/schemas/api';
-import type { RequestHandler } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 
 export const DELETE: RequestHandler = async ({ params }) => {
-    const notificationId = parseInt(params.id || '');
+    const notificationId = parseInt(params.id);
     if (isNaN(notificationId) || notificationId < 0) {
         return apiError('Invalid notification ID');
     }
@@ -21,7 +21,7 @@ export const DELETE: RequestHandler = async ({ params }) => {
 
 
 export const PUT: RequestHandler = async ({ request, params }) => {
-    const notificationId = parseInt(params.id || '');
+    const notificationId = parseInt(params.id);
     if (isNaN(notificationId) || notificationId < 0) {
         return apiError('Invalid notification ID');
     }
@@ -43,7 +43,7 @@ export const PUT: RequestHandler = async ({ request, params }) => {
 
 
 export const PATCH: RequestHandler = async ({ request, params }) => {
-    const notificationId = parseInt(params.id || '');
+    const notificationId = parseInt(params.id);
     if (isNaN(notificationId) || notificationId < 0) {
         return apiError('Invalid notification ID');
     }

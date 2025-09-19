@@ -5,7 +5,7 @@ import { storagesList, updateStorage } from '$lib/server/queries/storages';
 import { logger } from '$lib/server/services/logger';
 import { getRepositoryLocks, getRepositorySnapshots } from '$lib/server/services/restic';
 import type { ResticSnapshot } from '$lib/types/restic';
-import { err, ok, type ResultAsync } from 'neverthrow';
+import { err, ok, type Result } from 'neverthrow';
 
 /**
  * Short information about a backup that doesn't exist in the Restic repo but is not marked as 'pruned' in Backry's DB
@@ -20,9 +20,9 @@ export interface Desyncedbackup {
 /**
  * Check for backups that are marked as 'successful' but their Restic snapshots don't exist anymore in the repository.
  * @param storage The storage object to check for desynced backups.
- * @return A ResultAsync containing an array of desynced backups or an error message.
+ * @return A Result containing an array of desynced backups or an error message.
  */
-export async function getPruneDesyncBackups(storage: typeof storages.$inferSelect): Promise<ResultAsync<Desyncedbackup[], string>> {
+export async function getPruneDesyncBackups(storage: typeof storages.$inferSelect): Promise<Result<Desyncedbackup[], string>> {
     const backups = getUnprunedSnapshotByStorageId(storage.id);
     if (backups.length === 0) {
         return ok([]);
@@ -54,9 +54,9 @@ export async function getPruneDesyncBackups(storage: typeof storages.$inferSelec
 /**
  * Get restic snapshots labelled 'backry' that have no corresponding backup in the database.
  * @param storage The storage object to check for stale snapshots.
- * @return A ResultAsync containing an array of stale snapshots or an error message.
+ * @return A Result containing an array of stale snapshots or an error message.
  */
-export async function getStaleSnapshots(storage: typeof storages.$inferSelect): Promise<ResultAsync<ResticSnapshot[], string>> {
+export async function getStaleSnapshots(storage: typeof storages.$inferSelect): Promise<Result<ResticSnapshot[], string>> {
     const backupsSnapshotsIds = getSnapshotsIdsByStorageId(storage.id);
 
     const res = await getRepositorySnapshots(

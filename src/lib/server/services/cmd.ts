@@ -1,12 +1,12 @@
 import { $ } from 'bun';
-import { err, ok, type ResultAsync } from 'neverthrow';
+import { err, ok, type Result } from 'neverthrow';
 
 interface CommandOptions {
     cwd?: string;
     env?: Record<string, string>;
 }
 
-export async function runCommandSync(command: string, args: string[] = [], options?: CommandOptions): Promise<ResultAsync<$.ShellOutput, $.ShellOutput>> {
+export async function runCommandSync(command: string, args: string[] = [], options?: CommandOptions): Promise<Result<$.ShellOutput, $.ShellOutput>> {
     const cmd = $`${command} ${{ raw: args.map($.escape).join(' ') }}`
         .env(options?.env)
         .nothrow()
@@ -33,9 +33,9 @@ export async function runCommandSync(command: string, args: string[] = [], optio
  * @param command2 Second command
  * @param args2 Arguments for the second command, escaped via Bun's `$.escape`
  * @param options Options for the command
- * @returns ResultAsync with ShellOutput on success, or ShellOutput on error
+ * @returns Result with ShellOutput on success, or ShellOutput on error
  */
-export async function pipeCommandSync(command1: string, args1: string[] = [], command2: string, args2: string[] = [], options?: CommandOptions): Promise<ResultAsync<$.ShellOutput, $.ShellOutput>> {
+export async function pipeCommandSync(command1: string, args1: string[] = [], command2: string, args2: string[] = [], options?: CommandOptions): Promise<Result<$.ShellOutput, $.ShellOutput>> {
     const cmd = $`${command1} ${{ raw: args1.map($.escape).join(' ') }} | ${command2} ${{ raw: args2.map($.escape).join(' ') }}`
         .env(options?.env)
         .nothrow()
@@ -66,7 +66,7 @@ async function readAndDecodeStream<T>(
     reader: ReadableStreamDefaultReader<Uint8Array<ArrayBufferLike>>,
     json: boolean,
     onChunk?: (chunk: T) => void,
-): Promise<ResultAsync<T[], Error>> {
+): Promise<Result<T[], Error>> {
     const textDecoder = new TextDecoder();
     const result: T[] = [];
 
@@ -109,7 +109,7 @@ async function readAndDecodeStream<T>(
 }
 
 
-export async function runCommandStream<O, E>(command: string, args: string[] = [], options?: StreamCommandOptions<O, E>): Promise<ResultAsync<O[], (E | Error)[]>> {
+export async function runCommandStream<O, E>(command: string, args: string[] = [], options?: StreamCommandOptions<O, E>): Promise<Result<O[], (E | Error)[]>> {
     const subprocess = Bun.spawn([ command, ...args ], {
         cwd: options?.cwd,
         env: options?.env,

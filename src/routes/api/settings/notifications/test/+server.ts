@@ -3,7 +3,7 @@ import { apiError, apiSuccess } from '$lib/server/api/responses';
 import { parseRequestBody } from '$lib/server/schemas';
 import { notificationTestRequest } from '$lib/server/schemas/api';
 import { sendShoutrrrNotification } from '$lib/server/services/shoutrrr';
-import type { RequestHandler } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request }) => {
     const body = await parseRequestBody(request, notificationTestRequest);

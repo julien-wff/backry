@@ -1,6 +1,6 @@
 import type { databases } from '$lib/server/db/schema';
 import type { ContainerInspectInfo } from 'dockerode';
-import { Result, type ResultAsync } from 'neverthrow';
+import { type Result } from 'neverthrow';
 
 /**
  * Object to represent the base elements of any database connection string.
@@ -59,7 +59,7 @@ export interface EngineMethods {
      * Get the version of the dump command.
      * @returns CLI output, or error message.
      */
-    getDumpCmdVersion(): Promise<ResultAsync<string, string>>;
+    getDumpCmdVersion(): Promise<Result<string, string>>;
 
     /**
      * Get the environment variables to use for the dump command, if any.
@@ -72,7 +72,7 @@ export interface EngineMethods {
      * If no check command is defined, this must not be defined.
      * @returns CLI output, or error message.
      */
-    getCheckCmdVersion?(): Promise<ResultAsync<string, string>>;
+    getCheckCmdVersion?(): Promise<Result<string, string>>;
 
     /**
      * Generate the dump command for the engine.
@@ -88,7 +88,7 @@ export interface EngineMethods {
      * @returns On success, the connection string (potentially updated to apply fixes, like add the database name).
      *          On failure, the error message.
      */
-    checkConnection(connectionString: string): Promise<ResultAsync<string, string>>;
+    checkConnection(connectionString: string): Promise<Result<string, string>>;
 
     /**
      * Determine if the Docker container compatible with the engine.
@@ -147,5 +147,5 @@ export interface EngineMethods {
      * Get the version of the restore command.
      * @returns CLI output, or error message.
      */
-    getRestoreCmdVersion(): Promise<ResultAsync<string, string>>;
+    getRestoreCmdVersion(): Promise<Result<string, string>>;
 }

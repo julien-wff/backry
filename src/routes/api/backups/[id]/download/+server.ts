@@ -1,10 +1,11 @@
 import { getBackup } from '$lib/server/queries/backups';
 import { streamFileContent } from '$lib/server/services/restic';
 import { logger } from '$lib/server/services/logger';
-import { error, type RequestHandler } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ params }) => {
-    const backupId = parseInt(params.id || '');
+    const backupId = parseInt(params.id);
     if (isNaN(backupId) || backupId < 0) {
         return error(400, 'Invalid backup ID');
     }

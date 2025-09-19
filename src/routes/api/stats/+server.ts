@@ -1,7 +1,7 @@
 import { apiError, apiSuccess } from '$lib/server/api/responses';
 import { getApiStats } from '$lib/server/queries/shared';
 import { logger } from '$lib/server/services/logger';
-import { type RequestHandler } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async () => {
     try {

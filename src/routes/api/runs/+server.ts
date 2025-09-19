@@ -1,4 +1,4 @@
-import type { RequestHandler } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 import { getRunsWithBackupFilter } from '$lib/server/queries/runs';
 import { apiSuccess } from '$lib/server/api/responses';
 import type { RunsQueryResult } from '$lib/server/schemas/api';

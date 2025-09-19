@@ -2,7 +2,7 @@ import { runCommandSync } from '$lib/server/services/cmd';
 import type { ConnectionStringParams, EngineMethods } from '$lib/types/engine';
 import { Database } from 'bun:sqlite';
 import { type ContainerInspectInfo } from 'dockerode';
-import { err, ok, Result, type ResultAsync } from 'neverthrow';
+import { err, ok, type Result } from 'neverthrow';
 import path from 'node:path';
 import fs from 'node:fs/promises';
 
@@ -11,7 +11,7 @@ export const sqliteMethods = {
     restoreCommand: process.env.BACKRY_SQLITE_RESTORE_CMD ?? process.env.BACKRY_SQLITE_DUMP_CMD ?? 'sqlite3',
     dumpFileExtension: 'sql',
 
-    async getDumpCmdVersion(): Promise<ResultAsync<string, string>> {
+    async getDumpCmdVersion(): Promise<Result<string, string>> {
         const res = await runCommandSync(this.dumpCommand, [ '--version' ]);
         if (res.isErr()) {
             return err(res.error.stderr.toString().trim());
@@ -20,7 +20,7 @@ export const sqliteMethods = {
         return ok(res.value.text().trim());
     },
 
-    async checkConnection(connectionString: string): Promise<ResultAsync<string, string>> {
+    async checkConnection(connectionString: string): Promise<Result<string, string>> {
         // No need to specify the database
         try {
             const con = new Database(connectionString, { readonly: true, create: false });
@@ -108,7 +108,7 @@ export const sqliteMethods = {
         return [ this.restoreCommand, connectionString ];
     },
 
-    async getRestoreCmdVersion(): Promise<ResultAsync<string, string>> {
+    async getRestoreCmdVersion(): Promise<Result<string, string>> {
         const res = await runCommandSync(this.restoreCommand, [ '--version' ]);
         if (res.isErr()) {
             return err(res.error.stderr.toString().trim());

@@ -12,7 +12,7 @@ import { sendShoutrrrNotification } from '$lib/server/services/shoutrrr';
 import type { NotificationRunPayload } from '$lib/types/notifications';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-import { err, ok, type ResultAsync } from 'neverthrow';
+import { err, ok, type Result } from 'neverthrow';
 
 dayjs.extend(utc);
 
@@ -51,9 +51,9 @@ export async function fireNotificationsForTrigger(trigger: typeof NOTIFICATION_T
 /**
  * Create the payload for the notification based on the run ID.
  * @param runId The ID of the run to construct the payload for.
- * @return A ResultAsync containing the notification payload or an error message.
+ * @return A Result containing the notification payload or an error message.
  */
-async function constructRunPayload(runId: number): Promise<ResultAsync<NotificationRunPayload, string>> {
+async function constructRunPayload(runId: number): Promise<Result<NotificationRunPayload, string>> {
     const run = await getRunFull(runId);
     if (!run) {
         return err(`Run with ID ${runId} not found`);
@@ -91,9 +91,9 @@ async function constructRunPayload(runId: number): Promise<ResultAsync<Notificat
  * It renders the title and body templates, then sends the notification.
  * @param notification The notification object to send.
  * @param payload The payload for the notification to compile the templates.
- * @returns A ResultAsync indicating success or failure.
+ * @returns A Result indicating success or failure.
  */
-async function sendNotification(notification: typeof notifications.$inferSelect, payload: NotificationRunPayload): Promise<ResultAsync<void, string>> {
+async function sendNotification(notification: typeof notifications.$inferSelect, payload: NotificationRunPayload): Promise<Result<void, string>> {
     logger.debug(payload, `Sending notification #${notification.id} for trigger ${notification.trigger}`);
     const notificationTitle = renderNotificationTemplate(notification.title || 'Backry', payload);
     if (notificationTitle.isErr()) {

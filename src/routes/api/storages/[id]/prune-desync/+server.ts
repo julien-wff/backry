@@ -5,7 +5,7 @@ import { parseRequestBody } from '$lib/server/schemas';
 import { type StoragePruneDesyncResponse, storagePruneDesyncUpdateRequest } from '$lib/server/schemas/api';
 import { logger } from '$lib/server/services/logger';
 import { getPruneDesyncBackups } from '$lib/server/storages/health';
-import type { RequestHandler } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 
 /**
  * Get backups which are marked as 'successful' but their Restic snapshots don't exist anymore in the repository.

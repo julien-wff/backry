@@ -1,6 +1,6 @@
 import type { ApiResponse } from '$lib/server/api/responses';
 import type { BackupUpdateEventPayload, RestoreUpdateEventPayload } from '$lib/server/shared/events';
-import { err, ok, ResultAsync } from 'neverthrow';
+import { err, ok, type Result } from 'neverthrow';
 import type { z, ZodType } from 'zod';
 
 /**
@@ -8,7 +8,7 @@ import type { z, ZodType } from 'zod';
  * @param method HTTP method
  * @param url URL to fetch
  * @param body Request body
- * @returns ResultAsync with either the parsed response or an error
+ * @returns Result with either the parsed response or an error
  * @template R Type of the response body
  * @template B Zod schema for the request body, or null for empty body
  */
@@ -16,7 +16,7 @@ export async function fetchApi<R extends object, B extends ZodType | null = null
     method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
     url: string,
     body: B extends ZodType ? z.infer<B> : null,
-): Promise<ResultAsync<R, string>> {
+): Promise<Result<R, string>> {
     const res = await fetch(url, {
         method,
         ...(method !== 'GET' && body && {

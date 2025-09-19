@@ -2,10 +2,10 @@ import { apiError, apiSuccess } from '$lib/server/api/responses';
 import { deleteRun, getRunFull } from '$lib/server/queries/runs';
 import type { RunResponse } from '$lib/server/schemas/api';
 import { deleteSnapshots } from '$lib/server/services/restic';
-import { type RequestHandler } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 
 export const DELETE: RequestHandler = async ({ params }) => {
-    const runId = parseInt(params.id || '');
+    const runId = parseInt(params.id);
     if (isNaN(runId) || runId < 0) {
         return apiError('Invalid run ID', 400);
     }

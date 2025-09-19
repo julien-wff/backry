@@ -2,10 +2,10 @@ import { apiError, apiSuccess } from '$lib/server/api/responses';
 import { deleteBackup, getBackup } from '$lib/server/queries/backups';
 import type { BackupResponse } from '$lib/server/schemas/api';
 import { deleteSnapshots } from '$lib/server/services/restic';
-import { type RequestHandler } from '@sveltejs/kit';
+import { type RequestHandler } from './$types';
 
 export const DELETE: RequestHandler = async ({ params }) => {
-    const backupId = parseInt(params.id || '');
+    const backupId = parseInt(params.id);
     if (isNaN(backupId) || backupId < 0) {
         return apiError('Invalid backup ID', 400);
     }

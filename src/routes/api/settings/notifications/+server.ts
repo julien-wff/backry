@@ -3,7 +3,7 @@ import { apiError, apiSuccess } from '$lib/server/api/responses';
 import { createNotification } from '$lib/server/queries/notifications';
 import { parseRequestBody } from '$lib/server/schemas';
 import { notificationRequest, type NotificationResponse } from '$lib/server/schemas/api';
-import type { RequestHandler } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request }) => {
     const body = await parseRequestBody(request, notificationRequest);
@@ -11,7 +11,7 @@ export const POST: RequestHandler = async ({ request }) => {
         return apiError(body.error);
     }
 
-    // Check tempaltes
+    // Check templates
     const templateCheckRes = validateNotificationTemplates(body.value);
     if (templateCheckRes.isErr()) {
         return apiError(templateCheckRes.error, 400);

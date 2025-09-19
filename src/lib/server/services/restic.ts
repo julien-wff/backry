@@ -12,7 +12,7 @@ import type {
     ResticStats,
 } from '$lib/types/restic';
 import { type $ } from 'bun';
-import { err, ok, Result, type ResultAsync } from 'neverthrow';
+import { err, ok, type Result } from 'neverthrow';
 
 export const RESTIC_CMD = process.env.BACKRY_RESTIC_CMD || 'restic';
 
@@ -51,7 +51,7 @@ async function resticCommandToResult<T>(
     res: Result<$.ShellOutput, $.ShellOutput>,
     json = true,
     firstLines: number = Number.MAX_SAFE_INTEGER,
-): Promise<ResultAsync<T[], ResticError>> {
+): Promise<Result<T[], ResticError>> {
     if (res.isErr()) {
         logger.error(`Failed to run restic command: ${res.error.stderr.toString().trim()}`);
         return err(formatResticError(res.error));
@@ -75,7 +75,7 @@ async function resticCommandToResult<T>(
 }
 
 
-export async function getResticVersion(): Promise<ResultAsync<string, string>> {
+export async function getResticVersion(): Promise<Result<string, string>> {
     const res = await runCommandSync(RESTIC_CMD, [ 'version' ]);
     if (res.isErr()) {
         return err(res.error.stderr.toString().trim());
@@ -198,7 +198,7 @@ export async function deleteSnapshots(url: string,
 
 export async function getRepositoryLocks(url: string,
                                          password: string,
-                                         env: Record<string, string>): Promise<ResultAsync<ResticLock[], string>> {
+                                         env: Record<string, string>): Promise<Result<ResticLock[], string>> {
     const locksResult = await runCommandSync(
         RESTIC_CMD,
         [

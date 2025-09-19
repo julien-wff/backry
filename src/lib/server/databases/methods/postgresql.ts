@@ -3,7 +3,7 @@ import { runCommandSync } from '$lib/server/services/cmd';
 import type { ConnectionStringParams, EngineMethods } from '$lib/types/engine';
 import { SQL } from 'bun';
 import { type ContainerInspectInfo } from 'dockerode';
-import { err, ok, Result, type ResultAsync } from 'neverthrow';
+import { err, ok, type Result } from 'neverthrow';
 import dayjs from 'dayjs';
 
 export const postgresqlMethods = {
@@ -11,7 +11,7 @@ export const postgresqlMethods = {
     restoreCommand: process.env.BACKRY_POSTGRES_RESTORE_CMD ?? 'psql',
     dumpFileExtension: 'sql',
 
-    async getDumpCmdVersion(): Promise<ResultAsync<string, string>> {
+    async getDumpCmdVersion(): Promise<Result<string, string>> {
         const res = await runCommandSync(this.dumpCommand, [ '--version' ]);
         if (res.isErr()) {
             return err(res.error.stderr.toString().trim());
@@ -24,7 +24,7 @@ export const postgresqlMethods = {
         return [ this.dumpCommand, ...additionalArgs, connectionString ];
     },
 
-    async checkConnection(connectionString): Promise<ResultAsync<string, string>> {
+    async checkConnection(connectionString): Promise<Result<string, string>> {
         // If no database is specified, update the connection string to use the current one.
         let con: SQL;
         try {
@@ -173,7 +173,7 @@ export const postgresqlMethods = {
         return [ this.restoreCommand, connectionString ];
     },
 
-    async getRestoreCmdVersion(): Promise<ResultAsync<string, string>> {
+    async getRestoreCmdVersion(): Promise<Result<string, string>> {
         const res = await runCommandSync(this.restoreCommand, [ '--version' ]);
         if (res.isErr()) {
             return err(res.error.stderr.toString().trim());
