@@ -73,8 +73,8 @@ networks:
 
 ## Configuration
 
-Backry can be configured using environment variables. If you're using the provided Docker container, do **not** change
-the database URL or the CLI tools commands.
+Backry can be configured using environment variables. If you're using the provided Docker container, changing
+the database URL or the CLI tools commands may break things.
 
 ### Backry
 

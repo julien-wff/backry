@@ -112,14 +112,6 @@ COPY drizzle.config.ts ./
 COPY ./drizzle ./drizzle
 COPY --from=builder /app/build .
 
-# Database engines
-
-ENV BACKRY_SQLITE_DUMP_CMD="/usr/bin/sqlite3"
-ENV BACKRY_POSTGRES_DUMP_CMD="/usr/bin/pg_dump"
-ENV BACKRY_MYSQL_DUMP_CMD="/usr/local/bin/mysqldump"
-ENV BACKRY_MYSQL_CHECK_CMD="/usr/local/bin/mysql"
-ENV BACKRY_MONGODB_DUMP_CMD="/usr/local/bin/mongodump"
-
 # Metadata
 
 ARG BUILD_DATE
