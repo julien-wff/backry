@@ -20,7 +20,7 @@ export const init: ServerInit = async () => {
     await migrate(db, { migrationsFolder: './drizzle' });
 
     // Enable foreign key constraints
-    db.$client.exec('PRAGMA foreign_keys = ON;');
+    db.$client.run('PRAGMA foreign_keys = ON;');
 
     logger.info('Migrations applied successfully, starting up Backry...');
 
