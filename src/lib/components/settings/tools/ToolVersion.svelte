@@ -13,13 +13,13 @@
 <div class="flex flex-col gap-1">
     <div class="flex items-center gap-2 pl-1">
         <span class="status" class:status-error={error} class:status-success={version}></span>
-        {name}
+        <span class="text-nowrap">{name}</span>
         {#if cmd}
             <div class="tooltip" class:tooltip-error={!cmdResolved}>
                 <div class="tooltip-content max-w-2xl">
                     {cmdResolved ?? `Cannot resolve "${cmd}" in PATH`}
                 </div>
-                <span class="opacity-60 text-sm">({cmd})</span>
+                <span class="opacity-60 text-sm line-clamp-1">({cmd})</span>
             </div>
         {/if}
     </div>
