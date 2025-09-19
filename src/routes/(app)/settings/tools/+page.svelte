@@ -31,9 +31,13 @@
     <ToolVersion {...data.svelteKit} name="SvelteKit"/>
     <ToolVersion {...data.restic} name="Restic"/>
     <ToolVersion {...data.shoutrrr} name="Shoutrrr"/>
+    <ToolVersion {...data['postgresql:restore']} name="PSQL"/>
     <ToolVersion {...data['postgresql:dump']} name="PGDump"/>
-    <ToolVersion {...data['mysql:check']} name="MySQL"/>
+    <ToolVersion {...data['mysql:restore']} name="MySQL"/>
+    <ToolVersion {...data['mysql:check']} name="MySQL (check only)"/>
     <ToolVersion {...data['mysql:dump']} name="MySQL Dump"/>
     <ToolVersion {...data['sqlite:dump']} name="SQLite"/>
+    <ToolVersion {...data['sqlite:restore']} name="SQLite (restore only)"/>
     <ToolVersion {...data['mongodb:dump']} name="MongoDB Dump"/>
+    <ToolVersion {...data['mongodb:restore']} name="MongoDB Restore"/>
 </div>
