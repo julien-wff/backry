@@ -4,7 +4,7 @@ import { logger } from '$lib/server/services/logger';
 import { getRepositoryStats } from '$lib/server/services/restic';
 import { eq, or } from 'drizzle-orm';
 import fs from 'fs/promises';
-import { err, ok, type ResultAsync } from 'neverthrow';
+import { err, ok, type Result } from 'neverthrow';
 import path from 'path';
 
 export interface CheckPathResult {
@@ -21,9 +21,9 @@ export interface CheckPathError {
 /**
  * Get information about a local path to check if it's accessible and empty.
  * @param rawPath The path to check, can be relative or absolute.
- * @returns A promise that resolves to a ResultAsync containing the path information or an error.
+ * @returns A promise that resolves to a Result containing the path information or an error.
  */
-export async function checkPathForCreate(rawPath: string | null): Promise<ResultAsync<CheckPathResult, CheckPathError>> {
+export async function checkPathForCreate(rawPath: string | null): Promise<Result<CheckPathResult, CheckPathError>> {
     if (!rawPath) {
         return err({ error: 'path is required' });
     }

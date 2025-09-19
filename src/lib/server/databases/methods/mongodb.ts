@@ -3,7 +3,7 @@ import { runCommandSync } from '$lib/server/services/cmd';
 import type { ConnectionStringParams, EngineMethods } from '$lib/types/engine';
 import { type ContainerInspectInfo } from 'dockerode';
 import { MongoClient } from 'mongodb';
-import { err, ok, Result, type ResultAsync } from 'neverthrow';
+import { err, ok, type Result } from 'neverthrow';
 
 
 export const mongodbMethods = {
@@ -11,7 +11,7 @@ export const mongodbMethods = {
     restoreCommand: process.env.BACKRY_MONGODB_RESTORE_CMD ?? 'mongorestore',
     dumpFileExtension: 'archive',
 
-    async getDumpCmdVersion(): Promise<ResultAsync<string, string>> {
+    async getDumpCmdVersion(): Promise<Result<string, string>> {
         const res = await runCommandSync(this.dumpCommand, [ '--version' ]);
         if (res.isErr()) {
             return err(res.error.stderr.toString().trim());
@@ -24,7 +24,7 @@ export const mongodbMethods = {
         return [ this.dumpCommand, '--uri', connectionString, '--archive', '--quiet', ...additionalArgs ];
     },
 
-    async checkConnection(connectionString): Promise<ResultAsync<string, string>> {
+    async checkConnection(connectionString): Promise<Result<string, string>> {
         // Connection string doesn't need a database specified. No db = backup all databases.
         try {
             const client = new MongoClient(connectionString, {
@@ -94,7 +94,7 @@ export const mongodbMethods = {
         return ok();
     },
 
-    async getRestoreCmdVersion(): Promise<ResultAsync<string, string>> {
+    async getRestoreCmdVersion(): Promise<Result<string, string>> {
         const res = await runCommandSync(this.restoreCommand, [ '--version' ]);
         if (res.isErr()) {
             return err(res.error.stderr.toString().trim());

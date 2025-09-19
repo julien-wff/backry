@@ -3,7 +3,7 @@ import { databases } from '$lib/server/db/schema';
 import { runCommandSync } from '$lib/server/services/cmd';
 import type { ConnectionStringParams, EngineMethods } from '$lib/types/engine';
 import { type ContainerInspectInfo } from 'dockerode';
-import { err, ok, Result, type ResultAsync } from 'neverthrow';
+import { err, ok, type Result } from 'neverthrow';
 
 /**
  * Convert a connection string to an array of options for the mysql command line client.
@@ -51,7 +51,7 @@ export const mysqlMethods = {
     restoreCommand: process.env.BACKRY_MYSQL_RESTORE_CMD ?? process.env.BACKRY_MYSQL_CHECK_CMD ?? 'mysql',
     dumpFileExtension: 'sql',
 
-    async getDumpCmdVersion(): Promise<ResultAsync<string, string>> {
+    async getDumpCmdVersion(): Promise<Result<string, string>> {
         const res = await runCommandSync(this.dumpCommand, [ '--version' ]);
         if (res.isErr()) {
             return err(res.error.stderr.toString().trim());
@@ -60,7 +60,7 @@ export const mysqlMethods = {
         return ok(res.value.text().trim());
     },
 
-    async getCheckCmdVersion(): Promise<ResultAsync<string, string>> {
+    async getCheckCmdVersion(): Promise<Result<string, string>> {
         const res = await runCommandSync(this.checkCommand!, [ '--version' ]);
         if (res.isErr()) {
             return err(res.error.stderr.toString().trim());
@@ -79,7 +79,7 @@ export const mysqlMethods = {
         };
     },
 
-    async checkConnection(connectionString): Promise<ResultAsync<string, string>> {
+    async checkConnection(connectionString): Promise<Result<string, string>> {
         // A database name is required for MySQL connections. However, there is no "default database" like with PostgreSQL.
         const url = URL.parse(connectionString);
         if (!url) {
@@ -207,7 +207,7 @@ export const mysqlMethods = {
         };
     },
 
-    async getRestoreCmdVersion(): Promise<ResultAsync<string, string>> {
+    async getRestoreCmdVersion(): Promise<Result<string, string>> {
         const res = await runCommandSync(this.restoreCommand, [ '--version' ]);
         if (res.isErr()) {
             return err(res.error.stderr.toString().trim());

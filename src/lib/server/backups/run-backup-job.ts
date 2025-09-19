@@ -9,7 +9,7 @@ import { fireNotificationsForTrigger } from '$lib/server/settings/notifications'
 import { backupEmitter } from '$lib/server/shared/events';
 import type { EngineMethods } from '$lib/types/engine';
 import { sql } from 'drizzle-orm';
-import { err, ok, type ResultAsync } from 'neverthrow';
+import { err, ok, type Result } from 'neverthrow';
 import path from 'node:path';
 
 /**
@@ -18,7 +18,7 @@ import path from 'node:path';
  * @param forcedDatabases The list of database IDs to run the backup for. If null, all databases in the job will be backed up.
  * @returns If error, the error message. If success, void.
  */
-export async function runBackupJob(jobId: number, forcedDatabases: number[] | null = null): Promise<ResultAsync<void, string>> {
+export async function runBackupJob(jobId: number, forcedDatabases: number[] | null = null): Promise<Result<void, string>> {
     logger.info(`Starting backup for job #${jobId}`);
 
     const job = await getJob(jobId);
@@ -87,7 +87,7 @@ async function jobDatabaseBackup(
     jobIndex: number,
     runId: number,
     force = false,
-): Promise<ResultAsync<[ typeof backups.$inferSelect | null, number ], string>> {
+): Promise<Result<[ typeof backups.$inferSelect | null, number ], string>> {
     logger.info(`Starting backup for job #${job.id} database #${jobIndex}`);
 
     const jobDatabase = job.jobsDatabases[jobIndex];
@@ -190,7 +190,7 @@ async function applyPrunePolicyOnJobDatabase(
     jobId: number,
     databaseId: number,
     filePath: string,
-): Promise<ResultAsync<number, string>> {
+): Promise<Result<number, string>> {
     const forgetResult = await applyForgetPolicy(
         storage.url,
         storage.password!,
