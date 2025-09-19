@@ -4,7 +4,7 @@ import { parseRequestBody } from '$lib/server/schemas';
 import { storageStaleSnapshotsDeleteRequest, type StorageStaleSnapshotsResponse } from '$lib/server/schemas/api';
 import { deleteSnapshots } from '$lib/server/services/restic';
 import { getStaleSnapshots } from '$lib/server/storages/health';
-import { type RequestHandler } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 
 /**
  * Get 'restic' labelled snapshots that have no corresponding backup in the database

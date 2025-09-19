@@ -3,7 +3,7 @@ import { ENGINES_METHODS } from '$lib/server/databases/engines-methods';
 import { parseRequestBody } from '$lib/server/schemas';
 import { dockerConnectionStringRequest, type DockerConnectionStringResponse } from '$lib/server/schemas/api';
 import { inspectContainer } from '$lib/server/services/docker';
-import { type RequestHandler } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 
 /**
  * Generate a connection string for the specified container ID
@@ -14,8 +14,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
         return apiError(body.error);
     }
 
-    const containerId = params.id as string;
-    const container = await inspectContainer(containerId);
+    const container = await inspectContainer(params.id);
     if (container.isErr()) {
         return apiError(container.error, 404);
     }

@@ -1,6 +1,6 @@
 import { apiError, apiSuccess } from '$lib/server/api/responses';
 import { getResticVersion } from '$lib/server/services/restic';
-import { type RequestHandler } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ request }) => {
     const resticVersion = await getResticVersion();
@@ -14,7 +14,7 @@ export const GET: RequestHandler = async ({ request }) => {
             return apiError('Check failed', 500);
         }
     }
-    
+
     if (checkOk) {
         return new Response('ok', {
             status: 200,

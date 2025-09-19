@@ -2,11 +2,11 @@ import { apiError, apiSuccess } from '$lib/server/api/responses';
 import { deleteDatabase, updateDatabase } from '$lib/server/queries/databases';
 import { parseRequestBody } from '$lib/server/schemas';
 import { databaseRequest, type DatabaseResponse } from '$lib/server/schemas/api';
-import { type RequestHandler } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 
 
 export const PUT: RequestHandler = async ({ params, request }) => {
-    const databaseId = parseInt(params.id || '');
+    const databaseId = parseInt(params.id);
     if (isNaN(databaseId) || databaseId < 0) {
         return apiError('Invalid database ID');
     }
@@ -26,7 +26,7 @@ export const PUT: RequestHandler = async ({ params, request }) => {
 
 
 export const DELETE: RequestHandler = async ({ params }) => {
-    const databaseId = parseInt(params.id || '');
+    const databaseId = parseInt(params.id);
     if (isNaN(databaseId) || databaseId < 0) {
         return apiError('Invalid database ID');
     }

@@ -2,12 +2,10 @@ import { apiError, apiSuccess } from '$lib/server/api/responses';
 import type { DockerHostnamesCheckResponse } from '$lib/server/schemas/api';
 import { inspectContainer } from '$lib/server/services/docker';
 import { isPortReachable } from '$lib/server/services/net';
-import type { RequestHandler } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ params }) => {
-    const containerId = params['id'] as string;
-
-    const containerInfos = await inspectContainer(containerId);
+    const containerInfos = await inspectContainer(params.id);
     if (containerInfos.isErr()) {
         return apiError(containerInfos.error, 500);
     }

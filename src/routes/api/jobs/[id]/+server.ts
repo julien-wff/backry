@@ -4,10 +4,10 @@ import { deleteJob, updateJob, updateJobStatus } from '$lib/server/queries/jobs'
 import { parseRequestBody } from '$lib/server/schemas';
 import { jobPatchRequest, jobRequest, type JobResponse } from '$lib/server/schemas/api';
 import { addOrUpdateCronJob, stopCronJob } from '$lib/server/shared/cron';
-import { type RequestHandler } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 
 export const DELETE: RequestHandler = async ({ params }) => {
-    const jobId = parseInt(params.id || '');
+    const jobId = parseInt(params.id);
     if (isNaN(jobId) || jobId < 0) {
         return apiError('Invalid job ID');
     }
@@ -26,7 +26,7 @@ export const DELETE: RequestHandler = async ({ params }) => {
 
 
 export const PUT: RequestHandler = async ({ params, request }) => {
-    const jobId = parseInt(params.id || '');
+    const jobId = parseInt(params.id);
     if (isNaN(jobId) || jobId < 0) {
         return apiError('Invalid job ID');
     }
@@ -56,7 +56,7 @@ export const PUT: RequestHandler = async ({ params, request }) => {
 
 
 export const PATCH: RequestHandler = async ({ params, request }) => {
-    const jobId = parseInt(params.id || '');
+    const jobId = parseInt(params.id);
     if (isNaN(jobId) || jobId < 0) {
         return apiError('Invalid job ID');
     }
