@@ -105,8 +105,8 @@ the database URL or the CLI tools commands.
 | `BACKRY_MYSQL_DUMP_CMD`       | Dump MySQL databases      | `mysqldump`    |
 | `BACKRY_MYSQL_RESTORE_CMD`    | Restore MySQL dumps       | `mysql`        |
 | `BACKRY_MYSQL_CHECK_CMD`      | Check MySQL connection    | `mysql`        |
-| `BACKRY_MONGO_DUMP_CMD`       | Dump MongoDB databases    | `mongodump`    |
-| `BACKRY_MONGO_RESTORE_CMD`    | Restore MongoDB dumps     | `mongorestore` |
+| `BACKRY_MONGODB_DUMP_CMD`     | Dump MongoDB databases    | `mongodump`    |
+| `BACKRY_MONGODB_RESTORE_CMD`  | Restore MongoDB dumps     | `mongorestore` |
 | `BACKRY_RESTIC_CMD`           | Restic command            | `restic`       |
 | `BACKRY_SHOUTRR_CMD`          | Shoutrrr command          | `shoutrrr`     |
 
