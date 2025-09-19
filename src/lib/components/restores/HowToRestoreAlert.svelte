@@ -11,12 +11,12 @@
             backups
         </a>
         page, and use the
-        <button class="btn btn-sm btn-warning btn-soft" type="button">
+        <button class="btn btn-sm btn-warning btn-soft" inert type="button">
             <History class="w-4 h-4"/>
             Restore
         </button>
         button under a backup's
-        <button class="btn btn-square btn-sm btn-soft" type="button">
+        <button class="btn btn-square btn-sm btn-soft" inert type="button">
             <EllipsisVertical class="h-4 w-4"/>
         </button>
         actions menu.

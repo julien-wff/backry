@@ -72,7 +72,11 @@ export async function runRestoreBackup({
     // ENSURE SNAPSHOT FILE EXISTS
 
     const storage = backup.jobDatabase.job.storage;
-    const repoFiles = await listSnapshotFiles(storage.url, storage.password!, storage.env, backup.snapshotId!);
+    if (!backup.snapshotId || !backup.fileName) {
+        return restoreFailed(restore, 'Backup is missing snapshotId or fileName');
+    }
+
+    const repoFiles = await listSnapshotFiles(storage.url, storage.password!, storage.env, backup.snapshotId);
     if (repoFiles.isErr()) {
         return restoreFailed(restore, `Failed to list snapshot files: ${repoFiles.error.message}`);
     }
