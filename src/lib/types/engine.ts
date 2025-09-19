@@ -142,4 +142,11 @@ export interface EngineMethods {
      * @returns Environment variables.
      */
     getRestoreEnv?(connectionString: string): Record<string, string>;
+
+    /**
+     * Get the version of the restore command.
+     * If no restore command is defined, this must not be defined.
+     * @returns CLI output, or error message.
+     */
+    getRestoreCmdVersion(): Promise<ResultAsync<string, string>>;
 }

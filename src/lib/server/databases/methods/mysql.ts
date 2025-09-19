@@ -206,4 +206,13 @@ export const mysqlMethods = {
             MYSQL_PWD: url?.password ?? '',
         };
     },
+
+    async getRestoreCmdVersion(): Promise<ResultAsync<string, string>> {
+        const res = await runCommandSync(this.restoreCommand, [ '--version' ]);
+        if (res.isErr()) {
+            return err(res.error.stderr.toString().trim());
+        }
+
+        return ok(res.value.text().trim());
+    },
 } satisfies EngineMethods;

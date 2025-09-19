@@ -93,4 +93,13 @@ export const mongodbMethods = {
         // Handled in getRestoreBackupFromStdinCommand with --drop option.
         return ok();
     },
+
+    async getRestoreCmdVersion(): Promise<ResultAsync<string, string>> {
+        const res = await runCommandSync(this.restoreCommand, [ '--version' ]);
+        if (res.isErr()) {
+            return err(res.error.stderr.toString().trim());
+        }
+
+        return ok(res.value.text().trim());
+    },
 } satisfies EngineMethods;

@@ -172,4 +172,13 @@ export const postgresqlMethods = {
     getRestoreBackupFromStdinCommand(connectionString: string): string[] {
         return [ this.restoreCommand, connectionString ];
     },
+
+    async getRestoreCmdVersion(): Promise<ResultAsync<string, string>> {
+        const res = await runCommandSync(this.restoreCommand, [ '--version' ]);
+        if (res.isErr()) {
+            return err(res.error.stderr.toString().trim());
+        }
+
+        return ok(res.value.text().trim());
+    },
 } satisfies EngineMethods;
