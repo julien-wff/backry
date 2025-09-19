@@ -64,7 +64,7 @@ export const init: ServerInit = async () => {
 
     await computeToolChecksSuccess();
 
-    // For health checks are in more than 30 secs, run them now in the background
+    //  If next check run is >30s away, run it now in the background
     void (async () => {
         if (dayjs(cronNextExecutions('system:check-storages')[0]).diff(dayjs(), 'second') > 30) {
             await checkAllActiveRepositories();
