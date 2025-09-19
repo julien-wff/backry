@@ -11,7 +11,7 @@ export const POST: RequestHandler = async ({ request }) => {
         return apiError(body.error);
     }
 
-    // Check tempaltes
+    // Check templates
     const templateCheckRes = validateNotificationTemplates(body.value);
     if (templateCheckRes.isErr()) {
         return apiError(templateCheckRes.error, 400);
