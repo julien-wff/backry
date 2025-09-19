@@ -99,10 +99,16 @@ export async function getAllEnginesVersionsOrError() {
     await Promise.all(ENGINE_META_ENTRIES.map(async ([ engineId ]) => {
         const engine: EngineMethods = ENGINES_METHODS[engineId];
 
+        // Dump command
         result[`${engineId}:dump`] = newCheckResult(engine.dumpCommand, await engine.getDumpCmdVersion());
-        result[`${engineId}:restore`] = newCheckResult(engine.restoreCommand, await engine.getRestoreCmdVersion());
 
-        if (engine.checkCommand && engine.getCheckCmdVersion) {
+        // Restore command (if different from dump)
+        if (engine.restoreCommand !== engine.dumpCommand) {
+            result[`${engineId}:restore`] = newCheckResult(engine.restoreCommand, await engine.getRestoreCmdVersion());
+        }
+
+        // Check command (if available and different from dump and restore)
+        if (engine.checkCommand && engine.getCheckCmdVersion && engine.checkCommand !== engine.dumpCommand && engine.checkCommand !== engine.restoreCommand) {
             result[`${engineId}:check`] = newCheckResult(engine.checkCommand, await engine.getCheckCmdVersion());
         }
     }));
