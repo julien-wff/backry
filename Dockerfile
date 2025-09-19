@@ -17,7 +17,7 @@ RUN apk add --no-cache \
     # Make bin folders to copy them all in "runtime" stage
     mkdir /app/bin && \
     # Copy binaries from packages
-    cp /usr/bin/mysqldump /usr/bin/mysql /usr/bin/mongodump ./bin && \
+    cp /usr/bin/mysqldump /usr/bin/mysql /usr/bin/mongodump /usr/bin/mongorestore ./bin && \
     # Restic \
     RESTIC_URL=https://github.com/restic/restic/releases/download/v${RESTIC_VERSION}/restic_${RESTIC_VERSION}_linux_${TARGETARCH}.bz2 && \
     wget ${RESTIC_URL} -O restic.bz2 && \
