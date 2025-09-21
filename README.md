@@ -24,6 +24,7 @@
   services, FTP, and more.
 - 📚 **Incremental backups**: Uses [Restic](https://github.com/restic/restic) to perform incremental backups, saving
   storage space and time.
+- ↩️ **One-click restores**: Restore your databases to any previous backup with just a few clicks.
 - 🔐 **Safe**: Encrypts your backups using Restic's built-in encryption, ensuring your data is secure.
 - 🐳 **Docker integration**: Add your Docker container databases to Backry with just a few clicks.
 - 🔔 **Notifications**: Get notified about backup status via many channels, thanks
@@ -35,6 +36,10 @@
 *See more screenshots in the [screenshots](./screenshots) directory.*
 
 ## Installation
+
+> [!WARNING]
+> For the love of self-hosting, do **not** expose Backry to the internet. Secrets like passwords are exposed to the
+> client. Use a VPN, or only access it from your local network.
 
 ```yaml
 services:
@@ -144,8 +149,10 @@ do so!
 
 ## Was it vibecoded?
 
-Nope, I only use GitHub Copilot's auto-complete feature (which is not that great with Svelte 5, btw).
+Nope, I only use GitHub Copilot's tab-complete feature (which is not that great with Svelte 5, btw).
 If there are any bugs or issues, it's all on me :)
+
+PS: the emojis above are all hand-picked, imo it makes the readme prettier :)
 
 ## Contributing
 
