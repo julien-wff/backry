@@ -2,7 +2,7 @@ import { apiError, apiSuccess } from '$lib/server/api/responses';
 import { deleteStorage, storageUseCount, updateStorage } from '$lib/server/queries/storages';
 import { parseRequestBody } from '$lib/server/schemas';
 import { storagePatchRequest, storageRequest, type StorageResponse } from '$lib/server/schemas/api';
-import { type RequestHandler } from './$types';
+import type { RequestHandler } from './$types';
 
 
 export const PUT: RequestHandler = async ({ params, request }) => {
