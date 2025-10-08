@@ -12,8 +12,8 @@ export const load: PageServerLoad = async ({ url }) => {
     );
 
     const databasesByEngine = await getDatabasesCountByEngine();
-    const databasesCount = Object.values(databasesByEngine).reduce((acc, curr) => acc + curr.count, 0);
-    const enginesCount = Object.values(databasesByEngine).length;
+    const databasesCount = databasesByEngine.reduce((acc, curr) => acc + curr.count, 0);
+    const enginesCount = databasesByEngine.length;
 
     // True if we group databases by engine in the UI, for clarity.
     const splitDatabasesByEngine = databasesCount > 3 && enginesCount > 1;
