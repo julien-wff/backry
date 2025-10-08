@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db';
 import { DATABASE_ENGINES, databases } from '$lib/server/db/schema';
-import { eq, inArray, isNotNull } from 'drizzle-orm';
+import { count, eq, inArray, isNotNull } from 'drizzle-orm';
 
 /**
  * Fetches a complete list of all databases with all fields.
@@ -27,6 +27,17 @@ export const databasesListExtendedFiltered = (engines: typeof DATABASE_ENGINES[n
             },
         },
     });
+
+/**
+ * Fetches the number of databases for each engine type.
+ */
+export const getDatabasesCountByEngine = () =>
+    db
+        .select({ engine: databases.engine, count: count() })
+        .from(databases)
+        .groupBy(databases.engine)
+        .orderBy(databases.engine)
+        .execute();
 
 /**
  * Fetches a database by ID.
