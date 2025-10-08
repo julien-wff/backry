@@ -28,6 +28,12 @@ export interface EngineMeta {
      * @return True if the URL is from the engine, false otherwise.
      */
     isUrlFromEngine?: (url: string) => boolean;
+
+    /**
+     * Message to show when the user enables the "drop on restore" option.
+     * If not specified, a generic message will be shown.
+     */
+    dropOnRestoreMessage?: string;
 }
 
 /**

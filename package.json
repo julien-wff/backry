@@ -28,6 +28,7 @@
         "cron": "^4.3.3",
         "daisyui": "^5.1.13",
         "dayjs": "^1.11.18",
+        "dedent": "^1.7.0",
         "dockerode": "^4.0.8",
         "drizzle-kit": "^0.31.4",
         "drizzle-orm": "^0.44.5",

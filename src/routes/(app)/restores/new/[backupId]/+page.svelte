@@ -9,6 +9,7 @@
     import { OctagonAlert } from '$lib/components/icons';
     import RestoreConfirmModal from '$lib/components/restores/RestoreConfirmModal.svelte';
     import type { ModalControls } from '$lib/helpers/modal';
+    import DropExistingModal from '$lib/components/restores/DropExistingModal.svelte';
 
     let { data }: PageProps = $props();
 
@@ -16,12 +17,26 @@
 
     let selectedDestination = $state<'current' | 'other' | null>(null);
     let otherConnectionString = $state<string>('');
-    let dropDatabase = $state<boolean>(true);
+    let dropDatabase = $state<boolean>(false);
 
-    let modalControls = $state<ModalControls>();
+    let confirmModalControls = $state<ModalControls>();
+    let dropModalControls = $state<ModalControls>();
 
     async function handleFormSubmit() {
-        modalControls?.open();
+        confirmModalControls?.open();
+    }
+
+    function handleDropInputToggle() {
+        if (!dropDatabase) {
+            return;
+        }
+
+        dropDatabase = false;
+        dropModalControls?.open();
+    }
+
+    function handleDropAccept() {
+        dropDatabase = true;
     }
 </script>
 
@@ -35,11 +50,13 @@
     <RestoreConfirmModal backup={data.backup}
                          sourceDatabase={data.backup.jobDatabase.database}
                          sourceJobName={data.backup.jobDatabase.job.name}
-                         bind:controls={modalControls}
+                         bind:controls={confirmModalControls}
                          {selectedDestination}
                          {otherConnectionString}
                          {dropDatabase}/>
 {/if}
+
+<DropExistingModal bind:controls={dropModalControls} {engineMeta} ondropaccept={handleDropAccept}/>
 
 <ElementForm onsubmit={handleFormSubmit}
              title="Restore {engineMeta.displayName} backup ({data.backup.jobDatabase.job.name} - {data.backup.jobDatabase.database.name})">
@@ -92,7 +109,11 @@
 
     <InputContainer for="drop-db" label="Drop existing database">
         <label class="label">
-            <input bind:checked={dropDatabase} class="toggle toggle-primary" id="drop-db" type="checkbox"/>
+            <input bind:checked={dropDatabase}
+                   class="toggle toggle-primary"
+                   id="drop-db"
+                   onchange={handleDropInputToggle}
+                   type="checkbox"/>
             Drop and recreate the database before restoring
         </label>
     </InputContainer>
