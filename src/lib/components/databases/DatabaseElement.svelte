@@ -11,10 +11,11 @@
 
     interface Props {
         database: Awaited<ReturnType<typeof databasesListExtendedFiltered>>[number];
+        hideEngine?: boolean;
     }
 
 
-    let { database }: Props = $props();
+    let { database, hideEngine = false }: Props = $props();
     let loading = $state(false);
 
     let jobListFormatted = $derived(database.jobsDatabases.map(db => ({
@@ -54,7 +55,9 @@
                  secondaryBtns={secondaryButtons}
                  status={database.status}
                  title={database.name}>
-    <EngineIndicator engine={database.engine}/>
+    {#if !hideEngine}
+        <EngineIndicator engine={database.engine}/>
+    {/if}
 
     <div class="flex items-center gap-1">
         <EthernetPort class="w-4 h-4"/>
