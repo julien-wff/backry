@@ -43,7 +43,7 @@
             {#if databases.length > 0}
                 <div class="grid grid-cols-1 gap-2">
                     <div class="flex items-center gap-2">
-                        <img class="inline h-6" src={meta.icon} alt=""/>
+                        <img class="inline h-5" src={meta.icon} alt=""/>
                         <h2 class="text-lg font-medium">{meta.displayName}</h2>
                     </div>
 
