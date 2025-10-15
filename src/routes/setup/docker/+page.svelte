@@ -51,7 +51,7 @@
                 Validate & Next
             </button>
         {:else}
-            <a class="btn btn-primary" href="/onboarding/complete">
+            <a class="btn btn-primary" href="/setup/complete">
                 Next
             </a>
         {/if}

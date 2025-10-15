@@ -13,7 +13,7 @@
     </div>
 
     <div class="card-actions justify-end">
-        <a class="btn btn-primary" href="/onboarding/authentication">
+        <a class="btn btn-primary" href="/setup/authentication">
             Next
         </a>
     </div>

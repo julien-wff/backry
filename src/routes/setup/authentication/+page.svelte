@@ -17,7 +17,7 @@
     </div>
 
     <div class="card-actions justify-end">
-        <a class="btn btn-primary" href="/onboarding/docker">
+        <a class="btn btn-primary" href="/setup/docker">
             Next
         </a>
     </div>
