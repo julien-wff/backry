@@ -29,7 +29,6 @@
             <input bind:checked={dockerIntegration}
                    class="toggle toggle-primary"
                    id="docker-integration"
-                   onchange={handleDropInputToggle}
                    type="checkbox"/>
             Enable Docker integration
         </label>
@@ -40,7 +39,6 @@
                class="input w-full"
                disabled={!dockerIntegration}
                id="docker-host"
-               onchange={handleDropInputToggle}
                placeholder="e.g. unix:///var/run/docker.sock or tcp://localhost:2375"
                type="text"/>
     </InputContainer>
