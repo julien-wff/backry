@@ -4,7 +4,66 @@ import { logger } from '$lib/server/services/logger';
 import Docker, { type ContainerInspectInfo, type ImageInspectInfo } from 'dockerode';
 import { err, ok, type Result } from 'neverthrow';
 
-const docker = new Docker();
+const docker = getDockerEngine(process.env.DOCKER_HOST || '/var/run/docker.sock');
+
+interface DockerError extends Error {
+    code: string;
+    path?: string;
+    errno?: number;
+}
+
+/**
+ * Get a Docker engine instance based on the provided URI.
+ * If the URI is not recognized, it defaults to Docker Modem settings.
+ * @param uri Docker connection URI
+ * @returns Docker instance
+ */
+export function getDockerEngine(uri: string) {
+    const isSocketPath = uri.startsWith('/')
+        || uri.startsWith('\\\\.\\pipe\\')
+        || uri.startsWith('unix://')
+        || uri.startsWith('npipe://');
+
+    if (isSocketPath) {
+        return new Docker({ socketPath: uri });
+    }
+
+    const isUrl = uri.startsWith('http://')
+        || uri.startsWith('https://')
+        || uri.startsWith('tcp://');
+
+    if (isUrl) {
+        const url = new URL(uri);
+        return new Docker({
+            host: url.hostname,
+            port: url.port || undefined,
+            protocol: [ 'http:', 'https:' ].includes(url.protocol)
+                ? url.protocol.slice(0, -1) as 'http' | 'https'
+                : undefined,
+        });
+    }
+
+    // TODO: handle other cases (SSH, etc.)
+    logger.warn(`Docker URI format not recognized (${uri}), using default Docker connection`);
+    return new Docker();
+}
+
+/**
+ * Test connection to Docker
+ * @param uri Docker connection URI (not used in this implementation)
+ * @returns Either true if connection is successful or an error message
+ */
+export async function testDockerConnection(uri: string): Promise<Result<boolean, DockerError>> {
+    const docker = getDockerEngine(uri);
+
+    try {
+        await docker.ping();
+        return ok(true);
+    } catch (error) {
+        logger.error(error, `Error connecting to Docker`);
+        return err(error as DockerError);
+    }
+}
 
 /**
  * Get all containers from Docker
