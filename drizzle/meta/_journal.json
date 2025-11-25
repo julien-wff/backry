@@ -29,6 +29,13 @@
       "when": 1756917311211,
       "tag": "0003_restore_table",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1764091922306,
+      "tag": "0004_add_settings_table",
+      "breakpoints": true
     }
   ]
 }
