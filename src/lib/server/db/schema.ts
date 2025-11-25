@@ -1,6 +1,6 @@
+import { RESTORE_DESTINATION, RESTORE_STEPS, SETUP_STEPS } from '$lib/common/constants';
 import { relations, sql } from 'drizzle-orm';
 import { integer, real, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
-import { RESTORE_DESTINATION, RESTORE_STEPS } from '$lib/common/constants';
 
 export const ELEMENT_STATUS = [ 'active', 'inactive', 'error', 'unhealthy' ] as const;
 export const DATABASE_ENGINES = [ 'postgresql', 'sqlite', 'mysql', 'mongodb' ] as const;
@@ -167,4 +167,13 @@ export const notifications = sqliteTable('notifications', {
     url: text('url').notNull(),
     title: text('title'),
     body: text('body').notNull(),
+});
+
+export const settings = sqliteTable('settings', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    /** Docker URI is null if Docker integration is disabled */
+    dockerURI: text('docker_uri'),
+    setupCurrentStep: text('setup_current_step', { enum: SETUP_STEPS }).default('welcome'),
+    setupComplete: integer('setup_complete', { mode: 'boolean' }).notNull().default(false),
+    updatedAt: text('updated_at').default(sql`(CURRENT_TIMESTAMP)`).$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
 });
