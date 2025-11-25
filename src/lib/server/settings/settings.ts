@@ -6,7 +6,7 @@ import {
 } from '$lib/server/queries/settings';
 import { logger } from '$lib/server/services/logger';
 
-type Settings = Omit<typeof settings.$inferSelect, 'id' | 'updatedAt'>;
+export type Settings = Omit<typeof settings.$inferSelect, 'id' | 'updatedAt'>;
 
 let settingsCache: Settings | null = null;
 

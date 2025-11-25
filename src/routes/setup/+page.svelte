@@ -1,5 +1,12 @@
 <script lang="ts">
     import OnboardingCard from '$lib/components/onboarding/OnboardingCard.svelte';
+    import { SetupApiStore } from '$lib/helpers/setup.svelte';
+
+    const apiSetup = new SetupApiStore('authentication');
+
+    function handleValidateAndNext() {
+        apiSetup.updateSettingsAndGoToNextStep();
+    }
 </script>
 
 <svelte:head>
@@ -13,8 +20,8 @@
     </div>
 
     <div class="card-actions justify-end">
-        <a class="btn btn-primary" href="/setup/authentication">
+        <button class="btn btn-primary" disabled={apiSetup.loading} onclick={handleValidateAndNext}>
             Next
-        </a>
+        </button>
     </div>
 </OnboardingCard>

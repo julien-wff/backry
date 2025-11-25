@@ -1,6 +1,13 @@
 <script lang="ts">
     import { OctagonAlert } from '$lib/components/icons';
     import OnboardingCard from '$lib/components/onboarding/OnboardingCard.svelte';
+    import { SetupApiStore } from '$lib/helpers/setup.svelte';
+
+    const apiSetup = new SetupApiStore('docker');
+
+    function handleValidateAndNext() {
+        apiSetup.updateSettingsAndGoToNextStep();
+    }
 </script>
 
 <svelte:head>
@@ -17,8 +24,8 @@
     </div>
 
     <div class="card-actions justify-end">
-        <a class="btn btn-primary" href="/setup/docker">
+        <button class="btn btn-primary" disabled={apiSetup.loading} onclick={handleValidateAndNext}>
             Next
-        </a>
+        </button>
     </div>
 </OnboardingCard>

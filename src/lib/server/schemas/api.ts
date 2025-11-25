@@ -1,4 +1,4 @@
-import { RESTORE_DESTINATION } from '$lib/common/constants';
+import { RESTORE_DESTINATION, SETUP_STEPS } from '$lib/common/constants';
 import {
     backups,
     DATABASE_ENGINES,
@@ -288,7 +288,9 @@ export type NotificationResponse = typeof notifications.$inferSelect;
 
 // SETUP
 
-/** `POST /api/setup/docker-save` */
-export const setupDockerSaveRequest = z.object({
-    uri: z.string().trim().nonempty().nullable(),
+/** `POST /api/setup/settings` */
+export const settingsChangeRequest = z.object({
+    dockerURI: z.string().trim().optional().nullable(),
+    setupCurrentStep: z.enum(SETUP_STEPS).optional(),
+    setupComplete: z.boolean().optional(),
 });

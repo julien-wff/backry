@@ -1,5 +1,17 @@
 <script lang="ts">
+    import { goto } from '$app/navigation';
     import OnboardingCard from '$lib/components/onboarding/OnboardingCard.svelte';
+    import { SetupApiStore } from '$lib/helpers/setup.svelte';
+
+    const apiSetup = new SetupApiStore(() => {
+        goto('/dashboard');
+    });
+
+    function handleValidateAndNext() {
+        apiSetup.updateSettingsAndGoToNextStep({
+            setupComplete: true,
+        });
+    }
 </script>
 
 <svelte:head>
@@ -13,8 +25,8 @@
     <p>Thank you for installing Backry, and happy backing up!</p>
 
     <div class="card-actions justify-end">
-        <a class="btn btn-primary" href="/dashboard">
+        <button class="btn btn-primary" disabled={apiSetup.loading} onclick={handleValidateAndNext}>
             Finish
-        </a>
+        </button>
     </div>
 </OnboardingCard>
