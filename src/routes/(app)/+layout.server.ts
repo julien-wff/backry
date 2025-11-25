@@ -26,5 +26,6 @@ export const load: LayoutServerLoad = async () => {
         warnings: {
             storages: warnings.storages,
         },
+        settings,
     };
 };
