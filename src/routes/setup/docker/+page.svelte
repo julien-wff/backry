@@ -3,9 +3,12 @@
     import { Info, OctagonAlert } from '$lib/components/icons';
     import OnboardingCard from '$lib/components/onboarding/OnboardingCard.svelte';
     import { SetupApiStore } from '$lib/helpers/setup.svelte';
+    import type { PageProps } from './$types';
+
+    let { data }: PageProps = $props();
 
     let dockerIntegration = $state(true);
-    let dockerHost = $state('/var/run/docker.sock');
+    let dockerHost = $state(data.dockerURI || '/var/run/docker.sock');
 
     const apiSetup = new SetupApiStore('complete');
 

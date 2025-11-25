@@ -30,10 +30,10 @@ export class SetupApiStore {
                 setupCurrentStep: typeof this.nextAction === 'string' ? this.nextAction : undefined,
             },
         );
-        this.loading = false;
 
         if (res.isErr()) {
             this.error = res.error;
+            this.loading = false;
             return;
         }
 
@@ -42,5 +42,7 @@ export class SetupApiStore {
         } else {
             await goto(`/setup/${this.nextAction}`);
         }
+
+        this.loading = false;
     }
 }
