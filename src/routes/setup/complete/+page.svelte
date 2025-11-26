@@ -3,9 +3,7 @@
     import OnboardingCard from '$lib/components/onboarding/OnboardingCard.svelte';
     import { SetupApiStore } from '$lib/helpers/setup.svelte';
 
-    const apiSetup = new SetupApiStore(() => {
-        goto('/dashboard');
-    });
+    const apiSetup = new SetupApiStore(() => goto('/dashboard'));
 
     function handleValidateAndNext() {
         apiSetup.updateSettingsAndGoToNextStep({

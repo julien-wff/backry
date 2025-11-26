@@ -38,7 +38,7 @@ export class SetupApiStore {
         }
 
         if (typeof this.nextAction === 'function') {
-            this.nextAction();
+            await this.nextAction();
         } else {
             await goto(`/setup/${this.nextAction}`);
         }
