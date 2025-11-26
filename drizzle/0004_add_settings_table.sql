@@ -1,5 +1,5 @@
 CREATE TABLE `settings` (
-	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`id` integer PRIMARY KEY NOT NULL,
 	`docker_uri` text,
 	`setup_current_step` text DEFAULT 'welcome',
 	`setup_complete` integer DEFAULT false NOT NULL,

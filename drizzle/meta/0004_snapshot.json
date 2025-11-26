@@ -683,7 +683,7 @@
           "type": "integer",
           "primaryKey": true,
           "notNull": true,
-          "autoincrement": true
+          "autoincrement": false
         },
         "docker_uri": {
           "name": "docker_uri",

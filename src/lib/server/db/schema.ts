@@ -170,7 +170,7 @@ export const notifications = sqliteTable('notifications', {
 });
 
 export const settings = sqliteTable('settings', {
-    id: integer('id').primaryKey({ autoIncrement: true }),
+    id: integer('id').primaryKey(),
     /** Docker URI is null if Docker integration is disabled */
     dockerURI: text('docker_uri'),
     setupCurrentStep: text('setup_current_step', { enum: SETUP_STEPS }).default('welcome'),
