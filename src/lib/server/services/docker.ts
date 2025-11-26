@@ -50,7 +50,7 @@ export function getDockerEngine(uri: string) {
 
 /**
  * Test connection to Docker
- * @param uri Docker connection URI (not used in this implementation)
+ * @param uri Docker connection URI
  * @returns Either true if connection is successful or an error message
  */
 export async function testDockerConnection(uri: string): Promise<Result<boolean, DockerError>> {
