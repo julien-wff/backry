@@ -5,7 +5,6 @@ export const GET: RequestHandler = async ({ request }) => {
     let cleanup = () => {
     };
 
-    // TODO: find a solution to fix the cleanup function that is never called
     const stream = new ReadableStream({
         start(controller) {
             const onProgress = (data: any) => {
@@ -14,7 +13,6 @@ export const GET: RequestHandler = async ({ request }) => {
             backupEmitter.on('update', onProgress);
 
             cleanup = () => {
-                console.log('cleanup');
                 backupEmitter.off('update', onProgress);
                 controller.close();
             };

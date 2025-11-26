@@ -1,11 +1,10 @@
-import type { RequestHandler } from './$types';
 import { restoreEmitter, type RestoreUpdateEventPayload } from '$lib/server/shared/events';
+import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ params, request }) => {
     let cleanup = () => {
     };
 
-    // TODO: find a solution to fix the cleanup function that is never called
     const stream = new ReadableStream({
         start(controller) {
             const onProgress = (data: RestoreUpdateEventPayload) => {
@@ -20,7 +19,6 @@ export const GET: RequestHandler = async ({ params, request }) => {
             restoreEmitter.on('update', onProgress);
 
             cleanup = () => {
-                console.log('cleanup');
                 restoreEmitter.off('update', onProgress);
                 controller.close();
             };
