@@ -23,6 +23,13 @@
         </div>
     </div>
 
+    {#if apiSetup.error}
+        <div class="alert alert-soft alert-error mb-2">
+            <OctagonAlert class="inline w-6 h-6"/>
+            <p>{apiSetup.error}</p>
+        </div>
+    {/if}
+
     <div class="card-actions justify-end">
         <button class="btn btn-primary" disabled={apiSetup.loading} onclick={handleValidateAndNext}>
             Next
