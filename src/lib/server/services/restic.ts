@@ -357,7 +357,7 @@ export async function streamFileContent(url: string,
         snapshotId,
         fileName,
     ], {
-        env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env },
+        env: { ...process.env, RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env },
         stdout: 'pipe',
         stderr: 'pipe',
     });

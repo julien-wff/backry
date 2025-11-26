@@ -112,7 +112,7 @@ async function readAndDecodeStream<T>(
 export async function runCommandStream<O, E>(command: string, args: string[] = [], options?: StreamCommandOptions<O, E>): Promise<Result<O[], (E | Error)[]>> {
     const subprocess = Bun.spawn([ command, ...args ], {
         cwd: options?.cwd,
-        env: options?.env,
+        env: { ...process.env, ...(options?.env ?? {}) },
         stdout: 'pipe',
         stderr: 'pipe',
     });
