@@ -1,3 +1,4 @@
+import { RESTORE_DESTINATION, SETUP_STEPS } from '$lib/common/constants';
 import {
     backups,
     DATABASE_ENGINES,
@@ -10,12 +11,11 @@ import {
     runs,
     storages,
 } from '$lib/server/db/schema';
+import type { getRunsWithBackupFilter } from '$lib/server/queries/runs';
 import type { Desyncedbackup } from '$lib/server/storages/health';
 import type { ResticError, ResticInit, ResticLock, ResticSnapshot } from '$lib/types/restic';
 import { validateCronExpression } from 'cron';
 import { z } from 'zod';
-import type { getRunsWithBackupFilter } from '$lib/server/queries/runs';
-import { RESTORE_DESTINATION } from '$lib/common/constants';
 
 export const DATABASE_ALLOWED_STATUSES = [ 'active', 'error' ] as const satisfies readonly typeof ELEMENT_STATUS[number][];
 export const STORAGE_ALLOWED_STATUSES = [ 'active', 'unhealthy' ] as const satisfies readonly typeof ELEMENT_STATUS[number][];
@@ -285,3 +285,12 @@ export const notificationPatchRequest = notificationRequest.partial().extend({
  * `DELETE /api/settings/notifications/[id]`
  */
 export type NotificationResponse = typeof notifications.$inferSelect;
+
+// SETUP
+
+/** `POST /api/setup/settings` */
+export const settingsChangeRequest = z.object({
+    dockerURI: z.string().trim().optional().nullable(),
+    setupCurrentStep: z.enum(SETUP_STEPS).optional(),
+    setupComplete: z.boolean().optional(),
+});

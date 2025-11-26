@@ -22,9 +22,12 @@
         warnings: {
             storages: number;
         };
+        integrations: {
+            docker: boolean;
+        };
     }
 
-    const { errors, warnings }: Props = $props();
+    const { errors, warnings, integrations }: Props = $props();
 </script>
 
 <aside class="fixed top-0 flex h-screen w-28 flex-col gap-8 overflow-y-auto p-2 shadow-md bg-base-100 rounded-r-box">
@@ -46,7 +49,9 @@
         <NavbarElement href="/restores" icon={History} label="Restores"/>
 
         <div class="flex flex-1 flex-col justify-end gap-4">
-            <NavbarElement href="/integrations/docker" icon={Blocks} label="Integrations"/>
+            {#if integrations.docker}
+                <NavbarElement href="/integrations/docker" icon={Blocks} label="Integrations"/>
+            {/if}
             <NavbarElement hasError={errors.tools || errors.notifications > 0}
                            href="/settings"
                            icon={Settings}
