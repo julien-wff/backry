@@ -2,20 +2,21 @@
     import { invalidateAll } from '$app/navigation';
     import { page } from '$app/state';
     import BackupFilterModalContent from '$lib/components/backups/BackupFilterModalContent.svelte';
+    import HowToBackupAlert from '$lib/components/backups/HowToBackupAlert.svelte';
+    import NoBackupWithFiltersAlert from '$lib/components/backups/NoBackupWithFiltersAlert.svelte';
     import RunElement from '$lib/components/backups/RunElement.svelte';
     import Head from '$lib/components/common/Head.svelte';
     import Modal from '$lib/components/common/Modal.svelte';
     import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
     import { FileCheck, ListCheck } from '$lib/components/icons';
     import { subscribeApi } from '$lib/helpers/fetch';
+    import type { ModalControls } from '$lib/helpers/modal';
     import type { BackupUpdateEventPayload } from '$lib/server/shared/events';
     import dayjs from 'dayjs';
     import relativeTime from 'dayjs/plugin/relativeTime';
     import utc from 'dayjs/plugin/utc';
     import { onMount } from 'svelte';
     import type { PageData } from './$types';
-    import NoBackupWithFiltersAlert from '$lib/components/backups/NoBackupWithFiltersAlert.svelte';
-    import type { ModalControls } from '$lib/helpers/modal';
 
     dayjs.extend(relativeTime);
     dayjs.extend(utc);
@@ -75,11 +76,13 @@
     {/if}
 </PageContentHeader>
 
-<div class="grid grid-cols-1 gap-4">
-    {#each runsData.runs as run (run.id)}
-        <RunElement {run} job={runsData.jobs.get(run.jobId)} databases={runsData.databases}/>
-    {/each}
-</div>
+{#if runsData.runs.length > 0}
+    <div class="grid grid-cols-1 gap-4">
+        {#each runsData.runs as run (run.id)}
+            <RunElement {run} job={runsData.jobs.get(run.jobId)} databases={runsData.databases}/>
+        {/each}
+    </div>
+{/if}
 
 <a class="btn btn-primary btn-soft"
    class:btn-disabled={runsData.nextPageCursor === null}
@@ -95,8 +98,12 @@
     {/if}
 </a>
 
-{#if runsData.runs.length === 0 && filterCount > 0}
-    <NoBackupWithFiltersAlert {filterCount}/>
+{#if runsData.runs.length === 0}
+    {#if filterCount === 0}
+        <HowToBackupAlert/>
+    {:else}
+        <NoBackupWithFiltersAlert {filterCount}/>
+    {/if}
 {/if}
 
 <Modal bind:controls={filterModalControls} title="Filter backups">
