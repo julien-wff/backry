@@ -11,8 +11,8 @@
 
     let { data }: PageProps = $props();
 
-    let dockerURI = $state(data.dockerURI ?? '');
-    let dockerIntegrationEnabled = $state(data.dockerURI !== null);
+    let dockerURI = $state(data.settings.dockerURI ?? '');
+    let dockerIntegrationEnabled = $state(data.settings.dockerURI !== null);
 
     let loading = $state(false);
     let error = $state<string | null>(null);
