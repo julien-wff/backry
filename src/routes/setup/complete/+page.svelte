@@ -1,5 +1,6 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
+    import Head from '$lib/components/common/Head.svelte';
     import { OctagonAlert } from '$lib/components/icons';
     import OnboardingCard from '$lib/components/onboarding/OnboardingCard.svelte';
     import { SetupApiStore } from '$lib/helpers/setup.svelte';
@@ -13,9 +14,8 @@
     }
 </script>
 
-<svelte:head>
-    <title>Backry's onboarding complete</title>
-</svelte:head>
+
+<Head title="Setup complete"/>
 
 <OnboardingCard step={3} title="Complete">
     <p>

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Head from '$lib/components/common/Head.svelte';
     import { OctagonAlert } from '$lib/components/icons';
     import OnboardingCard from '$lib/components/onboarding/OnboardingCard.svelte';
     import { SetupApiStore } from '$lib/helpers/setup.svelte';
@@ -10,9 +11,8 @@
     }
 </script>
 
-<svelte:head>
-    <title>Authentication - Backry's onboarding</title>
-</svelte:head>
+
+<Head title="Authentication setup"/>
 
 <OnboardingCard step={1} title="Authentication">
     <div class="alert alert-soft alert-warning mb-2">

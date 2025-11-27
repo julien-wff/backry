@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Head from '$lib/components/common/Head.svelte';
     import InputContainer from '$lib/components/forms/InputContainer.svelte';
     import { Info, OctagonAlert } from '$lib/components/icons';
     import OnboardingCard from '$lib/components/onboarding/OnboardingCard.svelte';
@@ -19,9 +20,8 @@
     }
 </script>
 
-<svelte:head>
-    <title>Docker - Backry's onboarding</title>
-</svelte:head>
+
+<Head title="Docker integration setup"/>
 
 <OnboardingCard step={2} title="Docker">
     <div class="alert alert-soft alert-info mb-2">
