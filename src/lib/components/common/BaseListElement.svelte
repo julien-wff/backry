@@ -12,9 +12,9 @@
         PowerOff,
         Trash2,
     } from '$lib/components/icons';
+    import type { ModalControls } from '$lib/helpers/modal';
     import { type BACKUP_STATUS, type ELEMENT_STATUS } from '$lib/server/db/schema';
     import type { Snippet } from 'svelte';
-    import type { ModalControls } from '$lib/helpers/modal';
 
     interface Props {
         status?: typeof ELEMENT_STATUS[number] | typeof BACKUP_STATUS[number];
@@ -147,7 +147,7 @@
     </div>
 
     {#if children}
-        <div class="flex flex-nowrap gap-4 text-sm opacity-75 grayscale filter">
+        <div class="flex flex-nowrap gap-4 text-base-content/75 text-sm grayscale filter">
             {@render children()}
         </div>
     {/if}

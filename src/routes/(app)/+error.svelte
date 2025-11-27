@@ -9,7 +9,7 @@
         <p class="mt-4 text-lg">Something went wrong.</p>
 
         {#if page.error}
-            <p class="mt-2 opacity-50 grayscale">Error: {page.error.message}</p>
+            <p class="mt-2 text-base-content/75 grayscale">Error: {page.error.message}</p>
         {/if}
     </div>
 </div>

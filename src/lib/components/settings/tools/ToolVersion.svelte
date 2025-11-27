@@ -20,7 +20,7 @@
                     <div class="tooltip-content max-w-2xl">
                         {cmdResolved ?? `Cannot resolve "${cmd}" in PATH`}
                     </div>
-                    <span class="opacity-60 text-sm line-clamp-1">({cmd})</span>
+                    <span class="text-base-content/75 text-sm line-clamp-1">({cmd})</span>
                 </div>
             {/if}
         </div>
