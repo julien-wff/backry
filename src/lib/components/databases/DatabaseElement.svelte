@@ -12,10 +12,11 @@
     interface Props {
         database: Awaited<ReturnType<typeof databasesListExtendedFiltered>>[number];
         hideEngine?: boolean;
+        hideContainer?: boolean;
     }
 
 
-    let { database, hideEngine = false }: Props = $props();
+    let { database, hideEngine = false, hideContainer = false }: Props = $props();
     let loading = $state(false);
 
     let jobListFormatted = $derived(database.jobsDatabases.map(db => ({
@@ -74,7 +75,7 @@
         {/if}
     </div>
 
-    {#if database.containerName}
+    {#if database.containerName && !hideContainer}
         <div class="flex items-center gap-1">
             <img alt="Docker" class="w-4 h-4" src="/icons/docker.svg"/>
             {database.containerName}

@@ -18,8 +18,8 @@
         DatabaseResponse,
         databasesCheckRequest,
     } from '$lib/server/schemas/api';
-    import type { PageProps } from './$types';
     import { tick } from 'svelte';
+    import type { PageProps } from './$types';
 
     let { data }: PageProps = $props();
     const { searchParams } = page.url;
@@ -145,7 +145,7 @@
              title="{data.database ? 'Edit' : 'Add new'} database connection">
     <InputContainer label="Engine">
         <div class="flex gap-2">
-            {#each ENGINE_META_ENTRIES as [ engineId, engine ] (engineId)}
+            {#each ENGINE_META_ENTRIES as [engineId, engine] (engineId)}
                 <div class="w-32 gap-2 px-4 py-2 flex flex-col items-center bg-base-300 justify-center rounded-lg cursor-pointer border-2"
                      class:border-primary={selectedEngine === engineId}
                      class:border-transparent={selectedEngine !== engineId}
@@ -184,18 +184,20 @@
                required>
     </InputContainer>
 
-    <InputContainer for="container-name" label="Docker container name (if any)">
-        <input autocapitalize="off"
-               autocomplete="off"
-               bind:value={containerName}
-               class="input w-full"
-               id="container-name"
-               inputmode="text"
-               maxlength="63"
-               name="containerName"
-               pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]*"
-               spellcheck="false">
-    </InputContainer>
+    {#if data.settings.dockerURI !== null}
+        <InputContainer for="container-name" label="Docker container name (if any)">
+            <input autocapitalize="off"
+                   autocomplete="off"
+                   bind:value={containerName}
+                   class="input w-full"
+                   id="container-name"
+                   inputmode="text"
+                   maxlength="63"
+                   name="containerName"
+                   pattern="[a-zA-Z0-9][a-zA-Z0-9_.-]*"
+                   spellcheck="false">
+        </InputContainer>
+    {/if}
 
     <div class="flex gap-2">
         <button class="btn flex-1"
