@@ -290,7 +290,7 @@ export type NotificationResponse = typeof notifications.$inferSelect;
 
 /** `POST /api/setup/settings` */
 export const settingsChangeRequest = z.object({
-    dockerURI: z.string().trim().optional().nullable(),
+    dockerURI: z.string().trim().min(1).optional().nullable(),
     setupCurrentStep: z.enum(SETUP_STEPS).optional(),
     setupComplete: z.boolean().optional(),
 });
