@@ -33,7 +33,7 @@
 <div class="grid grid-cols-1 gap-4">
     {#if !data.splitDatabasesByEngine}
         {#each data.databases as database (database.id)}
-            <DatabaseElement {database}/>
+            <DatabaseElement {database} hideContainer={!data.settings.dockerURI}/>
         {/each}
     {:else}
         {#each data.databasesByEngine as { engine }}
@@ -49,7 +49,7 @@
 
                     <div class="grid grid-cols-1 gap-2">
                         {#each databases as database (database.id)}
-                            <DatabaseElement {database} hideEngine/>
+                            <DatabaseElement {database} hideEngine hideContainer={!data.settings.dockerURI}/>
                         {/each}
                     </div>
                 </div>
