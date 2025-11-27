@@ -23,8 +23,8 @@ export class SetupApiStore {
         this.error = null;
 
         const res = await fetchApi<object, typeof settingsChangeRequest>(
-            'POST',
-            '/api/setup/settings',
+            'PATCH',
+            '/api/settings',
             {
                 ...settings,
                 setupCurrentStep: typeof this.nextAction === 'string' ? this.nextAction : undefined,
