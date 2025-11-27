@@ -1,11 +1,16 @@
 import { apiError, apiSuccess } from '$lib/server/api/responses';
 import type { DockerHostnamesCheckResponse } from '$lib/server/schemas/api';
-import { inspectContainer } from '$lib/server/services/docker';
+import { getDockerEngineFromSettings, inspectContainer } from '$lib/server/services/docker';
 import { isPortReachable } from '$lib/server/services/net';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ params }) => {
-    const containerInfos = await inspectContainer(params.id);
+    const docker = await getDockerEngineFromSettings();
+    if (docker.isErr()) {
+        return apiError(docker.error, 503);
+    }
+
+    const containerInfos = await inspectContainer(docker.value, params.id);
     if (containerInfos.isErr()) {
         return apiError(containerInfos.error, 500);
     }
