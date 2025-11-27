@@ -5,7 +5,7 @@ import { testDockerConnection } from '$lib/server/services/docker';
 import { type Settings, updateSettings } from '$lib/server/settings/settings';
 import type { RequestHandler } from './$types';
 
-export const POST: RequestHandler = async ({ request }) => {
+export const PATCH: RequestHandler = async ({ request }) => {
     const body = await parseRequestBody(request, settingsChangeRequest);
     if (body.isErr()) {
         return apiError(body.error);
