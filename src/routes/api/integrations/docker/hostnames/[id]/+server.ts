@@ -1,11 +1,19 @@
 import { apiError, apiSuccess } from '$lib/server/api/responses';
 import type { DockerHostnamesCheckResponse } from '$lib/server/schemas/api';
-import { inspectContainer } from '$lib/server/services/docker';
+import { getDockerEngine, inspectContainer } from '$lib/server/services/docker';
 import { isPortReachable } from '$lib/server/services/net';
+import { getSettings } from '$lib/server/settings/settings';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ params }) => {
-    const containerInfos = await inspectContainer(params.id);
+    const settings = await getSettings();
+    if (!settings.dockerURI) {
+        return apiError('Docker integration is not configured', 503);
+    }
+
+    const docker = getDockerEngine(settings.dockerURI);
+
+    const containerInfos = await inspectContainer(docker, params.id);
     if (containerInfos.isErr()) {
         return apiError(containerInfos.error, 500);
     }

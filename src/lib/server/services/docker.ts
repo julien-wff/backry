@@ -4,8 +4,6 @@ import { logger } from '$lib/server/services/logger';
 import Docker, { type ContainerInspectInfo, type ImageInspectInfo } from 'dockerode';
 import { err, ok, type Result } from 'neverthrow';
 
-const docker = getDockerEngine(process.env.DOCKER_HOST || '/var/run/docker.sock');
-
 interface DockerError extends Error {
     code: string;
     path?: string;
@@ -67,9 +65,10 @@ export async function testDockerConnection(uri: string): Promise<Result<boolean,
 
 /**
  * Get all containers from Docker
+ * @param docker Docker instance
  * @returns Either an array of ContainerInspectInfo or an error message
  */
-export async function getContainers(): Promise<Result<ContainerInspectInfo[], string>> {
+export async function getContainers(docker: Docker): Promise<Result<ContainerInspectInfo[], string>> {
     try {
         const containers = await docker.listContainers({ all: true });
         const details = await Promise.all(
@@ -85,10 +84,11 @@ export async function getContainers(): Promise<Result<ContainerInspectInfo[], st
 
 /**
  * Inspect a container by its ID
+ * @param docker Docker instance
  * @param containerId Docker ID of the container
  * @return Either the ContainerInspectInfo or an error message
  */
-export async function inspectContainer(containerId: string): Promise<Result<ContainerInspectInfo, string>> {
+export async function inspectContainer(docker: Docker, containerId: string): Promise<Result<ContainerInspectInfo, string>> {
     try {
         return ok(await docker.getContainer(containerId).inspect());
     } catch (error) {
@@ -119,10 +119,11 @@ export function classifyContainersByEngine(containers: ContainerInspectInfo[]): 
 
 /**
  * Get containers and classify them by their database engine
+ * @param docker Docker instance
  * @returns Either an object with database engines as keys and arrays of ContainerInspectInfo as values or an error message
  */
-export async function getContainersByEngines(): Promise<Result<Record<typeof DATABASE_ENGINES[number], ContainerInspectInfo[]>, string>> {
-    const containersResult = await getContainers();
+export async function getContainersByEngines(docker: Docker): Promise<Result<Record<typeof DATABASE_ENGINES[number], ContainerInspectInfo[]>, string>> {
+    const containersResult = await getContainers(docker);
     if (containersResult.isErr()) {
         return err(containersResult.error);
     }
@@ -133,10 +134,11 @@ export async function getContainersByEngines(): Promise<Result<Record<typeof DAT
 
 /**
  * Get images from containers
+ * @param docker Docker instance
  * @param containers Array of ContainerInspectInfo
  * @returns Either an object with image names as keys and ImageInspectInfo as values or an error message
  */
-export async function getImagesFromContainers(containers: ContainerInspectInfo[]): Promise<Result<Record<string, ImageInspectInfo>, string>> {
+export async function getImagesFromContainers(docker: Docker, containers: ContainerInspectInfo[]): Promise<Result<Record<string, ImageInspectInfo>, string>> {
     try {
         const images = await Promise.all(
             containers.map(async (container) => [
