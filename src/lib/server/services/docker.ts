@@ -1,6 +1,7 @@
 import { ENGINES_METHODS } from '$lib/server/databases/engines-methods';
 import { DATABASE_ENGINES } from '$lib/server/db/schema';
 import { logger } from '$lib/server/services/logger';
+import { getSettings } from '$lib/server/settings/settings';
 import Docker, { type ContainerInspectInfo, type ImageInspectInfo } from 'dockerode';
 import { err, ok, type Result } from 'neverthrow';
 
@@ -44,6 +45,19 @@ export function getDockerEngine(uri: string) {
     // TODO: handle other cases (SSH, etc.)
     logger.warn(`Docker URI format not recognized (${uri}), using default Docker connection`);
     return new Docker();
+}
+
+/**
+ * Get Docker engine instance from settings
+ * @returns Either a Docker instance or an error message
+ */
+export async function getDockerEngineFromSettings(): Promise<Result<Docker, string>> {
+    const settings = await getSettings();
+    if (!settings.dockerURI) {
+        return err('Docker URI is not configured. Please configure it in Settings.');
+    }
+
+    return ok(getDockerEngine(settings.dockerURI));
 }
 
 /**
