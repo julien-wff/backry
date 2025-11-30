@@ -4,6 +4,7 @@ import { logger } from '$lib/server/services/logger';
 import { getSettings } from '$lib/server/settings/settings';
 import Docker, { type ContainerInspectInfo, type ImageInspectInfo } from 'dockerode';
 import { err, ok, type Result } from 'neverthrow';
+import { prettyPrintServerInfo } from '$lib/helpers/docker';
 
 interface DockerError extends Error {
     code: string;
@@ -163,6 +164,16 @@ export async function getImagesFromContainers(docker: Docker, containers: Contai
         return ok(Object.fromEntries(images));
     } catch (error) {
         logger.error(error, `Error getting images from containers`);
+        return err(error instanceof Error ? error.message : 'Unknown error');
+    }
+}
+
+export async function getDockerInfo(docker: Docker): Promise<Result<string, string>> {
+    try {
+        const info = await docker.info();
+        return ok(prettyPrintServerInfo(info));
+    } catch (error) {
+        logger.error(error, `Error getting / formatting Docker info`);
         return err(error instanceof Error ? error.message : 'Unknown error');
     }
 }

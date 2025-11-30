@@ -61,6 +61,21 @@
         </div>
     {/if}
 
+    {#if data.dockerInfo}
+        <div class="collapse border-base-300 bg-base-100 border mb-2">
+            <input type="checkbox"/>
+            <div class="collapse-title font-semibold">Docker engine info</div>
+            <div class="collapse-content whitespace-pre-wrap">{data.dockerInfo}</div>
+        </div>
+    {/if}
+
+    {#if data.dockerInfoError}
+        <div role="alert" class="alert alert-warning alert-soft">
+            <OctagonAlert class="w-4 h-4"/>
+            <span class="whitespace-break-spaces">Error getting Docker engine info: {data.dockerInfoError}</span>
+        </div>
+    {/if}
+
     <InputContainer for="docker-integration" label="Docker integration">
         <label class="label">
             <input bind:checked={dockerIntegrationEnabled}
