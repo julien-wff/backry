@@ -149,13 +149,18 @@ export const mysqlMethods = {
     getCredentialsFromContainer(container: ContainerInspectInfo): ConnectionStringParams {
         const infos: ConnectionStringParams = {};
 
-        const userKey = container.Config.Env.find(e => e.startsWith('MYSQL_USER='));
-        infos.username = userKey?.split('=')?.[1] ?? 'root';
+        const rootPasswordKey = container.Config.Env.find(e => e.startsWith('MYSQL_ROOT_PASSWORD='));
+        if (rootPasswordKey) {
+            // Prioritize root user if password is set
+            infos.username = 'root';
+            infos.password = rootPasswordKey.split('=')[1];
+        } else {
+            // Else try to get non-root user
+            const userKey = container.Config.Env.find(e => e.startsWith('MYSQL_USER='));
+            infos.username = userKey?.split('=')[1];
 
-        const passwordKey = container.Config.Env.find(e => e.startsWith('MYSQL_PASSWORD='))
-            || container.Config.Env.find(e => e.startsWith('MYSQL_ROOT_PASSWORD='));
-        if (passwordKey) {
-            infos.password = passwordKey.split('=')[1];
+            const passwordKey = container.Config.Env.find(e => e.startsWith('MYSQL_PASSWORD='));
+            infos.password = passwordKey?.split('=')[1];
         }
 
         const dbKey = container.Config.Env.find(e => e.startsWith('MYSQL_DATABASE='));
