@@ -31,15 +31,18 @@ export const GET: RequestHandler = async ({ params }) => {
         ].flat()),
     ].filter(Boolean);
 
-    const externalPorts = Object.values(containerInfos.value.NetworkSettings.Ports)
-        .flat()
-        .map(p => parseInt(p?.HostPort ?? ''))
-        .filter(p => !isNaN(p));
+    const externalPorts = [
+        ...new Set(Object.values(containerInfos.value.NetworkSettings.Ports)
+            .flat()
+            .map(p => parseInt(p?.HostPort ?? ''))
+            .filter(p => !isNaN(p)),
+        ),
+    ];
     const externalHostNames = [ 'localhost' ];
 
     const ips = await Promise.all([
-        ...internalHostNames.map(host => internalPorts.map(port => ({ host, port }))).flat(),
-        ...externalHostNames.map(host => externalPorts.map(port => ({ host, port }))).flat(),
+        ...internalHostNames.flatMap(host => internalPorts.map(port => ({ host, port }))),
+        ...externalHostNames.flatMap(host => externalPorts.map(port => ({ host, port }))),
     ].map(async ip => ({
         ...ip,
         reachable: await isPortReachable(ip.port, ip.host),
