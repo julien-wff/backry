@@ -1,6 +1,7 @@
 import { buildDbUrlFromParams } from '$lib/server/databases/utils';
 import { databases } from '$lib/server/db/schema';
 import { runCommandSync } from '$lib/server/services/cmd';
+import { logger } from '$lib/server/services/logger';
 import type { ConnectionStringParams, EngineMethods } from '$lib/types/engine';
 import { type ContainerInspectInfo } from 'dockerode';
 import { err, ok, type Result } from 'neverthrow';
@@ -45,6 +46,24 @@ function connectionStringToOptions(str: string, databaseWithFlag = true): string
     return options;
 }
 
+/**
+ * Extract and decode the password from a URL object.
+ * @param url The URL object to extract the password from. Can be null, in which case an empty string is returned.
+ * @returns The decoded password. If decoding fails, returns the raw password.
+ */
+function extractPassword(url: URL | null) {
+    if (!url) {
+        return '';
+    }
+
+    try {
+        return decodeURIComponent(url.password ?? '');
+    } catch (e) {
+        logger.warn(e, 'Failed to decode password from connection string');
+        return url.password ?? '';
+    }
+}
+
 export const mysqlMethods = {
     checkCommand: process.env.BACKRY_MYSQL_CHECK_CMD ?? process.env.BACKRY_MYSQL_RESTORE_CMD ?? 'mysql',
     dumpCommand: process.env.BACKRY_MYSQL_DUMP_CMD ?? 'mysqldump',
@@ -75,7 +94,7 @@ export const mysqlMethods = {
 
     getDumpEnv(database: typeof databases.$inferSelect): Record<string, string> {
         return {
-            MYSQL_PWD: URL.parse(database.connectionString)?.password ?? '',
+            MYSQL_PWD: extractPassword(URL.parse(database.connectionString)),
         };
     },
 
@@ -99,7 +118,7 @@ export const mysqlMethods = {
             ],
             {
                 env: {
-                    MYSQL_PWD: url.password ?? '',
+                    MYSQL_PWD: extractPassword(url),
                 },
             },
         );
@@ -146,7 +165,11 @@ export const mysqlMethods = {
     },
 
     hidePasswordInConnectionString(connectionString: string): string {
-        const url = new URL(connectionString);
+        const url = URL.parse(connectionString);
+        if (!url) {
+            return connectionString;
+        }
+
         if (url.password) {
             url.password = '***';
         }
@@ -185,7 +208,7 @@ export const mysqlMethods = {
             ],
             {
                 env: {
-                    MYSQL_PWD: url.password ?? '',
+                    MYSQL_PWD: extractPassword(url),
                 },
             },
         );
@@ -203,7 +226,7 @@ export const mysqlMethods = {
     getRestoreEnv(connectionString: string): Record<string, string> {
         const url = URL.parse(connectionString);
         return {
-            MYSQL_PWD: url?.password ?? '',
+            MYSQL_PWD: extractPassword(url),
         };
     },
 
