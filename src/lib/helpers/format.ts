@@ -28,7 +28,7 @@ export const formatDuration = (duration: number, showMs = true) => {
     } else if (durationObj.asMinutes() < 60) {
         return durationObj.format('m[m] s[s]');
     } else {
-        return durationObj.format('h[h] m[m] s[s]');
+        return durationObj.format('H[h] m[m] s[s]');
     }
 };
 
