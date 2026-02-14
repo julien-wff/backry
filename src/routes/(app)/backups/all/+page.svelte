@@ -5,7 +5,7 @@
     import Head from '$lib/components/common/Head.svelte';
     import Modal from '$lib/components/common/Modal.svelte';
     import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
-    import { ListCheck, Plus } from '$lib/components/icons';
+    import { CloudUpload, ListCheck, Plus } from '$lib/components/icons';
     import dayjs from 'dayjs';
     import relativeTime from 'dayjs/plugin/relativeTime';
     import utc from 'dayjs/plugin/utc';
@@ -158,6 +158,13 @@
                    onsecondarybuttonclick={() => filterModalControls?.open()}
                    secondaryButtonText={filterCount > 0 ? `Filters (${filterCount})` : undefined}
                    secondaryButtonType="filter">
+    {#snippet buttons()}
+        <a href="./upload" class="btn btn-soft btn-success">
+            <CloudUpload class="size-4"/>
+            Upload backup
+        </a>
+    {/snippet}
+
     All backups
 </PageContentHeader>
 
