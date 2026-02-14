@@ -11,6 +11,7 @@
     import { Tween } from 'svelte/motion';
     import { formatSize } from '$lib/helpers/format';
     import type { BackupResponse, backupUploadRequest } from '$lib/server/schemas/api';
+    import { onDestroy } from 'svelte';
 
     let { data }: PageProps = $props();
 
@@ -32,6 +33,8 @@
     let uploadedBytes = new Tween(0, { duration: 50 });
     let totalBytes = $state(0);
     let uploadProgress = $derived(totalBytes === 0 ? null : uploadedBytes.current / totalBytes);
+    let uploadBackupId = $state<number | null>(null);
+    let uploadAbortController = $state<AbortController | null>(null);
 
     async function handleFormSubmit() {
         if (isUploading || !selectedDatabase || !selectedJob || !selectedFiles) {
@@ -53,35 +56,54 @@
             return;
         }
 
+        uploadBackupId = initRes.value.id;
+        uploadAbortController = new AbortController();
+
         const uploadRes = await uploadFileInChunks(
-            `/api/backups/upload/chunk?backupId=${initRes.value.id}`,
+            `/api/backups/upload/chunk?backupId=${uploadBackupId}`,
             selectedFiles.item(0)!,
             (up, tot) => {
                 uploadedBytes.set(up);
                 totalBytes = tot;
             },
+            uploadAbortController.signal,
         );
         if (uploadRes.isErr()) {
             error = uploadRes.error;
             isUploading = false;
+            navigator.sendBeacon(`/api/backups/upload/abort?backupId=${uploadBackupId}`);
             return;
         }
 
         const finishRes = await fetchApi<BackupResponse>(
             'POST',
-            `/api/backups/upload/finish?backupId=${initRes.value.id}`,
+            `/api/backups/upload/finish?backupId=${uploadBackupId}`,
             null,
         );
         if (finishRes.isErr()) {
             error = finishRes.error;
             isUploading = false;
+            navigator.sendBeacon(`/api/backups/upload/abort?backupId=${uploadBackupId}`);
             return;
         }
 
         isUploading = false;
         isUploadSuccessful = true;
     }
+
+    function handleAbort() {
+        if (!isUploading || !uploadBackupId || !uploadAbortController || uploadAbortController.signal.aborted) {
+            return;
+        }
+
+        uploadAbortController.abort();
+        navigator.sendBeacon(`/api/backups/upload/abort?backupId=${uploadBackupId}`);
+    }
+
+    onDestroy(() => handleAbort());
 </script>
+
+<svelte:window onbeforeunload={handleAbort}/>
 
 <Head title="Manual backup upload"/>
 

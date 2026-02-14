@@ -79,6 +79,7 @@ export function subscribeApi<T>(endpoint: string, onChunk: (chunk: T) => void): 
  * @param url API endpoint to upload the file to
  * @param file File to upload
  * @param onProgress Optional callback to track upload progress, receives uploaded bytes and total bytes
+ * @param signal Optional AbortSignal to cancel the upload
  * @param chunkSize Size of each chunk in bytes (default: 5 MB)
  * @returns Result indicating success or error message
  */
@@ -86,11 +87,16 @@ export async function uploadFileInChunks(
     url: string,
     file: File,
     onProgress?: (uploadedBytes: number, totalBytes: number) => void,
+    signal?: AbortSignal,
     chunkSize = 5 * 1024 * 1024, // 5 MB
 ): Promise<Result<void, string>> {
     const totalChunks = Math.ceil(file.size / chunkSize);
 
     for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+        if (signal?.aborted) {
+            return err('Upload aborted');
+        }
+
         const start = chunkIndex * chunkSize;
         const end = Math.min(start + chunkSize, file.size);
         const chunk = file.slice(start, end);
@@ -102,6 +108,7 @@ export async function uploadFileInChunks(
             const res = await fetch(url, {
                 method: 'POST',
                 body: formData,
+                signal,
             });
 
             let response: ApiResponse<{}> | null;
