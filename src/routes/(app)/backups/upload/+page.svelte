@@ -11,7 +11,7 @@
     import { Tween } from 'svelte/motion';
     import { formatSize } from '$lib/helpers/format';
     import type { BackupResponse, backupUploadRequest } from '$lib/server/schemas/api';
-    import { onDestroy } from 'svelte';
+    import { beforeNavigate } from '$app/navigation';
 
     let { data }: PageProps = $props();
 
@@ -91,23 +91,24 @@
         isUploadSuccessful = true;
     }
 
-    function handleAbort() {
-        if (!isUploading || !uploadBackupId || !uploadAbortController || uploadAbortController.signal.aborted) {
+    beforeNavigate((nav) => {
+        if (!isUploading) {
             return;
         }
 
-        uploadAbortController.abort();
-        navigator.sendBeacon(`/api/backups/upload/abort?backupId=${uploadBackupId}`);
-    }
-
-    onDestroy(() => handleAbort());
+        if (nav.willUnload && uploadAbortController && !uploadAbortController.signal.aborted) {
+            uploadAbortController.abort();
+            navigator.sendBeacon(`/api/backups/upload/abort?backupId=${uploadBackupId}`);
+        } else {
+            nav.cancel();
+        }
+    });
 </script>
-
-<svelte:window onbeforeunload={handleAbort}/>
 
 <Head title="Manual backup upload"/>
 
-<PageContentHeader buttonType="back"
+<PageContentHeader buttonDisabled={isUploading}
+                   buttonType="back"
                    icon={CloudUpload}>
     Manual backup upload
 </PageContentHeader>

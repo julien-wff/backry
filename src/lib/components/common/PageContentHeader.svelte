@@ -8,6 +8,7 @@
         icon: typeof IconType;
         buttonType?: null | 'back' | 'new' | 'all';
         buttonText?: string;
+        buttonDisabled?: boolean;
         secondaryButtonType?: null | 'filter';
         secondaryButtonText?: string;
         onsecondarybuttonclick?: () => void;
@@ -19,6 +20,7 @@
         icon: Icon,
         buttonType = null,
         buttonText,
+        buttonDisabled,
         secondaryButtonType = null,
         secondaryButtonText,
         onsecondarybuttonclick,
@@ -43,17 +45,17 @@
         {/if}
 
         {#if buttonType === 'new'}
-            <a href="{page.url.pathname}/new" class="btn btn-primary">
+            <a href="{page.url.pathname}/new" class="btn btn-primary" class:btn-disabled={buttonDisabled}>
                 <Plus class="w-4 h-4"/>
                 {buttonText ?? 'Add new'}
             </a>
         {:else if buttonType === 'all'}
-            <a href="{page.url.pathname}/all" class="btn btn-primary">
+            <a href="{page.url.pathname}/all" class="btn btn-primary" class:btn-disabled={buttonDisabled}>
                 <ListCheck class="w-4 h-4"/>
                 {buttonText ?? 'See all'}
             </a>
         {:else if buttonType === 'back'}
-            <button class="btn btn-primary btn-soft" onclick={() => window.history.back()}>
+            <button class="btn btn-primary btn-soft" onclick={() => window.history.back()} disabled={buttonDisabled}>
                 <ChevronLeft class="w-4 h-4"/>
                 {buttonText ?? 'Back to list'}
             </button>
