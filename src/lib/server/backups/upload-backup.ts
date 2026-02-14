@@ -53,7 +53,7 @@ export async function createUploadSession(job: typeof jobs.$inferSelect,
     const engine: EngineMethods = ENGINES_METHODS[database.engine];
     const fileName = `${job.slug}_${database.slug}.${engine.dumpFileExtension}`;
 
-    const run = createRun('manual');
+    const run = createRun('upload');
     const backup = await createBackup(jobDatabase.id, fileName, run.id);
     backupEmitter.emit('update', backup);
 

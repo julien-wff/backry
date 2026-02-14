@@ -12,4 +12,6 @@
     <div class="badge badge-sm badge-warning badge-soft">Manual</div>
 {:else if origin === 'scheduled'}
     <div class="badge badge-sm badge-info badge-soft">Scheduled</div>
+{:else if origin === 'upload'}
+    <div class="badge badge-sm badge-secondary badge-soft">Upload</div>
 {/if}
