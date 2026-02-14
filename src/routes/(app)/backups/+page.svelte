@@ -8,7 +8,7 @@
     import Head from '$lib/components/common/Head.svelte';
     import Modal from '$lib/components/common/Modal.svelte';
     import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
-    import { FileCheck, ListCheck } from '$lib/components/icons';
+    import { CloudUpload, FileCheck, ListCheck } from '$lib/components/icons';
     import { subscribeApi } from '$lib/helpers/fetch';
     import type { ModalControls } from '$lib/helpers/modal';
     import type { BackupUpdateEventPayload } from '$lib/server/shared/events';
@@ -69,6 +69,13 @@
                    onsecondarybuttonclick={() => filterModalControls?.open()}
                    secondaryButtonText={filterCount > 0 ? `Filters (${filterCount})` : undefined}
                    secondaryButtonType="filter">
+    {#snippet buttons()}
+        <a href="./backups/upload" class="btn btn-soft btn-success">
+            <CloudUpload class="size-4"/>
+            Upload backup
+        </a>
+    {/snippet}
+
     {#if backupCount <= 1}
         Latest backups
     {:else}

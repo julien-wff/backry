@@ -11,6 +11,7 @@
         secondaryButtonType?: null | 'filter';
         secondaryButtonText?: string;
         onsecondarybuttonclick?: () => void;
+        buttons?: Snippet;
     }
 
     let {
@@ -21,6 +22,7 @@
         secondaryButtonType = null,
         secondaryButtonText,
         onsecondarybuttonclick,
+        buttons: buttonsSnippet,
     }: Props = $props();
 </script>
 
@@ -31,6 +33,8 @@
     </h2>
 
     <div class="flex gap-4">
+        {@render buttonsSnippet?.()}
+
         {#if secondaryButtonType === 'filter'}
             <button class="btn btn-secondary btn-soft" onclick={onsecondarybuttonclick}>
                 <Funnel class="w-4 h-4"/>
