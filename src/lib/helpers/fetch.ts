@@ -73,3 +73,57 @@ export function subscribeApi<T>(endpoint: string, onChunk: (chunk: T) => void): 
     };
 }
 
+
+/**
+ * Upload a file in chunks to the server
+ * @param url API endpoint to upload the file to
+ * @param file File to upload
+ * @param onProgress Optional callback to track upload progress, receives uploaded bytes and total bytes
+ * @param chunkSize Size of each chunk in bytes (default: 5 MB)
+ * @returns Result indicating success or error message
+ */
+export async function uploadFileInChunks(
+    url: string,
+    file: File,
+    onProgress?: (uploadedBytes: number, totalBytes: number) => void,
+    chunkSize = 5 * 1024 * 1024, // 5 MB
+): Promise<Result<void, string>> {
+    const totalChunks = Math.ceil(file.size / chunkSize);
+
+    for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+        const start = chunkIndex * chunkSize;
+        const end = Math.min(start + chunkSize, file.size);
+        const chunk = file.slice(start, end);
+
+        const formData = new FormData();
+        formData.append('chunk', chunk);
+
+        try {
+            const res = await fetch(url, {
+                method: 'POST',
+                body: formData,
+            });
+
+            let response: ApiResponse<{}> | null;
+            try {
+                response = await res.json();
+            } catch {
+                response = null;
+            }
+
+            if (response && response.error !== null) {
+                return err(response.error);
+            }
+
+            if (!res.ok) {
+                return err(`Upload failed at chunk ${chunkIndex + 1}/${totalChunks}`);
+            }
+
+            onProgress?.(end, file.size);
+        } catch (e) {
+            return err((e as Error).message);
+        }
+    }
+
+    return ok();
+}

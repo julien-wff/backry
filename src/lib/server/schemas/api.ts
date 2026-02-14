@@ -192,6 +192,12 @@ export const jobRunRequest = z.object({
 /** `DELETE /api/backups/[id]` */
 export type BackupResponse = typeof backups.$inferSelect;
 
+/** `POST /api/backups/upload` */
+export const backupUploadRequest = z.object({
+    databaseId: z.number().positive(),
+    jobId: z.number().positive(),
+});
+
 // RUNS
 
 /** `GET /api/runs` */

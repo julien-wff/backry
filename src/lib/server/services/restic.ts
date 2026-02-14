@@ -472,3 +472,87 @@ export async function pipeFileContentToCommand(url: string,
 
     return ok(res.value.text().trim());
 }
+
+/**
+ * Create a restic backup process that takes the file content from stdin.
+ * The process is not awaited and runs in the background, streaming restic's JSON output to the provided callbacks.
+ * This can be used to e.g. stream a SQL dump file from an HTTP request directly to restic without buffering it in memory.
+ * @param url URL to the restic repository
+ * @param password Repository password
+ * @param env Additional environment variables to set
+ * @param fileName Name of the saved file in the restic snapshot
+ * @param tags List of tags to add to the snapshot (e.g. jobId, databaseId). The tag `backry` is automatically added and should not be included here.
+ * @param signal AbortSignal to cancel the process if needed (e.g. if the HTTP request is aborted)
+ * @param onMessage Callback that is called for each JSON message output by restic to stdout. This includes both status updates and the final backup summary.
+ * @param onError Callback that is called for each JSON error message output by restic to stderr, or if there is an error parsing the output. The error message is passed as a ResticError object.
+ * @return The spawned process, which can be used to e.g. kill it if needed
+ */
+export async function createStdinUploadProcess(url: string,
+                                               password: string,
+                                               env: Record<string, string>,
+                                               fileName: string,
+                                               tags: string[],
+                                               signal?: AbortSignal,
+                                               onMessage?: (message: ResticBackupSummary | ResticBackupStatus) => void,
+                                               onError?: (error: ResticError) => void) {
+    tags = [ 'backry', ...tags.map((tag) => tag.replace(/,/g, '_')) ];
+
+    const process = Bun.spawn([
+        RESTIC_CMD,
+        '-r', url,
+        'backup',
+        '--json',
+        '--tag', tags.join(','),
+        '--stdin-filename', fileName,
+        '--stdin',
+    ], {
+        env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env },
+        stdin: 'pipe',
+        stdout: 'pipe',
+        stderr: 'pipe',
+        signal,
+    });
+
+    void process.stdout.pipeThrough(new TextDecoderStream()).pipeTo(new WritableStream({
+        write(chunk) {
+            try {
+                chunk.split('\n').filter(line => line.trim().length > 0).forEach(line => {
+                    try {
+                        const message = JSON.parse(line) as ResticBackupSummary | ResticBackupStatus;
+                        onMessage?.(message);
+                    } catch {
+                        logger.warn(`Failed to parse restic stdout line as JSON: ${line}`);
+                        onError?.({
+                            message_type: 'unknown',
+                            code: -1,
+                            message: line,
+                        });
+                    }
+                });
+            } catch {
+                onError?.({
+                    message_type: 'unknown',
+                    code: -1,
+                    message: chunk,
+                });
+            }
+        },
+    }));
+
+    void process.stderr.pipeThrough(new TextDecoderStream()).pipeTo(new WritableStream({
+        write(chunk) {
+            try {
+                const error = JSON.parse(chunk) as ResticError;
+                onError?.(error);
+            } catch {
+                onError?.({
+                    message_type: 'unknown',
+                    code: -1,
+                    message: chunk,
+                });
+            }
+        },
+    }));
+
+    return { process };
+}

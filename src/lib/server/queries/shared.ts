@@ -1,8 +1,21 @@
 import { formatSize } from '$lib/helpers/format';
 import { db } from '$lib/server/db';
-import { backups, databases, jobs, notifications, storages } from '$lib/server/db/schema';
+import { backups, databases, jobDatabases, jobs, notifications, storages } from '$lib/server/db/schema';
 import type { getNextJobs } from '$lib/server/shared/cron';
-import { avg, count, desc, eq, inArray, isNotNull, sum } from 'drizzle-orm';
+import { and, avg, count, desc, eq, inArray, isNotNull, sum } from 'drizzle-orm';
+
+/**
+ * Get the job-database intersection for a given job and database.
+ * @param jobId The job ID to check.
+ * @param databaseId The database ID to check.
+ * @returns The job-database record if it exists, otherwise null.
+ */
+export const getIntersectingJobDatabase = (jobId: number, databaseId: number) => db.query.jobDatabases.findFirst({
+    where: and(
+        eq(jobDatabases.jobId, jobId),
+        eq(jobDatabases.databaseId, databaseId),
+    ),
+});
 
 /**
  * Get the number of errors for databases, storages, backups, and notifications.
