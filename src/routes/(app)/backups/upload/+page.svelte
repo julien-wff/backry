@@ -146,7 +146,7 @@
 
     <InputContainer for="file" label="Backup file">
         <input bind:files={selectedFiles}
-               class="w-full file-input"
+               class="w-full file-input disabled:border-base-content/20"
                disabled={selectedDatabase === null}
                id="file"
                required
