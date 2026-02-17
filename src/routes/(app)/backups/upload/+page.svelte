@@ -123,7 +123,7 @@
         <select bind:value={selectedDatabase} class="w-full select" id="database" required>
             <option disabled selected value={null}>Select a database</option>
             {#each availableDatabases.values() as database (database.id)}
-                <option value={database.id} disabled={!['active', 'unhealthy'].includes(database.status)}>
+                <option value={database.id}>
                     {database.name} ({ENGINES_META[database.engine]?.displayName})
                 </option>
             {/each}
