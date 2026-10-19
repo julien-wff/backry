@@ -3,7 +3,7 @@
 
     interface Props {
         title: string;
-        icon: typeof IconType;
+        icon: IconType;
         href: string;
         active?: number;
         inactive?: number;

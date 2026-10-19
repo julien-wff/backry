@@ -26,6 +26,7 @@ export const GET: RequestHandler = async ({ params }) => {
     const internalHostNames = [
         ...new Set(
             [
+                // @ts-expect-error IPAddress may be returned by Docker but is not typed in dockerode.
                 containerInfos.value.NetworkSettings.IPAddress,
                 ...Object.values(containerInfos.value.NetworkSettings.Networks).map(
                     (net) => net.IPAddress,

@@ -17,7 +17,7 @@
 
     let { status, tooltip }: Props = $props();
 
-    const STATUS_MAPPING: Record<typeof status, { label: string, icon: typeof IconType }> = {
+    const STATUS_MAPPING: Record<typeof status, { label: string, icon: IconType }> = {
         active: { label: 'Active', icon: CircleCheck },
         inactive: { label: 'Inactive', icon: CircleX },
         error: { label: 'Error', icon: OctagonAlert },

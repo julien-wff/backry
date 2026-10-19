@@ -45,7 +45,7 @@
 <p class="mb-2">
     The notification {fieldName.toLowerCase()} can be customized using an EJS template. For more information on EJS,
     see the
-    <a class="link link-primary" href="https://ejs.co/#docs" rel="noopener noreferrer" target="_blank">
+    <a class="link link-primary" href="https://ejs.co/docs/#tags" rel="noopener noreferrer" target="_blank">
         EJS documentation
     </a>.
 </p>
@@ -57,7 +57,7 @@
 
 <div class="collapse border-base-300 border mb-2">
     <input type="checkbox"/>
-    <div class="collapse-title font-semibold">Exemple payload passed to the template</div>
+    <div class="collapse-title font-semibold">Example payload passed to the template</div>
     <div class="collapse-content">
         <CodeEditor bind:value={exampleValue} interactive={opened} language="json"/>
         {#if jsonError}

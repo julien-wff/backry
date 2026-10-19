@@ -5,7 +5,7 @@
 
     interface Props {
         children: Snippet;
-        icon: typeof IconType | string;
+        icon: IconType | string;
         href: string;
         error?: boolean;
     }

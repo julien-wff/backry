@@ -5,7 +5,7 @@
 
     interface Props {
         children: Snippet;
-        icon: typeof IconType;
+        icon: IconType;
         buttonType?: null | 'back' | 'new' | 'all';
         buttonText?: string;
         secondaryButtonType?: null | 'filter';

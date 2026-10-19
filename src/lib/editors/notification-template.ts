@@ -1,7 +1,7 @@
 import { formatDuration, formatSize } from '#lib/helpers/format.ts';
 import type { NotificationRunPayload } from '#lib/types/notifications.ts';
 import dayjs from 'dayjs';
-import { render } from 'ejs';
+import ejs from 'ejs';
 import { fromThrowable, Result } from 'neverthrow';
 
 export const NOTIFICATION_PAYLOAD_EXAMPLE = {
@@ -46,7 +46,7 @@ export function renderNotificationTemplate(
     data: Record<string, any>,
 ): Result<string, string> {
     return fromThrowable(
-        () => render(template, data, { async: false }),
+        () => ejs.render(template, data, { async: false }),
         (e) => (e instanceof Error ? e.message : String(e)),
     )();
 }

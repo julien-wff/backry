@@ -4,7 +4,7 @@
 
     interface Props {
         title: string;
-        icon: typeof IconType;
+        icon: IconType;
         href: string;
         children: Snippet;
         stat: string | number;
