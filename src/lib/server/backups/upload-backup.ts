@@ -71,6 +71,7 @@ export async function createUploadSession(job: typeof jobs.$inferSelect,
         controller.signal,
         msg => handleResticMessage(backup, msg),
         err => handleResticErrorMessage(backup, err),
+        (_, exitCode) => handleResticExit(backup.id, exitCode),
     );
 
     uploadSessions.set(backup.id, {
@@ -244,6 +245,26 @@ async function handleResticErrorMessage(backup: typeof backups.$inferSelect, err
         error: error.message,
     });
     logger.error(`Error when uploading backup #${backup.id}: ${error.message}`);
+}
+
+
+async function handleResticExit(backupId: number, exitCode: number | null) {
+    const session = uploadSessions.get(backupId);
+    if (!session) {
+        logger.warn(`Restic process for backup #${backupId} exited with code ${exitCode}, but no active upload session was found`);
+        return;
+    }
+
+    if (exitCode === 0) {
+        logger.info(`Restic process for backup #${backupId} completed successfully with exit code ${exitCode}`);
+        await updateDbOnEnd(backupId, session.backup);
+    } else {
+        logger.error(`Restic process for backup #${backupId} exited with code ${exitCode}`);
+        await updateDbOnEnd(backupId, {
+            ...session.backup,
+            error: session.backup.error ?? `restic exited with code ${exitCode}`,
+        });
+    }
 }
 
 

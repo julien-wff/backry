@@ -485,6 +485,7 @@ export async function pipeFileContentToCommand(url: string,
  * @param signal AbortSignal to cancel the process if needed (e.g. if the HTTP request is aborted)
  * @param onMessage Callback that is called for each JSON message output by restic to stdout. This includes both status updates and the final backup summary.
  * @param onError Callback that is called for each JSON error message output by restic to stderr, or if there is an error parsing the output. The error message is passed as a ResticError object.
+ * @param onExit Callback that is called when the process exits.
  * @return The spawned process, which can be used to e.g. kill it if needed
  */
 export async function createStdinUploadProcess(url: string,
@@ -494,7 +495,8 @@ export async function createStdinUploadProcess(url: string,
                                                tags: string[],
                                                signal?: AbortSignal,
                                                onMessage?: (message: ResticBackupSummary | ResticBackupStatus) => void,
-                                               onError?: (error: ResticError) => void) {
+                                               onError?: (error: ResticError) => void,
+                                               onExit?: Bun.Spawn.BaseOptions<'pipe', 'pipe', 'pipe'>['onExit']) {
     tags = [ 'backry', ...tags.map((tag) => tag.replace(/,/g, '_')) ];
 
     const process = Bun.spawn([
@@ -511,6 +513,7 @@ export async function createStdinUploadProcess(url: string,
         stdout: 'pipe',
         stderr: 'pipe',
         signal,
+        onExit,
     });
 
     void process.stdout.pipeThrough(new TextDecoderStream()).pipeTo(new WritableStream({
