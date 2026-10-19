@@ -1,8 +1,8 @@
-import { validateNotificationTemplates } from '$lib/server/api/notifications';
-import { apiError, apiSuccess } from '$lib/server/api/responses';
-import { deleteNotification, updateNotification } from '$lib/server/queries/notifications';
-import { parseRequestBody } from '$lib/server/schemas';
-import { notificationPatchRequest, notificationRequest, type NotificationResponse } from '$lib/server/schemas/api';
+import { validateNotificationTemplates } from '#lib/server/api/notifications.ts';
+import { apiError, apiSuccess } from '#lib/server/api/responses.ts';
+import { deleteNotification, updateNotification } from '#lib/server/queries/notifications.ts';
+import { parseRequestBody } from '#lib/server/schemas/index.ts';
+import { notificationPatchRequest, notificationRequest, type NotificationResponse } from '#lib/server/schemas/api.ts';
 import type { RequestHandler } from './$types';
 
 export const DELETE: RequestHandler = async ({ params }) => {
@@ -18,7 +18,6 @@ export const DELETE: RequestHandler = async ({ params }) => {
 
     return apiSuccess<NotificationResponse>(deletedNotification, 200);
 };
-
 
 export const PUT: RequestHandler = async ({ request, params }) => {
     const notificationId = parseInt(params.id);
@@ -40,7 +39,6 @@ export const PUT: RequestHandler = async ({ request, params }) => {
     const notification = updateNotification(notificationId, body.value);
     return apiSuccess<NotificationResponse>(notification, 200);
 };
-
 
 export const PATCH: RequestHandler = async ({ request, params }) => {
     const notificationId = parseInt(params.id);

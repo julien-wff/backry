@@ -1,7 +1,7 @@
-import { apiError, apiSuccess } from '$lib/server/api/responses';
-import { deleteRun, getRunFull } from '$lib/server/queries/runs';
-import type { RunResponse } from '$lib/server/schemas/api';
-import { deleteSnapshots } from '$lib/server/services/restic';
+import { apiError, apiSuccess } from '#lib/server/api/responses.ts';
+import { deleteRun, getRunFull } from '#lib/server/queries/runs.ts';
+import type { RunResponse } from '#lib/server/schemas/api.ts';
+import { deleteSnapshots } from '#lib/server/services/restic.ts';
 import type { RequestHandler } from './$types';
 
 export const DELETE: RequestHandler = async ({ params }) => {
@@ -23,14 +23,21 @@ export const DELETE: RequestHandler = async ({ params }) => {
 
     // If there are backup associated, check if all are finished and delete their files from Restic
     if (run.backups.length > 0) {
-        if (run.backups.some(backup => !backup.error && !backup.finishedAt)) {
+        if (run.backups.some((backup) => !backup.error && !backup.finishedAt)) {
             return apiError('Some backups are not finished', 400);
         }
 
         const storage = run.backups[0].jobDatabase.job.storage;
-        const snapshots = run.backups.map(backup => backup.snapshotId).filter(id => id !== null);
+        const snapshots = run.backups
+            .map((backup) => backup.snapshotId)
+            .filter((id) => id !== null);
         if (snapshots.length > 0) {
-            const res = await deleteSnapshots(storage.url, storage.password!, storage.env, snapshots);
+            const res = await deleteSnapshots(
+                storage.url,
+                storage.password!,
+                storage.env,
+                snapshots,
+            );
             if (res.isErr()) {
                 return apiError(res.error.message, 500);
             }

@@ -1,4 +1,4 @@
-import { RESTORE_DESTINATION, SETUP_STEPS } from '$lib/common/constants';
+import { RESTORE_DESTINATION, SETUP_STEPS } from '#lib/common/constants.ts';
 import {
     backups,
     DATABASE_ENGINES,
@@ -10,15 +10,21 @@ import {
     restores,
     runs,
     storages,
-} from '$lib/server/db/schema';
-import type { getRunsWithBackupFilter } from '$lib/server/queries/runs';
-import type { Desyncedbackup } from '$lib/server/storages/health';
-import type { ResticError, ResticInit, ResticLock, ResticSnapshot } from '$lib/types/restic';
+} from '#lib/server/db/schema.ts';
+import type { getRunsWithBackupFilter } from '#lib/server/queries/runs.ts';
+import type { Desyncedbackup } from '#lib/server/storages/health.ts';
+import type { ResticError, ResticInit, ResticLock, ResticSnapshot } from '#lib/types/restic.ts';
 import { validateCronExpression } from 'cron';
 import { z } from 'zod';
 
-export const DATABASE_ALLOWED_STATUSES = [ 'active', 'error' ] as const satisfies readonly typeof ELEMENT_STATUS[number][];
-export const STORAGE_ALLOWED_STATUSES = [ 'active', 'unhealthy' ] as const satisfies readonly typeof ELEMENT_STATUS[number][];
+export const DATABASE_ALLOWED_STATUSES = [
+    'active',
+    'error',
+] as const satisfies readonly (typeof ELEMENT_STATUS)[number][];
+export const STORAGE_ALLOWED_STATUSES = [
+    'active',
+    'unhealthy',
+] as const satisfies readonly (typeof ELEMENT_STATUS)[number][];
 
 // DATABASES
 
@@ -29,13 +35,21 @@ export const STORAGE_ALLOWED_STATUSES = [ 'active', 'unhealthy' ] as const satis
 export const databaseRequest = z.object({
     engine: z.enum(DATABASE_ENGINES),
     name: z.string().min(2),
-    slug: z.string().min(2).regex(/^[a-z0-9-]+$/),
+    slug: z
+        .string()
+        .min(2)
+        .regex(/^[a-z0-9-]+$/),
     connectionString: z.string().min(2),
-    containerName: z.string().trim().regex(/[a-zA-Z0-9][a-zA-Z0-9_.-]*/).max(63).optional().nullable(),
+    containerName: z
+        .string()
+        .trim()
+        .regex(/[a-zA-Z0-9][a-zA-Z0-9_.-]*/)
+        .max(63)
+        .optional()
+        .nullable(),
     status: z.enum(DATABASE_ALLOWED_STATUSES).optional(),
     error: z.string().min(2).nullable().optional(),
 });
-
 
 /** `POST /api/databases/check` */
 export const databasesCheckRequest = z.object({
@@ -151,14 +165,22 @@ export const jobRequest = z.object({
     name: z.string().min(3),
     slug: z.string().min(3),
     storageId: z.number().positive(),
-    cron: z.string().min(2).refine(val => validateCronExpression(val).valid, 'Invalid cron expression'),
+    cron: z
+        .string()
+        .min(2)
+        .refine(
+            (val) => validateCronExpression(val).valid,
+            'Invalid cron expression',
+        ),
     prunePolicy: z.string().optional(),
-    databases: z.array(
-        z.object({
-            id: z.number().positive(),
-            enabled: z.boolean(),
-        }),
-    ).min(1),
+    databases: z
+        .array(
+            z.object({
+                id: z.number().positive(),
+                enabled: z.boolean(),
+            }),
+        )
+        .min(1),
 });
 
 /**
@@ -182,9 +204,7 @@ export type JobResponse = typeof jobs.$inferSelect;
 
 /** `POST /api/jobs/[id]/run` */
 export const jobRunRequest = z.object({
-    databases: z.array(
-        z.number().min(0),
-    ).optional(),
+    databases: z.array(z.number().min(0)).optional(),
 });
 
 // BACKUPS
@@ -199,8 +219,10 @@ type GetRunsResult = Awaited<ReturnType<typeof getRunsWithBackupFilter>>;
 // Convert maps to arrays to JSON stringify properly
 export type RunsQueryResult = Omit<GetRunsResult, 'jobs' | 'databases'> & {
     jobs: Array<GetRunsResult['jobs'] extends Map<any, infer I> ? I : never>;
-    databases: Array<GetRunsResult['databases'] extends Map<any, infer I> ? I : never>;
-}
+    databases: Array<
+        GetRunsResult['databases'] extends Map<any, infer I> ? I : never
+    >;
+};
 
 /** `DELETE /api/runs/[id]` */
 export type RunResponse = typeof runs.$inferSelect;
@@ -231,26 +253,38 @@ export interface DockerHostnamesCheckResponse {
 // RESTORES
 
 /** `POST /api/restores` */
-export const restoreRequest = z.object({
-    backupId: z.number().positive(),
-    destination: z.enum(RESTORE_DESTINATION),
-    otherConnectionString: z.string().trim().optional().nullable().default(() => null),
-    dropDatabase: z.boolean().optional().default(() => false),
-}).superRefine((data, ctx) => {
-    if (data.destination === 'other' && !data.otherConnectionString) {
-        ctx.addIssue({
-            code: 'custom',
-            message: 'otherConnectionString is required when destination is "other"',
-            path: [ 'otherConnectionString' ],
-        });
-    } else if (data.destination === 'current' && data.otherConnectionString) {
-        ctx.addIssue({
-            code: 'custom',
-            message: 'otherConnectionString must be null when destination is "current"',
-            path: [ 'otherConnectionString' ],
-        });
-    }
-});
+export const restoreRequest = z
+    .object({
+        backupId: z.number().positive(),
+        destination: z.enum(RESTORE_DESTINATION),
+        otherConnectionString: z
+            .string()
+            .trim()
+            .optional()
+            .nullable()
+            .default(() => null),
+        dropDatabase: z
+            .boolean()
+            .optional()
+            .default(() => false),
+    })
+    .superRefine((data, ctx) => {
+        if (data.destination === 'other' && !data.otherConnectionString) {
+            ctx.addIssue({
+                code: 'custom',
+                message:
+                    'otherConnectionString is required when destination is "other"',
+                path: [ 'otherConnectionString' ],
+            });
+        } else if (data.destination === 'current' && data.otherConnectionString) {
+            ctx.addIssue({
+                code: 'custom',
+                message:
+                    'otherConnectionString must be null when destination is "current"',
+                path: [ 'otherConnectionString' ],
+            });
+        }
+    });
 
 export type RestoreResponse = typeof restores.$inferSelect;
 

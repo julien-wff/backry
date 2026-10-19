@@ -1,10 +1,9 @@
-import { buildDbUrlFromParams } from '$lib/server/databases/utils';
-import { runCommandSync } from '$lib/server/services/cmd';
-import type { ConnectionStringParams, EngineMethods } from '$lib/types/engine';
+import { buildDbUrlFromParams } from '#lib/server/databases/utils.ts';
+import { runCommandSync } from '#lib/server/services/cmd.ts';
+import type { ConnectionStringParams, EngineMethods } from '#lib/types/engine.ts';
 import { type ContainerInspectInfo } from 'dockerode';
 import { MongoClient } from 'mongodb';
 import { err, ok, type Result } from 'neverthrow';
-
 
 export const mongodbMethods = {
     dumpCommand: process.env.BACKRY_MONGODB_DUMP_CMD ?? 'mongodump',
@@ -21,7 +20,14 @@ export const mongodbMethods = {
     },
 
     getDumpCommand(connectionString, additionalArgs = []) {
-        return [ this.dumpCommand, '--uri', connectionString, '--archive', '--quiet', ...additionalArgs ];
+        return [
+            this.dumpCommand,
+            '--uri',
+            connectionString,
+            '--archive',
+            '--quiet',
+            ...additionalArgs,
+        ];
     },
 
     async checkConnection(connectionString): Promise<Result<string, string>> {
@@ -43,11 +49,17 @@ export const mongodbMethods = {
     },
 
     isDockerContainerFromEngine(container: ContainerInspectInfo): boolean {
-        return container.Args[0] === 'mongod'
-            || Object.keys(container.Config.ExposedPorts ?? {}).some(v => v.startsWith('27017/'));
+        return (
+            container.Args[0] === 'mongod' ||
+            Object.keys(container.Config.ExposedPorts ?? {}).some((v) =>
+                v.startsWith('27017/'),
+            )
+        );
     },
 
-    buildConnectionString(params: ConnectionStringParams): Result<string, string> {
+    buildConnectionString(
+        params: ConnectionStringParams,
+    ): Result<string, string> {
         if (!params.hostname) {
             return err('Hostname is required');
         }
@@ -56,20 +68,28 @@ export const mongodbMethods = {
         return ok(url.toString());
     },
 
-    getCredentialsFromContainer(container: ContainerInspectInfo): ConnectionStringParams {
+    getCredentialsFromContainer(
+        container: ContainerInspectInfo,
+    ): ConnectionStringParams {
         const infos: ConnectionStringParams = {};
 
-        const userKey = container.Config.Env.find(e => e.startsWith('MONGO_INITDB_ROOT_USERNAME='));
+        const userKey = container.Config.Env.find((e) =>
+            e.startsWith('MONGO_INITDB_ROOT_USERNAME='),
+        );
         if (userKey) {
             infos.username = userKey.split('=')[1];
         }
 
-        const passwordKey = container.Config.Env.find(e => e.startsWith('MONGO_INITDB_ROOT_PASSWORD='));
+        const passwordKey = container.Config.Env.find((e) =>
+            e.startsWith('MONGO_INITDB_ROOT_PASSWORD='),
+        );
         if (passwordKey) {
             infos.password = passwordKey.split('=')[1];
         }
 
-        const dbKey = container.Config.Env.find(e => e.startsWith('MONGO_INITDB_DATABASE='));
+        const dbKey = container.Config.Env.find((e) =>
+            e.startsWith('MONGO_INITDB_DATABASE='),
+        );
         if (dbKey) {
             infos.database = dbKey.split('=')[1];
         }
@@ -86,7 +106,14 @@ export const mongodbMethods = {
     },
 
     getRestoreBackupFromStdinCommand(connectionString, drop): string[] {
-        return [ this.restoreCommand, '--uri', connectionString, '--archive', '--verbose', ...(drop ? [ '--drop' ] : []) ];
+        return [
+            this.restoreCommand,
+            '--uri',
+            connectionString,
+            '--archive',
+            '--verbose',
+            ...(drop ? [ '--drop' ] : []),
+        ];
     },
 
     async recreateDatabase(_connectionString): Promise<Result<void, string>> {

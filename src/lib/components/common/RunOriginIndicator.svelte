@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { RUN_ORIGIN } from '$lib/server/db/schema';
+    import type { RUN_ORIGIN } from '#lib/server/db/schema.ts';
 
     interface Props {
         origin: typeof RUN_ORIGIN[number];

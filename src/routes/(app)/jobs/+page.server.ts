@@ -1,4 +1,4 @@
-import { jobsListFull } from '$lib/server/queries/jobs';
+import { jobsListFull } from '#lib/server/queries/jobs.ts';
 import { sendAt, validateCronExpression } from 'cron';
 import type { PageServerLoad } from './$types';
 
@@ -7,9 +7,14 @@ export const load: PageServerLoad = async () => {
 
     return {
         jobs,
-        nextExecutions: jobs.reduce((acc, job) => ({
-            ...acc,
-            [job.id]: validateCronExpression(job.cron).valid ? sendAt(job.cron).toJSDate() : null,
-        }), {} as Record<number, Date | null>),
+        nextExecutions: jobs.reduce(
+            (acc, job) => ({
+                ...acc,
+                [job.id]: validateCronExpression(job.cron).valid
+                    ? sendAt(job.cron).toJSDate()
+                    : null,
+            }),
+            {} as Record<number, Date | null>,
+        ),
     };
 };

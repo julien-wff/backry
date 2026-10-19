@@ -1,9 +1,9 @@
-import type { ENGINES_META } from '$lib/common/engines-meta';
-import { mongodbMethods } from '$lib/server/databases/methods/mongodb';
-import { mysqlMethods } from '$lib/server/databases/methods/mysql';
-import { postgresqlMethods } from '$lib/server/databases/methods/postgresql';
-import { sqliteMethods } from '$lib/server/databases/methods/sqlite';
-import type { EngineMethods } from '$lib/types/engine';
+import type { ENGINES_META } from '#lib/common/engines-meta.ts';
+import { mongodbMethods } from '#lib/server/databases/methods/mongodb.ts';
+import { mysqlMethods } from '#lib/server/databases/methods/mysql.ts';
+import { postgresqlMethods } from '#lib/server/databases/methods/postgresql.ts';
+import { sqliteMethods } from '#lib/server/databases/methods/sqlite.ts';
+import type { EngineMethods } from '#lib/types/engine.ts';
 
 export const ENGINES_METHODS = {
     postgresql: postgresqlMethods,

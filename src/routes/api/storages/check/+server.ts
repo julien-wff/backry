@@ -1,12 +1,11 @@
-import { apiError, apiSuccess } from '$lib/server/api/responses';
-import { parseRequestBody } from '$lib/server/schemas';
-import { storagesCheckRequest, type StoragesCheckResponse } from '$lib/server/schemas/api';
-import { getRepositoryStats } from '$lib/server/services/restic';
-import { type CheckPathError, checkPathForCreate, type CheckPathResult } from '$lib/server/storages/checks';
-import type { ResticError } from '$lib/types/restic';
+import { apiError, apiSuccess } from '#lib/server/api/responses.ts';
+import { parseRequestBody } from '#lib/server/schemas/index.ts';
+import { storagesCheckRequest, type StoragesCheckResponse } from '#lib/server/schemas/api.ts';
+import { getRepositoryStats } from '#lib/server/services/restic.ts';
+import { type CheckPathError, checkPathForCreate, type CheckPathResult } from '#lib/server/storages/checks.ts';
+import type { ResticError } from '#lib/types/restic.ts';
 import { Result } from 'neverthrow';
 import type { RequestHandler } from './$types';
-
 
 export const POST: RequestHandler = async ({ request }) => {
     const body = await parseRequestBody(request, storagesCheckRequest);
@@ -19,7 +18,9 @@ export const POST: RequestHandler = async ({ request }) => {
     // If local: check if the path is valid
     let checkPathResult: Result<CheckPathResult, CheckPathError> | null = null;
     if (isLocal) {
-        checkPathResult = await checkPathForCreate(body.value.url.replace('local:', ''));
+        checkPathResult = await checkPathForCreate(
+            body.value.url.replace('local:', ''),
+        );
         if (checkPathResult.isErr()) {
             return apiSuccess<StoragesCheckResponse>({
                 error: checkPathResult.error.error,
@@ -43,7 +44,9 @@ export const POST: RequestHandler = async ({ request }) => {
 
     return apiSuccess<StoragesCheckResponse>({
         error: null,
-        newLocalUrl: checkPathResult?.value.path ? `local:${checkPathResult!.value.path}` : null,
+        newLocalUrl: checkPathResult?.value.path
+            ? `local:${checkPathResult!.value.path}`
+            : null,
         isLocalFolderEmptyEmpty: checkPathResult?.value.isEmpty ?? null,
         resticError,
     });

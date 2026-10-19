@@ -1,12 +1,12 @@
 <script lang="ts">
-    import Modal from '$lib/components/common/Modal.svelte';
-    import type { ModalControls } from '$lib/helpers/modal';
-    import RestoreRecap from '$lib/components/restores/RestoreRecap.svelte';
-    import { fetchApi } from '$lib/helpers/fetch';
-    import type { restoreRequest, RestoreResponse } from '$lib/server/schemas/api';
-    import { addToast } from '$lib/stores/toasts.svelte';
+    import Modal from '#lib/components/common/Modal.svelte';
+    import type { ModalControls } from '#lib/helpers/modal.ts';
+    import RestoreRecap from '#lib/components/restores/RestoreRecap.svelte';
+    import { fetchApi } from '#lib/helpers/fetch.ts';
+    import type { restoreRequest, RestoreResponse } from '#lib/server/schemas/api.ts';
+    import { addToast } from '#lib/stores/toasts.svelte.ts';
     import { goto } from '$app/navigation';
-    import type { backups, databases } from '$lib/server/db/schema';
+    import type { backups, databases } from '#lib/server/db/schema.ts';
 
     interface Props {
         controls: ModalControls | undefined;

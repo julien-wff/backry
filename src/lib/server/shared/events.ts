@@ -1,4 +1,4 @@
-import type { backups, restores } from '$lib/server/db/schema';
+import type { backups, restores } from '#lib/server/db/schema.ts';
 import { EventEmitter as BaseEventEmitter } from 'node:events';
 
 export class EventEmitter<TEvents extends Record<string, any>> {
@@ -31,9 +31,8 @@ export class EventEmitter<TEvents extends Record<string, any>> {
 }
 
 // Backups
-export type BackupUpdateEventPayload =
-    Partial<typeof backups.$inferSelect>
-    & Pick<typeof backups.$inferSelect, 'id'>;
+export type BackupUpdateEventPayload = Partial<typeof backups.$inferSelect> &
+    Pick<typeof backups.$inferSelect, 'id'>;
 
 export interface BackupEvents {
     update: [ BackupUpdateEventPayload ];
@@ -42,9 +41,8 @@ export interface BackupEvents {
 export const backupEmitter = new EventEmitter<BackupEvents>();
 
 // Restores
-export type RestoreUpdateEventPayload =
-    Partial<typeof restores.$inferSelect>
-    & Pick<typeof restores.$inferSelect, 'id'>;
+export type RestoreUpdateEventPayload = Partial<typeof restores.$inferSelect> &
+    Pick<typeof restores.$inferSelect, 'id'>;
 
 export interface RestoreEvents {
     update: [ RestoreUpdateEventPayload ];

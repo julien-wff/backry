@@ -1,15 +1,13 @@
-import { db } from '$lib/server/db';
-import { jobDatabases, jobs } from '$lib/server/db/schema';
-import type { JobRequest } from '$lib/server/schemas/api';
+import { db } from '#lib/server/db/index.ts';
+import { jobDatabases, jobs } from '#lib/server/db/schema.ts';
+import type { JobRequest } from '#lib/server/schemas/api.ts';
 import { and, eq, notInArray, or } from 'drizzle-orm';
 
 /**
  * Get all jobs with info about the storage and the databases to back up
  */
-export const jobsListFull = async () => db
-    .query
-    .jobs
-    .findMany({
+export const jobsListFull = async () =>
+    db.query.jobs.findMany({
         orderBy: (jobs, { asc }) => asc(jobs.name),
         with: {
             jobsDatabases: {
@@ -22,40 +20,34 @@ export const jobsListFull = async () => db
         },
     });
 
-
 /**
  * Get all jobs with limited info (ID, name and status)
  */
-export const jobListLimited = () => db.query.jobs.findMany({
-    orderBy: (jobs, { asc }) => asc(jobs.name),
-    columns: {
-        id: true,
-        name: true,
-        status: true,
-    },
-});
-
+export const jobListLimited = () =>
+    db.query.jobs.findMany({
+        orderBy: (jobs, { asc }) => asc(jobs.name),
+        columns: {
+            id: true,
+            name: true,
+            status: true,
+        },
+    });
 
 /**
  * Get all active and errored jobs to create CRON jobs.
  * Errors are included so they can be retried.
  */
-export const getJobsToRun = async () => db
-    .query
-    .jobs
-    .findMany({
+export const getJobsToRun = async () =>
+    db.query.jobs.findMany({
         where: or(eq(jobs.status, 'active'), eq(jobs.status, 'error')),
     });
-
 
 /**
  * Get a job with info about the storage and the databases to back up
  * @param id
  */
-export const getJob = async (id: number) => db
-    .query
-    .jobs
-    .findFirst({
+export const getJob = async (id: number) =>
+    db.query.jobs.findFirst({
         where: (jobs, { eq }) => eq(jobs.id, id),
         with: {
             jobsDatabases: {
@@ -107,11 +99,8 @@ export async function createJob(req: JobRequest) {
  * @param id Job ID
  * @returns Deleted job, or null if not found
  */
-export const deleteJob = async (id: number) => db
-    .delete(jobs)
-    .where(eq(jobs.id, id))
-    .returning()
-    .get();
+export const deleteJob = async (id: number) =>
+    db.delete(jobs).where(eq(jobs.id, id)).returning().get();
 
 /**
  * Update a job and its databases to back up
@@ -135,14 +124,16 @@ export const updateJob = async (id: number, job: JobRequest) => {
         return null;
     }
 
-    const providedDatabaseIds = job.databases.map(db => db.id);
+    const providedDatabaseIds = job.databases.map((db) => db.id);
 
     await db
         .delete(jobDatabases)
-        .where(and(
-            eq(jobDatabases.jobId, id),
-            notInArray(jobDatabases.databaseId, providedDatabaseIds),
-        ))
+        .where(
+            and(
+                eq(jobDatabases.jobId, id),
+                notInArray(jobDatabases.databaseId, providedDatabaseIds),
+            ),
+        )
         .execute();
 
     await Promise.all(
@@ -170,10 +161,7 @@ export const updateJob = async (id: number, job: JobRequest) => {
     return updatedJob;
 };
 
-
-export const updateJobStatus = async (id: number, status: 'active' | 'inactive') => db
-    .update(jobs)
-    .set({ status })
-    .where(eq(jobs.id, id))
-    .returning()
-    .get();
+export const updateJobStatus = async (
+    id: number,
+    status: 'active' | 'inactive',
+) => db.update(jobs).set({ status }).where(eq(jobs.id, id)).returning().get();

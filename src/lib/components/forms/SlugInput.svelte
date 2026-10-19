@@ -1,6 +1,7 @@
 <script lang="ts">
-    import InputContainer from '$lib/components/forms/InputContainer.svelte';
-    import { slugify } from '$lib/helpers/format';
+    import { untrack } from 'svelte';
+    import InputContainer from '#lib/components/forms/InputContainer.svelte';
+    import { slugify } from '#lib/helpers/format.ts';
 
     interface Props {
         slug: string;
@@ -11,7 +12,7 @@
 
     let { slug = $bindable(), baseValue, disabled, source }: Props = $props();
 
-    let oldBaseValue = $state(baseValue);
+    let oldBaseValue = $state(untrack(() => baseValue));
     $effect(() => updateSlug(baseValue));
 
     function updateSlug(_: string) {

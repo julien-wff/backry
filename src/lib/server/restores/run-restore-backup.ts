@@ -1,16 +1,20 @@
-import type { getBackup } from '$lib/server/queries/backups';
-import { DATABASE_ENGINES, restores } from '$lib/server/db/schema';
-import { logger } from '$lib/server/services/logger';
-import { listSnapshotFiles, pipeFileContentToCommand } from '$lib/server/services/restic';
+import type { getBackup } from '#lib/server/queries/backups.ts';
+import { DATABASE_ENGINES, restores } from '#lib/server/db/schema.ts';
+import { logger } from '#lib/server/services/logger.ts';
+import { listSnapshotFiles, pipeFileContentToCommand } from '#lib/server/services/restic.ts';
 import { err, ok, type Result } from 'neverthrow';
-import { createRestore, setRestoreToFinished, updateRestore as updateRestoreDb } from '$lib/server/queries/restores';
-import { ENGINES_METHODS } from '$lib/server/databases/engines-methods';
-import type { RESTORE_DESTINATION } from '$lib/common/constants';
-import { restoreEmitter } from '$lib/server/shared/events';
+import {
+    createRestore,
+    setRestoreToFinished,
+    updateRestore as updateRestoreDb,
+} from '#lib/server/queries/restores.ts';
+import { ENGINES_METHODS } from '#lib/server/databases/engines-methods.ts';
+import type { RESTORE_DESTINATION } from '#lib/common/constants.ts';
+import { restoreEmitter } from '#lib/server/shared/events.ts';
 
 interface RunRestoreBackupArgs {
     backup: NonNullable<Awaited<ReturnType<typeof getBackup>>>;
-    selectedDestination: typeof RESTORE_DESTINATION[number];
+    selectedDestination: (typeof RESTORE_DESTINATION)[number];
     otherConnectionString?: string | null;
     dropDatabase: boolean;
     onRestoreCreated?: (restore: typeof restores.$inferSelect) => void;
@@ -22,7 +26,10 @@ interface RunRestoreBackupArgs {
  * @param payload Partial restore data to update
  * @returns Updated restore from DB
  */
-function updateRestore(id: number, payload: Partial<typeof restores.$inferSelect>) {
+function updateRestore(
+    id: number,
+    payload: Partial<typeof restores.$inferSelect>,
+) {
     restoreEmitter.emit('update', { id, ...payload });
     return updateRestoreDb(id, payload);
 }
@@ -56,7 +63,8 @@ export async function runRestoreBackup({
                                            dropDatabase,
                                            onRestoreCreated,
                                        }: RunRestoreBackupArgs): Promise<Result<void, string>> {
-    const connectionString = otherConnectionString ?? backup.jobDatabase.database.connectionString;
+    const connectionString =
+        otherConnectionString ?? backup.jobDatabase.database.connectionString;
     const restore = createRestore({
         backupId: backup.id,
         connectionString,
@@ -67,7 +75,9 @@ export async function runRestoreBackup({
 
     const engineMethods = ENGINES_METHODS[backup.jobDatabase.database.engine];
 
-    logger.info(`Starting restore #${restore.id} of backup #${backup.id} to ${selectedDestination} database...`);
+    logger.info(
+        `Starting restore #${restore.id} of backup #${backup.id} to ${selectedDestination} database...`,
+    );
 
     // ENSURE SNAPSHOT FILE EXISTS
 
@@ -76,64 +86,111 @@ export async function runRestoreBackup({
         return restoreFailed(restore, 'Backup is missing snapshotId or fileName');
     }
 
-    const repoFiles = await listSnapshotFiles(storage.url, storage.password!, storage.env, backup.snapshotId);
+    const repoFiles = await listSnapshotFiles(
+        storage.url,
+        storage.password!,
+        storage.env,
+        backup.snapshotId,
+    );
     if (repoFiles.isErr()) {
-        return restoreFailed(restore, `Failed to list snapshot files: ${repoFiles.error.message}`);
+        return restoreFailed(
+            restore,
+            `Failed to list snapshot files: ${repoFiles.error.message}`,
+        );
     }
 
     const isFilePresentInRepo = repoFiles.value.some(
-        f => 'message_type' in f
-            && f.message_type === 'node'
-            && f.type === 'file'
-            && f.name === backup.fileName,
+        (f) =>
+            'message_type' in f &&
+            f.message_type === 'node' &&
+            f.type === 'file' &&
+            f.name === backup.fileName,
     );
 
     if (!isFilePresentInRepo) {
-        return restoreFailed(restore, `Snapshot ${backup.fileName} file not found in storage`);
+        return restoreFailed(
+            restore,
+            `Snapshot ${backup.fileName} file not found in storage`,
+        );
     }
 
-    logger.info(`Snapshot file ${backup.fileName} verified for backup #${backup.id}`);
+    logger.info(
+        `Snapshot file ${backup.fileName} verified for backup #${backup.id}`,
+    );
 
     // CHECK DESTINATION DB
 
     updateRestore(restore.id, { currentStep: 'check_destination' });
 
     const dbCheckResult = await engineMethods.checkConnection(connectionString);
-    if (dbCheckResult.isErr() && !ignoreDbPingError(backup.jobDatabase.database.engine, dbCheckResult.error, dropDatabase)) {
-        return restoreFailed(restore, `Failed to connect to destination database: ${dbCheckResult.error}`);
+    if (
+        dbCheckResult.isErr() &&
+        !ignoreDbPingError(
+            backup.jobDatabase.database.engine,
+            dbCheckResult.error,
+            dropDatabase,
+        )
+    ) {
+        return restoreFailed(
+            restore,
+            `Failed to connect to destination database: ${dbCheckResult.error}`,
+        );
     }
 
-    logger.info(`Connection to destination database verified for restore #${restore.id}`);
+    logger.info(
+        `Connection to destination database verified for restore #${restore.id}`,
+    );
 
     // DROP AND RECREATE DATABASE
 
     if (dropDatabase) {
         updateRestore(restore.id, { currentStep: 'drop_db' });
-        if (!('recreateDatabase' in engineMethods) || !engineMethods.recreateDatabase) {
-            return restoreFailed(restore, `Engine "${backup.jobDatabase.database.engine}" does not support dropping and recreating databases`);
+        if (
+            !('recreateDatabase' in engineMethods) ||
+            !engineMethods.recreateDatabase
+        ) {
+            return restoreFailed(
+                restore,
+                `Engine "${backup.jobDatabase.database.engine}" does not support dropping and recreating databases`,
+            );
         }
 
-        logger.info(`Dropping and recreating destination database for restore #${restore.id}...`);
+        logger.info(
+            `Dropping and recreating destination database for restore #${restore.id}...`,
+        );
 
         const dropResult = await engineMethods.recreateDatabase?.(connectionString);
         if (dropResult?.isErr()) {
-            return restoreFailed(restore, `Failed to drop and recreate database: ${dropResult.error}`);
+            return restoreFailed(
+                restore,
+                `Failed to drop and recreate database: ${dropResult.error}`,
+            );
         }
-        logger.info(`Destination database dropped and recreated for restore #${restore.id}`);
+        logger.info(
+            `Destination database dropped and recreated for restore #${restore.id}`,
+        );
     }
 
     // RUN RESTORE
 
     updateRestore(restore.id, { currentStep: 'restore' });
-    if (!('getRestoreBackupFromStdinCommand' in engineMethods) || !engineMethods.getRestoreBackupFromStdinCommand) {
-        return restoreFailed(restore, `Engine "${backup.jobDatabase.database.engine}" does not support restoring from stdin`);
+    if (
+        !('getRestoreBackupFromStdinCommand' in engineMethods) ||
+        !engineMethods.getRestoreBackupFromStdinCommand
+    ) {
+        return restoreFailed(
+            restore,
+            `Engine "${backup.jobDatabase.database.engine}" does not support restoring from stdin`,
+        );
     }
 
     logger.info(`Running restore command for restore #${restore.id}...`);
 
-    const restoreEnv: Record<string, string> = 'getRestoreEnv' in engineMethods && typeof engineMethods.getRestoreEnv === 'function'
-        ? engineMethods.getRestoreEnv(connectionString)
-        : {};
+    const restoreEnv: Record<string, string> =
+        'getRestoreEnv' in engineMethods &&
+        typeof engineMethods.getRestoreEnv === 'function'
+            ? engineMethods.getRestoreEnv(connectionString)
+            : {};
 
     const restoreRes = await pipeFileContentToCommand(
         storage.url,
@@ -141,13 +198,21 @@ export async function runRestoreBackup({
         { ...storage.env, ...restoreEnv },
         backup.snapshotId!,
         backup.fileName,
-        engineMethods.getRestoreBackupFromStdinCommand(connectionString, dropDatabase),
+        engineMethods.getRestoreBackupFromStdinCommand(
+            connectionString,
+            dropDatabase,
+        ),
     );
     if (restoreRes.isErr()) {
-        return restoreFailed(restore, `Failed to restore backup: ${restoreRes.error.message}`);
+        return restoreFailed(
+            restore,
+            `Failed to restore backup: ${restoreRes.error.message}`,
+        );
     }
 
-    logger.info(`Restore command completed for restore #${restore.id}, checking result...`);
+    logger.info(
+        `Restore command completed for restore #${restore.id}, checking result...`,
+    );
 
     // DONE
 
@@ -166,9 +231,17 @@ export async function runRestoreBackup({
  * @param recreateDb Whether we plan to recreate the database
  * @returns True if the error can be ignored, false otherwise
  */
-function ignoreDbPingError(engine: typeof DATABASE_ENGINES[number], error: string, recreateDb: boolean) {
+function ignoreDbPingError(
+    engine: (typeof DATABASE_ENGINES)[number],
+    error: string,
+    recreateDb: boolean,
+) {
     // For PostgreSQL, ignore "database does not exist" error if we plan to recreate it
-    if (engine === 'postgresql' && recreateDb && error.match(/database ".+" does not exist/)) {
+    if (
+        engine === 'postgresql' &&
+        recreateDb &&
+        error.match(/database ".+" does not exist/)
+    ) {
         return true;
     }
 

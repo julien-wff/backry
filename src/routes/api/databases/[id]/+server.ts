@@ -1,9 +1,8 @@
-import { apiError, apiSuccess } from '$lib/server/api/responses';
-import { deleteDatabase, updateDatabase } from '$lib/server/queries/databases';
-import { parseRequestBody } from '$lib/server/schemas';
-import { databaseRequest, type DatabaseResponse } from '$lib/server/schemas/api';
+import { apiError, apiSuccess } from '#lib/server/api/responses.ts';
+import { deleteDatabase, updateDatabase } from '#lib/server/queries/databases.ts';
+import { parseRequestBody } from '#lib/server/schemas/index.ts';
+import { databaseRequest, type DatabaseResponse } from '#lib/server/schemas/api.ts';
 import type { RequestHandler } from './$types';
-
 
 export const PUT: RequestHandler = async ({ params, request }) => {
     const databaseId = parseInt(params.id);
@@ -23,7 +22,6 @@ export const PUT: RequestHandler = async ({ params, request }) => {
 
     return apiSuccess<DatabaseResponse>(updatedDatabase);
 };
-
 
 export const DELETE: RequestHandler = async ({ params }) => {
     const databaseId = parseInt(params.id);

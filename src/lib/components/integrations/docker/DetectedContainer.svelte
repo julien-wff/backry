@@ -1,18 +1,18 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
-    import Modal from '$lib/components/common/Modal.svelte';
-    import { CircleArrowRight, CirclePlus, OctagonAlert } from '$lib/components/icons';
-    import { fetchApi } from '$lib/helpers/fetch';
-    import type { DATABASE_ENGINES } from '$lib/server/db/schema';
+    import Modal from '#lib/components/common/Modal.svelte';
+    import { CircleArrowRight, CirclePlus, OctagonAlert } from '#lib/components/icons.ts';
+    import { fetchApi } from '#lib/helpers/fetch.ts';
+    import type { DATABASE_ENGINES } from '#lib/server/db/schema.ts';
     import {
         type dockerConnectionStringRequest,
         type DockerConnectionStringResponse,
         type DockerHostnamesCheckResponse,
-    } from '$lib/server/schemas/api';
-    import type { processContainerForClient, processImageForClient } from '$lib/server/services/docker';
-    import type { ModalControls } from '$lib/helpers/modal';
-    import { capitalizeFirstLetter } from '$lib/helpers/format';
-    import type { getDatabasesWithContainer } from '$lib/server/queries/databases';
+    } from '#lib/server/schemas/api.ts';
+    import type { processContainerForClient, processImageForClient } from '#lib/server/services/docker.ts';
+    import type { ModalControls } from '#lib/helpers/modal.ts';
+    import { capitalizeFirstLetter } from '#lib/helpers/format.ts';
+    import type { getDatabasesWithContainer } from '#lib/server/queries/databases.ts';
 
     interface Props {
         container: ReturnType<typeof processContainerForClient>;

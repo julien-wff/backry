@@ -1,4 +1,4 @@
-import { getSettings } from '$lib/server/settings/settings';
+import { getSettings } from '#lib/server/settings/settings.ts';
 import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
 

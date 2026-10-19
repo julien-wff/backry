@@ -1,11 +1,11 @@
 <script lang="ts">
     import { page } from '$app/state';
-    import { ChevronLeft, Funnel, type IconType, ListCheck, Plus } from '$lib/components/icons';
+    import { ChevronLeft, Funnel, type IconType, ListCheck, Plus } from '#lib/components/icons.ts';
     import type { Snippet } from 'svelte';
 
     interface Props {
         children: Snippet;
-        icon: typeof IconType;
+        icon: IconType;
         buttonType?: null | 'back' | 'new' | 'all';
         buttonText?: string;
         secondaryButtonType?: null | 'filter';

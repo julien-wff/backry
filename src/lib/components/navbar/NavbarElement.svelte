@@ -1,9 +1,9 @@
 <script lang="ts">
     import { page } from '$app/state';
-    import { type IconType } from '$lib/components/icons';
+    import { type IconType } from '#lib/components/icons.ts';
 
     interface Props {
-        icon: typeof IconType;
+        icon: IconType;
         label: string;
         href: string;
         hasError?: boolean;

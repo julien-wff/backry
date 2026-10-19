@@ -1,7 +1,7 @@
-import { apiError, apiSuccess } from '$lib/server/api/responses';
-import { createDatabase } from '$lib/server/queries/databases';
-import { parseRequestBody } from '$lib/server/schemas';
-import { databaseRequest, type DatabaseResponse } from '$lib/server/schemas/api';
+import { apiError, apiSuccess } from '#lib/server/api/responses.ts';
+import { createDatabase } from '#lib/server/queries/databases.ts';
+import { parseRequestBody } from '#lib/server/schemas/index.ts';
+import { databaseRequest, type DatabaseResponse } from '#lib/server/schemas/api.ts';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request }) => {

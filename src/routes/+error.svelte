@@ -1,6 +1,6 @@
 <script lang="ts">
     import { page } from '$app/state';
-    import Head from '$lib/components/common/Head.svelte';
+    import Head from '#lib/components/common/Head.svelte';
 </script>
 
 <Head title={page.error?.message}/>

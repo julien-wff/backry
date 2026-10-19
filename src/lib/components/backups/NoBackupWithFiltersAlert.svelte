@@ -1,6 +1,6 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
-    import { Funnel } from '$lib/components/icons';
+    import { Funnel } from '#lib/components/icons.ts';
 
     interface Props {
         filterCount: number;
@@ -9,7 +9,7 @@
     let { filterCount }: Props = $props();
 
     function resetFilters() {
-        goto(`?`, { invalidateAll: true, replaceState: true });
+        goto(`?`, { refreshAll: true, replace: true });
     }
 </script>
 

@@ -1,8 +1,8 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
     import { page } from '$app/state';
-    import { ENGINE_META_ENTRIES } from '$lib/common/engines-meta';
-    import InputContainer from '$lib/components/forms/InputContainer.svelte';
+    import { ENGINE_META_ENTRIES } from '#lib/common/engines-meta.ts';
+    import InputContainer from '#lib/components/forms/InputContainer.svelte';
 
     let enginesFilter = $state(page.url.searchParams.get('engines')?.split(',') ?? []);
     let areAllEnginesSelected = $derived(enginesFilter.length === 0 || enginesFilter.length === ENGINE_META_ENTRIES.length);
@@ -16,14 +16,14 @@
     }
 
     function applyFilters() {
-        const params = new URLSearchParams(page.url.searchParams);
+        const params = new URLSearchParams(page.url.search);
         if (enginesFilter.length > 0) {
             params.set('engines', enginesFilter.join(','));
         } else {
             params.delete('engines');
         }
 
-        goto(`?${params.toString()}`, { invalidateAll: true });
+        goto(`?${params.toString()}`, { refreshAll: true });
     }
 
     function resetFilters() {
@@ -34,7 +34,7 @@
 
 <InputContainer label="Engines ({areAllEnginesSelected ? 'all' : enginesFilter.length})">
     <div class="flex gap-2">
-        {#each ENGINE_META_ENTRIES as [engineId, engine] (engineId)}
+        {#each ENGINE_META_ENTRIES as [ engineId, engine ] (engineId)}
             <button class="w-32 gap-2 px-4 py-2 flex flex-col items-center bg-base-300 justify-center rounded-lg cursor-pointer border-2"
                     class:border-primary={enginesFilter.includes(engineId)}
                     class:border-transparent={!enginesFilter.includes(engineId)}

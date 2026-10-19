@@ -1,6 +1,6 @@
-import { getErrorCountPerType, getWarningCountPerType } from '$lib/server/queries/shared';
-import { getSettings } from '$lib/server/settings/settings';
-import { areToolChecksSuccessful } from '$lib/server/shared/tool-checks';
+import { getErrorCountPerType, getWarningCountPerType } from '#lib/server/queries/shared.ts';
+import { getSettings } from '#lib/server/settings/settings.ts';
+import { areToolChecksSuccessful } from '#lib/server/shared/tool-checks.ts';
 import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
 

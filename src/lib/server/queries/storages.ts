@@ -1,6 +1,6 @@
-import { db } from '$lib/server/db';
-import { jobs, storages } from '$lib/server/db/schema';
-import type { StorageRequest } from '$lib/server/schemas/api';
+import { db } from '#lib/server/db/index.ts';
+import { jobs, storages } from '#lib/server/db/schema.ts';
+import type { StorageRequest } from '#lib/server/schemas/api.ts';
 import { count, eq } from 'drizzle-orm';
 
 /**
@@ -15,34 +15,25 @@ export const storagesList = () =>
  * @return Storage or null if not found.
  */
 export const getStorage = (id: number) =>
-    db
-        .select()
-        .from(storages)
-        .where(eq(storages.id, id))
-        .get();
+    db.select().from(storages).where(eq(storages.id, id)).get();
 
 /**
  * Creates a new storage from an HTTP request.
  * @param storage Fields from request body.
  */
-export const createStorage = (storage: StorageRequest) => db
-    .insert(storages)
-    .values(storage)
-    .returning()
-    .get();
+export const createStorage = (storage: StorageRequest) =>
+    db.insert(storages).values(storage).returning().get();
 
 /**
  * Updates a storage by ID.
  * @param id Storage ID.
  * @param storage Fields from request body.
  */
-export const updateStorage = (id: number, storage: Partial<typeof storages.$inferInsert>) =>
-    db
-        .update(storages)
-        .set(storage)
-        .where(eq(storages.id, id))
-        .returning()
-        .get();
+export const updateStorage = (
+    id: number,
+    storage: Partial<typeof storages.$inferInsert>,
+) =>
+    db.update(storages).set(storage).where(eq(storages.id, id)).returning().get();
 
 /**
  * Deletes a storage by ID.
@@ -50,20 +41,17 @@ export const updateStorage = (id: number, storage: Partial<typeof storages.$infe
  * @return Deleted storage or null if not found.
  */
 export const deleteStorage = (id: number) =>
-    db
-        .delete(storages)
-        .where(eq(storages.id, id))
-        .returning()
-        .get();
+    db.delete(storages).where(eq(storages.id, id)).returning().get();
 
 /**
  * Checks by how many jobs a storage is used.
  * @param id Storage ID.
  * @return Promise resolving to the count of jobs using the storage.
  */
-export const storageUseCount = (id: number) => db
-    .select({ count: count() })
-    .from(jobs)
-    .where(eq(jobs.storageId, id))
-    .execute()
-    .then(rows => rows[0]?.count ?? 0);
+export const storageUseCount = (id: number) =>
+    db
+        .select({ count: count() })
+        .from(jobs)
+        .where(eq(jobs.storageId, id))
+        .execute()
+        .then((rows) => rows[0]?.count ?? 0);

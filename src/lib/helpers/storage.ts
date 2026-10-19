@@ -1,4 +1,4 @@
-import type { ResticLock } from '$lib/types/restic';
+import type { ResticLock } from '#lib/types/restic.ts';
 import dayjs from 'dayjs';
 
 /**
@@ -7,4 +7,4 @@ import dayjs from 'dayjs';
  * @return The count of stale locks.
  */
 export const staleLocksCount = (locks: ResticLock[]) =>
-    locks.filter(lock => dayjs(lock.time).add(30, 'minutes').isBefore()).length;
+    locks.filter((lock) => dayjs(lock.time).add(30, 'minutes').isBefore()).length;

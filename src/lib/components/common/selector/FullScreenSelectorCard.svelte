@@ -1,11 +1,11 @@
 <script lang="ts">
     import { page } from '$app/state';
-    import { type IconType } from '$lib/components/icons';
+    import { type IconType } from '#lib/components/icons.ts';
     import type { Snippet } from 'svelte';
 
     interface Props {
         children: Snippet;
-        icon: typeof IconType | string;
+        icon: IconType | string;
         href: string;
         error?: boolean;
     }

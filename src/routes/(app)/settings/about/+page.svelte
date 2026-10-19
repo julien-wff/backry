@@ -1,9 +1,9 @@
 <script>
-    import { PUBLIC_BUILD_DATE, PUBLIC_VCS_REF, PUBLIC_VERSION } from '$env/static/public';
-    import Head from '$lib/components/common/Head.svelte';
-    import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
-    import { Settings } from '$lib/components/icons.js';
-    import { formatUtcDate } from '$lib/helpers/format.js';
+    import { PUBLIC_BUILD_DATE, PUBLIC_VCS_REF, PUBLIC_VERSION } from '$app/env/public';
+    import Head from '#lib/components/common/Head.svelte';
+    import PageContentHeader from '#lib/components/common/PageContentHeader.svelte';
+    import { Settings } from '#lib/components/icons.ts';
+    import { formatUtcDate } from '#lib/helpers/format.ts';
 </script>
 
 <Head title="Settings - Tools info"/>

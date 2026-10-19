@@ -1,5 +1,5 @@
-import { db } from '$lib/server/db';
-import { DATABASE_ENGINES, databases } from '$lib/server/db/schema';
+import { db } from '#lib/server/db/index.ts';
+import { DATABASE_ENGINES, databases } from '#lib/server/db/schema.ts';
 import { count, eq, inArray, isNotNull } from 'drizzle-orm';
 
 /**
@@ -12,7 +12,9 @@ export const databasesList = () =>
  * Fetches a complete list of all databases with all fields, according to filters.
  * Also grabs associated jobs.
  */
-export const databasesListExtendedFiltered = (engines: typeof DATABASE_ENGINES[number][]) =>
+export const databasesListExtendedFiltered = (
+    engines: (typeof DATABASE_ENGINES)[number][],
+) =>
     db.query.databases.findMany({
         orderBy: (databases, { asc }) => asc(databases.name),
         where: inArray(databases.engine, engines),
@@ -63,7 +65,10 @@ export const createDatabase = (values: typeof databases.$inferInsert) =>
  * @param values The new values to update the database with.
  * @returns The updated database record, or null if not found.
  */
-export const updateDatabase = (id: number, values: typeof databases.$inferInsert) =>
+export const updateDatabase = (
+    id: number,
+    values: typeof databases.$inferInsert,
+) =>
     db
         .update(databases)
         .set(values)
@@ -83,8 +88,13 @@ export const deleteDatabase = (id: number) =>
  * Get databases that have a container name set (linked to a Docker container).
  * @returns A list of databases with their ID, name, and container name.
  */
-export const getDatabasesWithContainer = () => db
-    .select({ id: databases.id, name: databases.name, containerName: databases.containerName })
-    .from(databases)
-    .where(isNotNull(databases.containerName))
-    .execute();
+export const getDatabasesWithContainer = () =>
+    db
+        .select({
+            id: databases.id,
+            name: databases.name,
+            containerName: databases.containerName,
+        })
+        .from(databases)
+        .where(isNotNull(databases.containerName))
+        .execute();

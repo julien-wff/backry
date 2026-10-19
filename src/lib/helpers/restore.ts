@@ -1,13 +1,19 @@
-import type { restores } from '$lib/server/db/schema';
-import { RESTORE_STEPS } from '$lib/common/constants';
+import type { restores } from '#lib/server/db/schema.ts';
+import { RESTORE_STEPS } from '#lib/common/constants.ts';
 
-export function getRestoreStepStatus(restore: typeof restores.$inferSelect, step: typeof RESTORE_STEPS[number]) {
+export function getRestoreStepStatus(
+    restore: typeof restores.$inferSelect,
+    step: (typeof RESTORE_STEPS)[number],
+) {
     const currentIndex = RESTORE_STEPS.indexOf(restore.currentStep);
     const stepIndex = RESTORE_STEPS.indexOf(step);
     const isError = !!restore.error;
     const isFinished = !!restore.finishedAt;
 
-    if (stepIndex < currentIndex || (stepIndex === currentIndex && !isError && isFinished)) {
+    if (
+        stepIndex < currentIndex ||
+        (stepIndex === currentIndex && !isError && isFinished)
+    ) {
         return 'completed';
     } else if (stepIndex === currentIndex) {
         if (isError) {

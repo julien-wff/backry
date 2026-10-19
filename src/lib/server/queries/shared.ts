@@ -1,7 +1,7 @@
-import { formatSize } from '$lib/helpers/format';
-import { db } from '$lib/server/db';
-import { backups, databases, jobs, notifications, storages } from '$lib/server/db/schema';
-import type { getNextJobs } from '$lib/server/shared/cron';
+import { formatSize } from '#lib/helpers/format.ts';
+import { db } from '#lib/server/db/index.ts';
+import { backups, databases, jobs, notifications, storages } from '#lib/server/db/schema.ts';
+import type { getNextJobs } from '#lib/server/shared/cron.ts';
 import { avg, count, desc, eq, inArray, isNotNull, sum } from 'drizzle-orm';
 
 /**
@@ -9,12 +9,25 @@ import { avg, count, desc, eq, inArray, isNotNull, sum } from 'drizzle-orm';
  * @returns Error count per type.
  */
 export async function getErrorCountPerType() {
-    const [ errorDbs, errorStorages, errorBackups, errorNotifications ] = await Promise.all([
-        db.select({ id: databases.id }).from(databases).where(eq(databases.status, 'error')),
-        db.select({ id: storages.id }).from(storages).where(eq(storages.status, 'error')),
-        db.select({ id: backups.id }).from(backups).where(isNotNull(backups.error)),
-        db.select({ id: notifications.id }).from(notifications).where(eq(notifications.status, 'error')),
-    ]);
+    const [ errorDbs, errorStorages, errorBackups, errorNotifications ] =
+        await Promise.all([
+            db
+                .select({ id: databases.id })
+                .from(databases)
+                .where(eq(databases.status, 'error')),
+            db
+                .select({ id: storages.id })
+                .from(storages)
+                .where(eq(storages.status, 'error')),
+            db
+                .select({ id: backups.id })
+                .from(backups)
+                .where(isNotNull(backups.error)),
+            db
+                .select({ id: notifications.id })
+                .from(notifications)
+                .where(eq(notifications.status, 'error')),
+        ]);
 
     return {
         databases: errorDbs.length,
@@ -30,7 +43,10 @@ export async function getErrorCountPerType() {
  */
 export async function getWarningCountPerType() {
     const [ warningStorages ] = await Promise.all([
-        db.select({ id: storages.id }).from(storages).where(eq(storages.status, 'unhealthy')),
+        db
+            .select({ id: storages.id })
+            .from(storages)
+            .where(eq(storages.status, 'unhealthy')),
     ]);
 
     return {
@@ -38,9 +54,20 @@ export async function getWarningCountPerType() {
     };
 }
 
-
-export async function getDashboardStats(nextJobParams: ReturnType<typeof getNextJobs> = []) {
-    const [ dbStats, storageStats, jobsCount, latestBackups, nextJobs, backupsCount, totalStorageSize, avgBackupSize, avgBackupDuration ] = await Promise.all([
+export async function getDashboardStats(
+    nextJobParams: ReturnType<typeof getNextJobs> = [],
+) {
+    const [
+        dbStats,
+        storageStats,
+        jobsCount,
+        latestBackups,
+        nextJobs,
+        backupsCount,
+        totalStorageSize,
+        avgBackupSize,
+        avgBackupDuration,
+    ] = await Promise.all([
         // Databases stats (active, error)
         db.select({ id: databases.id, status: databases.status }).from(databases),
         // Storages stats (active, error)
@@ -75,7 +102,10 @@ export async function getDashboardStats(nextJobParams: ReturnType<typeof getNext
         }),
         // Next jobs
         db.query.jobs.findMany({
-            where: inArray(jobs.id, nextJobParams.map(j => j.jobId)),
+            where: inArray(
+                jobs.id,
+                nextJobParams.map((j) => j.jobId),
+            ),
             columns: { id: true, name: true },
             with: {
                 jobsDatabases: {
@@ -91,31 +121,41 @@ export async function getDashboardStats(nextJobParams: ReturnType<typeof getNext
         // Total storage size
         db.select({ size: sum(storages.diskSize) }).from(storages),
         // Average dump size
-        db.select({ size: avg(backups.dumpSize) }).from(backups).where(isNotNull(backups.dumpSize)),
+        db
+            .select({ size: avg(backups.dumpSize) })
+            .from(backups)
+            .where(isNotNull(backups.dumpSize)),
         // Average backup duration
-        db.select({ duration: avg(backups.duration) }).from(backups).where(isNotNull(backups.duration)),
+        db
+            .select({ duration: avg(backups.duration) })
+            .from(backups)
+            .where(isNotNull(backups.duration)),
     ]);
 
     return {
         databases: {
             total: dbStats.length,
-            active: dbStats.filter(db => db.status === 'active').length,
-            error: dbStats.filter(db => db.status === 'error').length,
+            active: dbStats.filter((db) => db.status === 'active').length,
+            error: dbStats.filter((db) => db.status === 'error').length,
         },
         storages: {
             total: storageStats.length,
-            active: storageStats.filter(storage => storage.status === 'active').length,
-            error: storageStats.filter(storage => storage.status === 'error').length,
-            unhealthy: storageStats.filter(storage => storage.status === 'unhealthy').length,
+            active: storageStats.filter((storage) => storage.status === 'active')
+                .length,
+            error: storageStats.filter((storage) => storage.status === 'error')
+                .length,
+            unhealthy: storageStats.filter(
+                (storage) => storage.status === 'unhealthy',
+            ).length,
         },
         jobs: {
             total: jobsCount.length,
-            active: jobsCount.filter(job => job.status === 'active').length,
-            inactive: jobsCount.filter(job => job.status === 'inactive').length,
+            active: jobsCount.filter((job) => job.status === 'active').length,
+            inactive: jobsCount.filter((job) => job.status === 'inactive').length,
         },
         latestBackups,
         nextJobs: nextJobParams.map(({ jobId, date: nextDate }) => ({
-            ...nextJobs.find(j => j.id === jobId),
+            ...nextJobs.find((j) => j.id === jobId),
             nextDate,
         })),
         backupsCount: backupsCount[0]?.count ?? 0,
@@ -129,36 +169,56 @@ export async function getDashboardStats(nextJobParams: ReturnType<typeof getNext
  * Get statistics that are exposed on the API, used for things like Homepage
  */
 export async function getApiStats() {
-    const [ backupsStats, jobsStats, databasesStats, storagesStats, diskStats ] = await Promise.all([
-        db.query.backups.findMany({
-            columns: {
-                error: true,
-                prunedAt: true,
-                finishedAt: true,
-            },
-        }),
-        db.select({ status: jobs.status, count: count() }).from(jobs).groupBy(jobs.status),
-        db.select({ status: databases.status, count: count() }).from(databases).groupBy(databases.status),
-        db.select({ status: storages.status, count: count() }).from(storages).groupBy(storages.status),
-        db.select({ diskSizeTotal: sum(storages.diskSize) }).from(storages),
-    ]);
+    const [ backupsStats, jobsStats, databasesStats, storagesStats, diskStats ] =
+        await Promise.all([
+            db.query.backups.findMany({
+                columns: {
+                    error: true,
+                    prunedAt: true,
+                    finishedAt: true,
+                },
+            }),
+            db
+                .select({ status: jobs.status, count: count() })
+                .from(jobs)
+                .groupBy(jobs.status),
+            db
+                .select({ status: databases.status, count: count() })
+                .from(databases)
+                .groupBy(databases.status),
+            db
+                .select({ status: storages.status, count: count() })
+                .from(storages)
+                .groupBy(storages.status),
+            db.select({ diskSizeTotal: sum(storages.diskSize) }).from(storages),
+        ]);
 
     return {
-        backupsError: backupsStats.filter(b => b.error).length,
-        backupsPruned: backupsStats.filter(b => !b.error && b.prunedAt).length,
-        backupsSuccess: backupsStats.filter(b => !b.error && !b.prunedAt && b.finishedAt).length,
-        backupsRunning: backupsStats.filter(b => !b.error && !b.prunedAt && !b.finishedAt).length,
+        backupsError: backupsStats.filter((b) => b.error).length,
+        backupsPruned: backupsStats.filter((b) => !b.error && b.prunedAt).length,
+        backupsSuccess: backupsStats.filter(
+            (b) => !b.error && !b.prunedAt && b.finishedAt,
+        ).length,
+        backupsRunning: backupsStats.filter(
+            (b) => !b.error && !b.prunedAt && !b.finishedAt,
+        ).length,
         backupsTotal: backupsStats.length,
-        jobsActive: jobsStats.find(j => j.status === 'active')?.count ?? 0,
+        jobsActive: jobsStats.find((j) => j.status === 'active')?.count ?? 0,
         jobsTotal: jobsStats.reduce((acc, j) => acc + j.count, 0),
-        databasesActive: databasesStats.find(d => d.status === 'active')?.count ?? 0,
-        databasesError: databasesStats.find(d => d.status === 'error')?.count ?? 0,
+        databasesActive:
+            databasesStats.find((d) => d.status === 'active')?.count ?? 0,
+        databasesError:
+            databasesStats.find((d) => d.status === 'error')?.count ?? 0,
         databasesTotal: databasesStats.reduce((acc, d) => acc + d.count, 0),
-        storagesActive: storagesStats.find(s => s.status === 'active')?.count ?? 0,
-        storagesError: storagesStats.find(s => s.status === 'error')?.count ?? 0,
-        storagesUnhealthy: storagesStats.find(s => s.status === 'unhealthy')?.count ?? 0,
+        storagesActive:
+            storagesStats.find((s) => s.status === 'active')?.count ?? 0,
+        storagesError: storagesStats.find((s) => s.status === 'error')?.count ?? 0,
+        storagesUnhealthy:
+            storagesStats.find((s) => s.status === 'unhealthy')?.count ?? 0,
         storagesTotal: storagesStats.reduce((acc, s) => acc + s.count, 0),
         diskSizeTotal: Number.parseInt(diskStats[0].diskSizeTotal ?? '0'),
-        diskSizeTotalFormatted: formatSize(Number.parseInt(diskStats[0].diskSizeTotal ?? '0')),
+        diskSizeTotalFormatted: formatSize(
+            Number.parseInt(diskStats[0].diskSizeTotal ?? '0'),
+        ),
     };
 }

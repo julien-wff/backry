@@ -1,5 +1,5 @@
-import { runCommandSync } from '$lib/server/services/cmd';
-import type { ConnectionStringParams, EngineMethods } from '$lib/types/engine';
+import { runCommandSync } from '#lib/server/services/cmd.ts';
+import type { ConnectionStringParams, EngineMethods } from '#lib/types/engine.ts';
 import { Database } from 'bun:sqlite';
 import { type ContainerInspectInfo } from 'dockerode';
 import { err, ok, type Result } from 'neverthrow';
@@ -8,7 +8,10 @@ import fs from 'node:fs/promises';
 
 export const sqliteMethods = {
     dumpCommand: process.env.BACKRY_SQLITE_DUMP_CMD ?? 'sqlite3',
-    restoreCommand: process.env.BACKRY_SQLITE_RESTORE_CMD ?? process.env.BACKRY_SQLITE_DUMP_CMD ?? 'sqlite3',
+    restoreCommand:
+        process.env.BACKRY_SQLITE_RESTORE_CMD ??
+        process.env.BACKRY_SQLITE_DUMP_CMD ??
+        'sqlite3',
     dumpFileExtension: 'sql',
 
     async getDumpCmdVersion(): Promise<Result<string, string>> {
@@ -20,10 +23,15 @@ export const sqliteMethods = {
         return ok(res.value.text().trim());
     },
 
-    async checkConnection(connectionString: string): Promise<Result<string, string>> {
+    async checkConnection(
+        connectionString: string,
+    ): Promise<Result<string, string>> {
         // No need to specify the database
         try {
-            const con = new Database(connectionString, { readonly: true, create: false });
+            const con = new Database(connectionString, {
+                readonly: true,
+                create: false,
+            });
             con.close();
         } catch (e) {
             if (e instanceof Error) {
@@ -35,15 +43,26 @@ export const sqliteMethods = {
         return ok(connectionString);
     },
 
-    getDumpCommand(connectionString: string, additionalArgs?: string[]): string[] {
-        return [ this.dumpCommand, ...additionalArgs ?? [], '-readonly', connectionString, '.dump' ];
+    getDumpCommand(
+        connectionString: string,
+        additionalArgs?: string[],
+    ): string[] {
+        return [
+            this.dumpCommand,
+            ...(additionalArgs ?? []),
+            '-readonly',
+            connectionString,
+            '.dump',
+        ];
     },
 
     isDockerContainerFromEngine(container: ContainerInspectInfo): boolean {
         return false;
     },
 
-    buildConnectionString(params: ConnectionStringParams): Result<string, string> {
+    buildConnectionString(
+        params: ConnectionStringParams,
+    ): Result<string, string> {
         if (!params.database) {
             return err('Missing "database" parameter');
         }
@@ -51,7 +70,9 @@ export const sqliteMethods = {
         return ok(`sqlite://${params.database}`);
     },
 
-    getCredentialsFromContainer(container: ContainerInspectInfo): ConnectionStringParams {
+    getCredentialsFromContainer(
+        container: ContainerInspectInfo,
+    ): ConnectionStringParams {
         return {};
     },
 
@@ -60,7 +81,9 @@ export const sqliteMethods = {
         return connectionString;
     },
 
-    async recreateDatabase(connectionString: string): Promise<Result<void, string>> {
+    async recreateDatabase(
+        connectionString: string,
+    ): Promise<Result<void, string>> {
         // Extract the file path from the connection string
         let dbPath: string;
         try {
@@ -85,7 +108,9 @@ export const sqliteMethods = {
         } catch (e) {
             const deleteError = e as NodeJS.ErrnoException;
             if (deleteError.code !== 'ENOENT') {
-                return err(`Failed to delete existing database file ${dbPath}: ${deleteError.message}`);
+                return err(
+                    `Failed to delete existing database file ${dbPath}: ${deleteError.message}`,
+                );
             }
         }
 

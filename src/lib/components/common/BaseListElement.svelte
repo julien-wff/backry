@@ -1,6 +1,6 @@
 <script lang="ts">
-    import ConfirmDeleteModal from '$lib/components/common/ConfirmDeleteModal.svelte';
-    import StatusIndicator from '$lib/components/common/StatusIndicator.svelte';
+    import ConfirmDeleteModal from '#lib/components/common/ConfirmDeleteModal.svelte';
+    import StatusIndicator from '#lib/components/common/StatusIndicator.svelte';
     import {
         CircleArrowRight,
         CopyPlus,
@@ -11,9 +11,9 @@
         Power,
         PowerOff,
         Trash2,
-    } from '$lib/components/icons';
-    import type { ModalControls } from '$lib/helpers/modal';
-    import { type BACKUP_STATUS, type ELEMENT_STATUS } from '$lib/server/db/schema';
+    } from '#lib/components/icons.ts';
+    import type { ModalControls } from '#lib/helpers/modal.ts';
+    import { type BACKUP_STATUS, type ELEMENT_STATUS } from '#lib/server/db/schema.ts';
     import type { Snippet } from 'svelte';
 
     interface Props {

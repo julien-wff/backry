@@ -1,7 +1,7 @@
-import { apiError, apiSuccess } from '$lib/server/api/responses';
-import { getStorageFromRequest } from '$lib/server/api/storages';
-import type { StorageLocksResponse } from '$lib/server/schemas/api';
-import { getRepositoryLocks, unlockRepository } from '$lib/server/services/restic';
+import { apiError, apiSuccess } from '#lib/server/api/responses.ts';
+import { getStorageFromRequest } from '#lib/server/api/storages.ts';
+import type { StorageLocksResponse } from '#lib/server/schemas/api.ts';
+import { getRepositoryLocks, unlockRepository } from '#lib/server/services/restic.ts';
 import type { RequestHandler } from './$types';
 
 /**
@@ -13,7 +13,11 @@ export const GET: RequestHandler = async ({ params }) => {
         return storage.error;
     }
 
-    const locks = await getRepositoryLocks(storage.value.url, storage.value.password!, storage.value.env);
+    const locks = await getRepositoryLocks(
+        storage.value.url,
+        storage.value.password!,
+        storage.value.env,
+    );
     if (locks.isErr()) {
         return apiError(locks.error, 500);
     }
@@ -30,7 +34,11 @@ export const DELETE: RequestHandler = async ({ params }) => {
         return storage.error;
     }
 
-    const res = await unlockRepository(storage.value.url, storage.value.password!, storage.value.env);
+    const res = await unlockRepository(
+        storage.value.url,
+        storage.value.password!,
+        storage.value.env,
+    );
     if (res.isErr()) {
         return apiError(res.error.message, 500);
     }

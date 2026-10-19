@@ -1,5 +1,5 @@
-import type { ApiResponse } from '$lib/server/api/responses';
-import type { BackupUpdateEventPayload, RestoreUpdateEventPayload } from '$lib/server/shared/events';
+import type { ApiResponse } from '#lib/server/api/responses.ts';
+import type { BackupUpdateEventPayload, RestoreUpdateEventPayload } from '#lib/server/shared/events.ts';
 import { err, ok, type Result } from 'neverthrow';
 import type { z, ZodType } from 'zod';
 
@@ -12,19 +12,23 @@ import type { z, ZodType } from 'zod';
  * @template R Type of the response body
  * @template B Zod schema for the request body, or null for empty body
  */
-export async function fetchApi<R extends object, B extends ZodType | null = null>(
+export async function fetchApi<
+    R extends object,
+    B extends ZodType | null = null,
+>(
     method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
     url: string,
     body: B extends ZodType ? z.infer<B> : null,
 ): Promise<Result<R, string>> {
     const res = await fetch(url, {
         method,
-        ...(method !== 'GET' && body && {
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(body),
-        }),
+        ...(method !== 'GET' &&
+            body && {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(body),
+            }),
     });
 
     let response: ApiResponse<R> | null;
@@ -49,10 +53,18 @@ export async function fetchApi<R extends object, B extends ZodType | null = null
     return ok(response.data);
 }
 
-
-export function subscribeApi<T extends BackupUpdateEventPayload>(endpoint: '/api/backups/subscribe', onChunk: (chunk: T) => void): () => void;
-export function subscribeApi<T extends RestoreUpdateEventPayload>(endpoint: `/api/restores/${number}/subscribe`, onChunk: (chunk: T) => void): () => void;
-export function subscribeApi<T>(endpoint: string, onChunk: (chunk: T) => void): () => void {
+export function subscribeApi<T extends BackupUpdateEventPayload>(
+    endpoint: '/api/backups/subscribe',
+    onChunk: (chunk: T) => void,
+): () => void;
+export function subscribeApi<T extends RestoreUpdateEventPayload>(
+    endpoint: `/api/restores/${number}/subscribe`,
+    onChunk: (chunk: T) => void,
+): () => void;
+export function subscribeApi<T>(
+    endpoint: string,
+    onChunk: (chunk: T) => void,
+): () => void {
     const eventSource = new EventSource(endpoint);
 
     eventSource.onmessage = (event) => {
@@ -72,4 +84,3 @@ export function subscribeApi<T>(endpoint: string, onChunk: (chunk: T) => void): 
         eventSource.close();
     };
 }
-

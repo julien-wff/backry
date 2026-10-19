@@ -1,6 +1,6 @@
 <script lang="ts">
-    import Modal from '$lib/components/common/Modal.svelte';
-    import type { ModalControls } from '$lib/helpers/modal';
+    import Modal from '#lib/components/common/Modal.svelte';
+    import type { ModalControls } from '#lib/helpers/modal.ts';
 
     interface Props {
         controls: ModalControls | undefined;

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { browser } from '$app/environment';
+    import { browser } from '$app/env';
     import type { PrismEditor } from 'prism-code-editor';
     import { basicEditor } from 'prism-code-editor/setups';
     import type { EditorTheme } from 'prism-code-editor/themes';
@@ -45,7 +45,7 @@
         editor = basicEditor(editorDiv!, {
             language,
             theme: !isDarkMode ? 'github-light' : 'github-dark',
-            onUpdate: v => (value = v),
+            onUpdate: (v) => value = v,
             value,
             readOnly: readonly,
             wordWrap: true,

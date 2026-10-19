@@ -1,7 +1,7 @@
-import { getAllEnginesVersionsOrError } from '$lib/server/databases/checks';
-import { getResticVersion, RESTIC_CMD } from '$lib/server/services/restic';
-import { getShoutrrrVersion, SHOUTRRR_CMD } from '$lib/server/services/shoutrrr';
-import { setToolChecksSuccess } from '$lib/server/shared/tool-checks';
+import { getAllEnginesVersionsOrError } from '#lib/server/databases/checks.ts';
+import { getResticVersion, RESTIC_CMD } from '#lib/server/services/restic.ts';
+import { getShoutrrrVersion, SHOUTRRR_CMD } from '#lib/server/services/shoutrrr.ts';
+import { setToolChecksSuccess } from '#lib/server/shared/tool-checks.ts';
 import { VERSION as svelteKitVersion } from '@sveltejs/kit';
 import path from 'path';
 import type { PageServerLoad } from './$types';
@@ -14,9 +14,10 @@ export const load: PageServerLoad = async ({}) => {
     ]);
 
     // Warning: this will not update errors.tools in +layout.server.ts right away, data needs to be invalidated client-side
-    setToolChecksSuccess(resticVersion.isOk()
-        && shoutrrrVersion.isOk()
-        && Object.values(enginesVersions).every(engine => !engine.error),
+    setToolChecksSuccess(
+        resticVersion.isOk() &&
+        shoutrrrVersion.isOk() &&
+        Object.values(enginesVersions).every((engine) => !engine.error),
     );
 
     return {

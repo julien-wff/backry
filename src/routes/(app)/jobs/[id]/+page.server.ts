@@ -1,7 +1,7 @@
-import { parseIdOrNewParam } from '$lib/server/api/params';
-import { databasesList } from '$lib/server/queries/databases';
-import { getJob } from '$lib/server/queries/jobs';
-import { storagesList } from '$lib/server/queries/storages';
+import { parseIdOrNewParam } from '#lib/server/api/params.ts';
+import { databasesList } from '#lib/server/queries/databases.ts';
+import { getJob } from '#lib/server/queries/jobs.ts';
+import { storagesList } from '#lib/server/queries/storages.ts';
 import { error } from '@sveltejs/kit';
 import dayjs from 'dayjs';
 import tz from 'dayjs/plugin/timezone';

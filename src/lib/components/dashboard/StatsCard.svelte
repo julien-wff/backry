@@ -1,10 +1,10 @@
 <script lang="ts">
-    import { type IconType } from '$lib/components/icons';
+    import { type IconType } from '#lib/components/icons.ts';
     import type { Snippet } from 'svelte';
 
     interface Props {
         title: string;
-        icon: typeof IconType;
+        icon: IconType;
         href: string;
         children: Snippet;
         stat: string | number;

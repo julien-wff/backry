@@ -1,5 +1,10 @@
-import { pipeCommandSync, runCommandStream, runCommandSync, type StreamCommandOptions } from '$lib/server/services/cmd';
-import { logger } from '$lib/server/services/logger';
+import {
+    pipeCommandSync,
+    runCommandStream,
+    runCommandSync,
+    type StreamCommandOptions,
+} from '#lib/server/services/cmd.ts';
+import { logger } from '#lib/server/services/logger.ts';
 import type {
     ResticBackupStatus,
     ResticBackupSummary,
@@ -10,17 +15,17 @@ import type {
     ResticNode,
     ResticSnapshot,
     ResticStats,
-} from '$lib/types/restic';
+} from '#lib/types/restic.ts';
 import { type $ } from 'bun';
 import { err, ok, type Result } from 'neverthrow';
 
 export const RESTIC_CMD = process.env.BACKRY_RESTIC_CMD || 'restic';
 
 export const RESTIC_DEFAULT_ENV = {
-    'RESTIC_CACHE_DIR': process.env.RESTIC_CACHE_DIR ?? '',
-    'XDG_CACHE_DIR': process.env.XDG_CACHE_DIR ?? '',
-    'HOME': process.env.HOME ?? '',
-    'LOCALAPPDATA': process.env.LOCALAPPDATA ?? '',
+    RESTIC_CACHE_DIR: process.env.RESTIC_CACHE_DIR ?? '',
+    XDG_CACHE_DIR: process.env.XDG_CACHE_DIR ?? '',
+    HOME: process.env.HOME ?? '',
+    LOCALAPPDATA: process.env.LOCALAPPDATA ?? '',
 };
 
 function formatResticError(shellOutput: $.ShellOutput) {
@@ -53,17 +58,23 @@ async function resticCommandToResult<T>(
     firstLines: number = Number.MAX_SAFE_INTEGER,
 ): Promise<Result<T[], ResticError>> {
     if (res.isErr()) {
-        logger.error(`Failed to run restic command: ${res.error.stderr.toString().trim()}`);
+        logger.error(
+            `Failed to run restic command: ${res.error.stderr.toString().trim()}`,
+        );
         return err(formatResticError(res.error));
     }
 
-    const output = res.value.text().trim().split('\n').filter((line) => line.length > 0);
+    const output = res.value
+        .text()
+        .trim()
+        .split('\n')
+        .filter((line) => line.length > 0);
     if (!json) {
         return ok(output as T[]);
     }
 
     try {
-        return ok(output.slice(0, firstLines).map(o => JSON.parse(o)) as T[]);
+        return ok(output.slice(0, firstLines).map((o) => JSON.parse(o)) as T[]);
     } catch {
         logger.error(`Failed to parse restic output: ${res.value.text().trim()}`);
         return err({
@@ -74,7 +85,6 @@ async function resticCommandToResult<T>(
     }
 }
 
-
 export async function getResticVersion(): Promise<Result<string, string>> {
     const res = await runCommandSync(RESTIC_CMD, [ 'version' ]);
     if (res.isErr()) {
@@ -84,7 +94,6 @@ export async function getResticVersion(): Promise<Result<string, string>> {
     return ok(res.value.text().trim());
 }
 
-
 /**
  * Get the raw statistics of a restic repository.
  * @param path URL to the restic repository
@@ -92,16 +101,29 @@ export async function getResticVersion(): Promise<Result<string, string>> {
  * @param env Additional environment variables to set
  * @param onlyBackry If true, only include snapshots from backry
  */
-export async function getRepositoryStats(path: string, password: string, env: Record<string, string>, onlyBackry = false) {
+export async function getRepositoryStats(
+    path: string,
+    password: string,
+    env: Record<string, string>,
+    onlyBackry = false,
+) {
     const res = await runCommandSync(
         RESTIC_CMD,
-        [ 'stats', '-r', path, '--json', '--no-lock', '--mode', 'raw-data', ...(onlyBackry ? [ '--tag', 'backry' ] : []) ],
+        [
+            'stats',
+            '-r',
+            path,
+            '--json',
+            '--no-lock',
+            '--mode',
+            'raw-data',
+            ...(onlyBackry ? [ '--tag', 'backry' ] : []),
+        ],
         { env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env } },
     );
 
     return resticCommandToResult<ResticStats>(res);
 }
-
 
 /**
  * Get the list of all snapshots in a restic repository.
@@ -111,23 +133,36 @@ export async function getRepositoryStats(path: string, password: string, env: Re
  * @param onlyBackry If true, only include snapshots from backry (with the `backry` tag)
  * @return An array with a single element being the complete list of snapshots
  */
-export async function getRepositorySnapshots(path: string, password: string, env: Record<string, string>, onlyBackry = false) {
+export async function getRepositorySnapshots(
+    path: string,
+    password: string,
+    env: Record<string, string>,
+    onlyBackry = false,
+) {
     const res = await runCommandSync(
         RESTIC_CMD,
-        [ 'snapshots', '-r', path, '--json', '--no-lock', ...(onlyBackry ? [ '--tag', 'backry' ] : []) ],
+        [
+            'snapshots',
+            '-r',
+            path,
+            '--json',
+            '--no-lock',
+            ...(onlyBackry ? [ '--tag', 'backry' ] : []),
+        ],
         { env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env } },
     );
 
     return resticCommandToResult<ResticSnapshot[]>(res);
 }
 
-
-export async function initRepository(path: string, password: string, env: Record<string, string>) {
-    const res = await runCommandSync(
-        RESTIC_CMD,
-        [ 'init', '-r', path, '--json' ],
-        { env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env } },
-    );
+export async function initRepository(
+    path: string,
+    password: string,
+    env: Record<string, string>,
+) {
+    const res = await runCommandSync(RESTIC_CMD, [ 'init', '-r', path, '--json' ], {
+        env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env },
+    });
 
     return resticCommandToResult<ResticInit>(res);
 }
@@ -137,24 +172,31 @@ type BackupFromCommandExtras = Pick<
     'onStdout' | 'onStderr'
 >;
 
-export async function backupFromCommand(url: string,
-                                        password: string,
-                                        env: Record<string, string>,
-                                        command: string[],
-                                        fileName: string,
-                                        tags: string[],
-                                        extras: BackupFromCommandExtras = {}) {
+export async function backupFromCommand(
+    url: string,
+    password: string,
+    env: Record<string, string>,
+    command: string[],
+    fileName: string,
+    tags: string[],
+    extras: BackupFromCommandExtras = {},
+) {
     tags = [ 'backry', ...tags.map((tag) => tag.replace(/,/g, '_')) ];
 
     return runCommandStream(
         RESTIC_CMD,
         [
-            '-r', url,
+            '-r',
+            url,
             'backup',
             '--json',
-            '--tag', tags.join(','),
-            '--stdin-filename', fileName,
-            '--stdin-from-command', '--', ...command,
+            '--tag',
+            tags.join(','),
+            '--stdin-filename',
+            fileName,
+            '--stdin-from-command',
+            '--',
+            ...command,
         ],
         {
             env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env },
@@ -164,7 +206,6 @@ export async function backupFromCommand(url: string,
     );
 }
 
-
 /**
  * Delete snapshots from a restic repository using `forget --prune`.
  * @param url URL to the restic repository
@@ -173,20 +214,17 @@ export async function backupFromCommand(url: string,
  * @param snapshots List of snapshot IDs to delete
  * @return Full CLI text output from restic
  */
-export async function deleteSnapshots(url: string,
-                                      password: string,
-                                      env: Record<string, string>,
-                                      snapshots: string[]) {
+export async function deleteSnapshots(
+    url: string,
+    password: string,
+    env: Record<string, string>,
+    snapshots: string[],
+) {
     // forget with --prune does not yet support JSON output as of restic v0.18.0
     // https://restic.readthedocs.io/en/v0.18.0/075_scripting.html#forget
     const res = await runCommandSync(
         RESTIC_CMD,
-        [
-            '-r', url,
-            'forget',
-            '--prune',
-            ...snapshots,
-        ],
+        [ '-r', url, 'forget', '--prune', ...snapshots ],
         {
             env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env },
         },
@@ -195,19 +233,14 @@ export async function deleteSnapshots(url: string,
     return resticCommandToResult<string>(res, false);
 }
 
-
-export async function getRepositoryLocks(url: string,
-                                         password: string,
-                                         env: Record<string, string>): Promise<Result<ResticLock[], string>> {
+export async function getRepositoryLocks(
+    url: string,
+    password: string,
+    env: Record<string, string>,
+): Promise<Result<ResticLock[], string>> {
     const locksResult = await runCommandSync(
         RESTIC_CMD,
-        [
-            '-r', url,
-            'list',
-            'locks',
-            '--json',
-            '--no-lock',
-        ],
+        [ '-r', url, 'list', 'locks', '--json', '--no-lock' ],
         {
             env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env },
         },
@@ -218,27 +251,23 @@ export async function getRepositoryLocks(url: string,
         return err(locks.error.message);
     }
 
-    const locksData = await Promise.all(locks.value.map(async (lock) => {
-        const lockResult = await runCommandSync(
-            RESTIC_CMD,
-            [
-                '-r', url,
-                'cat',
-                'lock',
-                lock,
-                '--no-lock',
-            ],
-            {
-                env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env },
-            },
-        );
+    const locksData = await Promise.all(
+        locks.value.map(async (lock) => {
+            const lockResult = await runCommandSync(
+                RESTIC_CMD,
+                [ '-r', url, 'cat', 'lock', lock, '--no-lock' ],
+                {
+                    env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env },
+                },
+            );
 
-        const res = await resticCommandToResult<string>(lockResult, false);
-        if (res.isErr()) {
-            return err(res.error.message);
-        }
-        return ok(JSON.parse(res.value.join('\n')) as ResticLock);
-    }));
+            const res = await resticCommandToResult<string>(lockResult, false);
+            if (res.isErr()) {
+                return err(res.error.message);
+            }
+            return ok(JSON.parse(res.value.join('\n')) as ResticLock);
+        }),
+    );
 
     const errors = locksData.filter((lock) => lock.isErr());
     if (errors.length > 0) {
@@ -252,24 +281,17 @@ export async function getRepositoryLocks(url: string,
     return ok(data);
 }
 
-
-export async function unlockRepository(url: string,
-                                       password: string,
-                                       env: Record<string, string>) {
-    const res = await runCommandSync(
-        RESTIC_CMD,
-        [
-            '-r', url,
-            'unlock',
-        ],
-        {
-            env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env },
-        },
-    );
+export async function unlockRepository(
+    url: string,
+    password: string,
+    env: Record<string, string>,
+) {
+    const res = await runCommandSync(RESTIC_CMD, [ '-r', url, 'unlock' ], {
+        env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env },
+    });
 
     return resticCommandToResult<string>(res, false);
 }
-
 
 /**
  * Apply a forget policy to delete snapshots from a repository.
@@ -283,21 +305,27 @@ export async function unlockRepository(url: string,
  * @param jobId Job ID to filter the snapshots by.
  * @param databaseId Database ID to filter the snapshots by.
  */
-export async function applyForgetPolicy(url: string,
-                                        password: string,
-                                        env: Record<string, string>,
-                                        policy: string,
-                                        jobId: number,
-                                        databaseId: number) {
+export async function applyForgetPolicy(
+    url: string,
+    password: string,
+    env: Record<string, string>,
+    policy: string,
+    jobId: number,
+    databaseId: number,
+) {
     const res = await runCommandSync(
         RESTIC_CMD,
         [
-            '-r', url,
+            '-r',
+            url,
             'forget',
             '--json',
-            '--tag', 'backry',
-            '--tag', `jobId:${jobId}`,
-            '--tag', `dbId:${databaseId}`,
+            '--tag',
+            'backry',
+            '--tag',
+            `jobId:${jobId}`,
+            '--tag',
+            `dbId:${databaseId}`,
             '--prune',
             ...policy.split(' '),
         ],
@@ -309,20 +337,15 @@ export async function applyForgetPolicy(url: string,
     return resticCommandToResult<ResticForget[]>(res, true, 1);
 }
 
-
-export async function listSnapshotFiles(url: string,
-                                        password: string,
-                                        env: Record<string, string>,
-                                        snapshotId: string) {
+export async function listSnapshotFiles(
+    url: string,
+    password: string,
+    env: Record<string, string>,
+    snapshotId: string,
+) {
     const res = await runCommandSync(
         RESTIC_CMD,
-        [
-            '-r', url,
-            'ls',
-            snapshotId,
-            '--json',
-            '--no-lock',
-        ],
+        [ '-r', url, 'ls', snapshotId, '--json', '--no-lock' ],
         {
             env: { RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env },
         },
@@ -330,7 +353,6 @@ export async function listSnapshotFiles(url: string,
 
     return resticCommandToResult<ResticSnapshot | ResticNode>(res);
 }
-
 
 /**
  * Stream the content of a file from a restic repository.
@@ -343,24 +365,27 @@ export async function listSnapshotFiles(url: string,
  * @param fileName Name of the file to download from the snapshot
  * @return A ReadableStream that streams the file content, and a Promise that resolves when the process exits.
  */
-export async function streamFileContent(url: string,
-                                        password: string,
-                                        env: Record<string, string>,
-                                        snapshotId: string,
-                                        fileName: string) {
+export async function streamFileContent(
+    url: string,
+    password: string,
+    env: Record<string, string>,
+    snapshotId: string,
+    fileName: string,
+) {
     // Spawn restic dump and stream stdout directly to the HTTP response to avoid buffering the whole file in memory.
-    const subprocess = Bun.spawn([
-        RESTIC_CMD,
-        '-r', url,
-        '--no-lock',
-        'dump',
-        snapshotId,
-        fileName,
-    ], {
-        env: { ...process.env, RESTIC_PASSWORD: password, ...RESTIC_DEFAULT_ENV, ...env },
-        stdout: 'pipe',
-        stderr: 'pipe',
-    });
+    const subprocess = Bun.spawn(
+        [ RESTIC_CMD, '-r', url, '--no-lock', 'dump', snapshotId, fileName ],
+        {
+            env: {
+                ...process.env,
+                RESTIC_PASSWORD: password,
+                ...RESTIC_DEFAULT_ENV,
+                ...env,
+            },
+            stdout: 'pipe',
+            stderr: 'pipe',
+        },
+    );
 
     const stdoutReader = subprocess.stdout.getReader();
     const stderrReader = subprocess.stderr.getReader();
@@ -411,7 +436,9 @@ export async function streamFileContent(url: string,
         const exitCode = await subprocess.exited;
         if (exitCode !== 0) {
             // Attempt to parse stderr as restic JSON error, else fallback to raw text
-            const stderrText = (await new Blob(stderrChunks as BlobPart[]).text()).trim();
+            const stderrText = (
+                await new Blob(stderrChunks as BlobPart[]).text()
+            ).trim();
             try {
                 return err(JSON.parse(stderrText));
             } catch {
@@ -428,7 +455,6 @@ export async function streamFileContent(url: string,
     return { stream, exitPromise };
 }
 
-
 /**
  * Read the content of a file from a restic repository and pipe it to a command.
  * The command output is collected and returned as a string.
@@ -443,22 +469,17 @@ export async function streamFileContent(url: string,
  * @param command Command to run, with arguments as separate array elements
  * @return The command output as a string, or a Restic error
  */
-export async function pipeFileContentToCommand(url: string,
-                                               password: string,
-                                               env: Record<string, string>,
-                                               snapshotId: string,
-                                               fileName: string,
-                                               command: string[]): Promise<Result<string, ResticError>> {
+export async function pipeFileContentToCommand(
+    url: string,
+    password: string,
+    env: Record<string, string>,
+    snapshotId: string,
+    fileName: string,
+    command: string[],
+): Promise<Result<string, ResticError>> {
     const res = await pipeCommandSync(
         RESTIC_CMD,
-        [
-            '-r', url,
-            '--no-lock',
-            '--quiet',
-            'dump',
-            snapshotId,
-            fileName,
-        ],
+        [ '-r', url, '--no-lock', '--quiet', 'dump', snapshotId, fileName ],
         command[0],
         command.slice(1),
         {

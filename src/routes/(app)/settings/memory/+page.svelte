@@ -1,12 +1,12 @@
 <script lang="ts">
-    import { invalidateAll } from '$app/navigation';
-    import Head from '$lib/components/common/Head.svelte';
-    import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
-    import { HardDriveDownload, RefreshCw, Settings } from '$lib/components/icons';
+    import { refreshAll } from '$app/navigation';
+    import Head from '#lib/components/common/Head.svelte';
+    import PageContentHeader from '#lib/components/common/PageContentHeader.svelte';
+    import { HardDriveDownload, RefreshCw, Settings } from '#lib/components/icons.ts';
     import { onMount } from 'svelte';
     import type { PageProps } from './$types';
-    import CodeEditor from '$lib/components/common/CodeEditor.svelte';
-    import { formatSize } from '$lib/helpers/format';
+    import CodeEditor from '#lib/components/common/CodeEditor.svelte';
+    import { formatSize } from '#lib/helpers/format.ts';
 
     let { data }: PageProps = $props();
 
@@ -17,7 +17,7 @@
         const timer = setInterval(async () => {
             if (!document.hidden && autoRefresh && !refreshing) {
                 refreshing = true;
-                await invalidateAll();
+                await refreshAll();
                 refreshing = false;
             }
         }, 1000);

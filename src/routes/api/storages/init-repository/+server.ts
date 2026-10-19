@@ -1,7 +1,7 @@
-import { apiError, apiSuccess } from '$lib/server/api/responses';
-import { parseRequestBody } from '$lib/server/schemas';
-import { storageInitRepositoryRequest } from '$lib/server/schemas/api';
-import { initRepository } from '$lib/server/services/restic';
+import { apiError, apiSuccess } from '#lib/server/api/responses.ts';
+import { parseRequestBody } from '#lib/server/schemas/index.ts';
+import { storageInitRepositoryRequest } from '#lib/server/schemas/api.ts';
+import { initRepository } from '#lib/server/services/restic.ts';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request }) => {

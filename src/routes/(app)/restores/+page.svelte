@@ -1,10 +1,10 @@
 <script lang="ts">
-    import Head from '$lib/components/common/Head.svelte';
-    import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
-    import { History } from '$lib/components/icons';
+    import Head from '#lib/components/common/Head.svelte';
+    import PageContentHeader from '#lib/components/common/PageContentHeader.svelte';
+    import { History } from '#lib/components/icons.ts';
     import type { PageData } from './$types';
-    import RestoreElement from '$lib/components/restores/RestoreElement.svelte';
-    import HowToRestoreAlert from '$lib/components/restores/HowToRestoreAlert.svelte';
+    import RestoreElement from '#lib/components/restores/RestoreElement.svelte';
+    import HowToRestoreAlert from '#lib/components/restores/HowToRestoreAlert.svelte';
 
     interface Props {
         data: PageData;

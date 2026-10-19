@@ -1,20 +1,21 @@
 <script lang="ts">
+    import { untrack } from 'svelte';
     import { goto } from '$app/navigation';
-    import Head from '$lib/components/common/Head.svelte';
-    import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
-    import ElementForm from '$lib/components/forms/ElementForm.svelte';
-    import InputContainer from '$lib/components/forms/InputContainer.svelte';
-    import SlugInput from '$lib/components/forms/SlugInput.svelte';
-    import { Timer } from '$lib/components/icons';
-    import JobDatabaseSelector from '$lib/components/jobs/JobDatabaseSelector.svelte';
-    import JobPrunePolicyField from '$lib/components/jobs/JobPrunePolicyField.svelte';
-    import { randomId } from '$lib/helpers/common';
-    import { fetchApi } from '$lib/helpers/fetch';
-    import { type jobRequest, type JobResponse } from '$lib/server/schemas/api';
+    import Head from '#lib/components/common/Head.svelte';
+    import PageContentHeader from '#lib/components/common/PageContentHeader.svelte';
+    import ElementForm from '#lib/components/forms/ElementForm.svelte';
+    import InputContainer from '#lib/components/forms/InputContainer.svelte';
+    import SlugInput from '#lib/components/forms/SlugInput.svelte';
+    import { Timer } from '#lib/components/icons.ts';
+    import JobDatabaseSelector from '#lib/components/jobs/JobDatabaseSelector.svelte';
+    import JobPrunePolicyField from '#lib/components/jobs/JobPrunePolicyField.svelte';
+    import { randomId } from '#lib/helpers/common.ts';
+    import { fetchApi } from '#lib/helpers/fetch.ts';
+    import { type jobRequest, type JobResponse } from '#lib/server/schemas/api.ts';
     import { sendAt, validateCronExpression } from 'cron';
     import type { PageData } from './$types';
-    import Modal from '$lib/components/common/Modal.svelte';
-    import type { ModalControls } from '$lib/helpers/modal';
+    import Modal from '#lib/components/common/Modal.svelte';
+    import type { ModalControls } from '#lib/helpers/modal.ts';
 
     interface Props {
         data: PageData;
@@ -22,15 +23,17 @@
 
     let { data }: Props = $props();
 
+    const initialData = untrack(() => data);
+
     let error = $state<string | null>();
     let isLoading = $state(false);
 
-    let jobName = $state(data.job?.name ?? '');
-    let slug = $state(data.job?.slug ?? '');
-    let storageBackend = $state<number>(data.job?.storageId ?? -1);
-    let cron = $state(data.job?.cron ?? '');
-    let prunePolicy = $state(data.job?.prunePolicy ?? '');
-    let selectedDatabases = $state(data.job?.jobsDatabases.map(jd => ({
+    let jobName = $state(initialData.job?.name ?? '');
+    let slug = $state(initialData.job?.slug ?? '');
+    let storageBackend = $state<number>(initialData.job?.storageId ?? -1);
+    let cron = $state(initialData.job?.cron ?? '');
+    let prunePolicy = $state(initialData.job?.prunePolicy ?? '');
+    let selectedDatabases = $state(initialData.job?.jobsDatabases.map(jd => ({
         databaseId: jd.databaseId,
         enabled: jd.status === 'active',
         selectionId: randomId(),

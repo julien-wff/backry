@@ -1,7 +1,7 @@
-import { apiError, apiSuccess } from '$lib/server/api/responses';
-import { runBackupJob } from '$lib/server/backups/run-backup-job';
-import { parseRequestBody } from '$lib/server/schemas';
-import { jobRunRequest } from '$lib/server/schemas/api';
+import { apiError, apiSuccess } from '#lib/server/api/responses.ts';
+import { runBackupJob } from '#lib/server/backups/run-backup-job.ts';
+import { parseRequestBody } from '#lib/server/schemas/index.ts';
+import { jobRunRequest } from '#lib/server/schemas/api.ts';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ params, request }) => {

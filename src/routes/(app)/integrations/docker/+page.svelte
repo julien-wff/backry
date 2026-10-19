@@ -1,10 +1,10 @@
 <script lang="ts">
-    import Head from '$lib/components/common/Head.svelte';
-    import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
-    import ElementForm from '$lib/components/forms/ElementForm.svelte';
-    import { Blocks, OctagonAlert } from '$lib/components/icons';
-    import DetectedContainer from '$lib/components/integrations/docker/DetectedContainer.svelte';
-    import { ENGINES_META } from '$lib/common/engines-meta';
+    import Head from '#lib/components/common/Head.svelte';
+    import PageContentHeader from '#lib/components/common/PageContentHeader.svelte';
+    import ElementForm from '#lib/components/forms/ElementForm.svelte';
+    import { Blocks, OctagonAlert } from '#lib/components/icons.ts';
+    import DetectedContainer from '#lib/components/integrations/docker/DetectedContainer.svelte';
+    import { ENGINES_META } from '#lib/common/engines-meta.ts';
     import type { PageProps } from './$types';
 
     let { data }: PageProps = $props();

@@ -1,18 +1,18 @@
 <script lang="ts">
-    import { invalidateAll } from '$app/navigation';
-    import Head from '$lib/components/common/Head.svelte';
-    import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
-    import { Settings } from '$lib/components/icons';
-    import ToolVersion from '$lib/components/settings/tools/ToolVersion.svelte';
+    import { refreshAll } from '$app/navigation';
+    import Head from '#lib/components/common/Head.svelte';
+    import PageContentHeader from '#lib/components/common/PageContentHeader.svelte';
+    import { Settings } from '#lib/components/icons.ts';
+    import ToolVersion from '#lib/components/settings/tools/ToolVersion.svelte';
     import { onMount } from 'svelte';
     import type { PageProps } from './$types';
-    import ToolVersionCategory from '$lib/components/settings/tools/ToolVersionCategory.svelte';
+    import ToolVersionCategory from '#lib/components/settings/tools/ToolVersionCategory.svelte';
 
     let { data }: PageProps = $props();
 
     onMount(() => {
         // Fetch the latest update for tools validity in the layout, because +page.server.ts updates it
-        invalidateAll();
+        refreshAll();
     });
 </script>
 

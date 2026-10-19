@@ -1,4 +1,4 @@
-import { backupEmitter } from '$lib/server/shared/events';
+import { backupEmitter } from '#lib/server/shared/events.ts';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ request }) => {
@@ -30,7 +30,7 @@ export const GET: RequestHandler = async ({ request }) => {
             'Content-Type': 'text/event-stream',
             'X-Accel-Buffering': 'no',
             'Cache-Control': 'no-cache',
-            'Connection': 'keep-alive',
+            Connection: 'keep-alive',
         },
     });
 };

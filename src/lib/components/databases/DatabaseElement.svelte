@@ -1,13 +1,13 @@
 <script lang="ts">
-    import { invalidateAll } from '$app/navigation';
-    import BaseListElement from '$lib/components/common/BaseListElement.svelte';
-    import CollapsableElementList from '$lib/components/common/CollapsableElementList.svelte';
-    import EngineIndicator from '$lib/components/common/EngineIndicator.svelte';
-    import { EthernetPort, FileCheck, Timer } from '$lib/components/icons';
-    import { fetchApi } from '$lib/helpers/fetch';
-    import type { databasesListExtendedFiltered } from '$lib/server/queries/databases';
-    import type { DatabaseResponse } from '$lib/server/schemas/api';
-    import { addToast } from '$lib/stores/toasts.svelte';
+    import { refreshAll } from '$app/navigation';
+    import BaseListElement from '#lib/components/common/BaseListElement.svelte';
+    import CollapsableElementList from '#lib/components/common/CollapsableElementList.svelte';
+    import EngineIndicator from '#lib/components/common/EngineIndicator.svelte';
+    import { EthernetPort, FileCheck, Timer } from '#lib/components/icons.ts';
+    import { fetchApi } from '#lib/helpers/fetch.ts';
+    import type { databasesListExtendedFiltered } from '#lib/server/queries/databases.ts';
+    import type { DatabaseResponse } from '#lib/server/schemas/api.ts';
+    import { addToast } from '#lib/stores/toasts.svelte.ts';
 
     interface Props {
         database: Awaited<ReturnType<typeof databasesListExtendedFiltered>>[number];
@@ -30,7 +30,7 @@
         const res = await fetchApi<DatabaseResponse>('DELETE', `/api/databases/${database.id}`, null);
 
         if (res.isOk()) {
-            await invalidateAll();
+            await refreshAll();
         } else {
             addToast(`Failed to delete database #${database.id}: ${res.error}`, 'error');
         }

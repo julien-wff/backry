@@ -1,9 +1,9 @@
 <script lang="ts">
     import { page } from '$app/state';
-    import { OctagonAlert, ShieldCheck, Trash2 } from '$lib/components/icons';
-    import { fetchApi } from '$lib/helpers/fetch';
-    import { formatUtcDate } from '$lib/helpers/format';
-    import type { StoragePruneDesyncResponse, storagePruneDesyncUpdateRequest } from '$lib/server/schemas/api';
+    import { OctagonAlert, ShieldCheck, Trash2 } from '#lib/components/icons.ts';
+    import { fetchApi } from '#lib/helpers/fetch.ts';
+    import { formatUtcDate } from '#lib/helpers/format.ts';
+    import type { StoragePruneDesyncResponse, storagePruneDesyncUpdateRequest } from '#lib/server/schemas/api.ts';
     import { onMount } from 'svelte';
 
     interface Props {

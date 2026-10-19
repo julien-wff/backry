@@ -1,8 +1,8 @@
 <script lang="ts">
-    import InputContainer from '$lib/components/forms/InputContainer.svelte';
-    import { ArrowDown, ArrowUp, Power, PowerOff, Trash2 } from '$lib/components/icons';
-    import { randomId } from '$lib/helpers/common';
-    import type { databases } from '$lib/server/db/schema';
+    import InputContainer from '#lib/components/forms/InputContainer.svelte';
+    import { ArrowDown, ArrowUp, Power, PowerOff, Trash2 } from '#lib/components/icons.ts';
+    import { randomId } from '#lib/helpers/common.ts';
+    import type { databases } from '#lib/server/db/schema.ts';
     import { flip } from 'svelte/animate';
 
     interface Props {

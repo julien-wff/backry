@@ -1,6 +1,6 @@
 <script lang="ts">
-    import InputContainer from '$lib/components/forms/InputContainer.svelte';
-    import { Plus, Trash2 } from '$lib/components/icons';
+    import InputContainer from '#lib/components/forms/InputContainer.svelte';
+    import { Plus, Trash2 } from '#lib/components/icons.ts';
 
     interface Props {
         envVars: { key: string; value: string }[];

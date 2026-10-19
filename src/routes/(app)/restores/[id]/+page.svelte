@@ -1,14 +1,14 @@
 <script lang="ts">
-    import { History, OctagonAlert } from '$lib/components/icons.js';
-    import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
-    import ElementForm from '$lib/components/forms/ElementForm.svelte';
-    import Head from '$lib/components/common/Head.svelte';
-    import type { PageProps } from './$types.js';
-    import RestoreStep from '$lib/components/restores/RestoreStep.svelte';
-    import RestoreRecap from '$lib/components/restores/RestoreRecap.svelte';
+    import { History, OctagonAlert } from '#lib/components/icons.ts';
+    import PageContentHeader from '#lib/components/common/PageContentHeader.svelte';
+    import ElementForm from '#lib/components/forms/ElementForm.svelte';
+    import Head from '#lib/components/common/Head.svelte';
+    import type { PageProps } from './$types.ts';
+    import RestoreStep from '#lib/components/restores/RestoreStep.svelte';
+    import RestoreRecap from '#lib/components/restores/RestoreRecap.svelte';
     import { onMount } from 'svelte';
-    import { subscribeApi } from '$lib/helpers/fetch';
-    import type { RestoreUpdateEventPayload } from '$lib/server/shared/events';
+    import { subscribeApi } from '#lib/helpers/fetch.ts';
+    import type { RestoreUpdateEventPayload } from '#lib/server/shared/events.ts';
 
     let { data }: PageProps = $props();
 

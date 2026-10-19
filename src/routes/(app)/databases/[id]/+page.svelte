@@ -1,45 +1,47 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
     import { page } from '$app/state';
-    import { ENGINE_META_ENTRIES, ENGINES_META } from '$lib/common/engines-meta';
-    import Head from '$lib/components/common/Head.svelte';
-    import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
-    import ElementForm from '$lib/components/forms/ElementForm.svelte';
-    import InputContainer from '$lib/components/forms/InputContainer.svelte';
-    import SlugInput from '$lib/components/forms/SlugInput.svelte';
-    import { Database } from '$lib/components/icons';
-    import { fetchApi } from '$lib/helpers/fetch';
-    import { slugify } from '$lib/helpers/format';
-    import type { DATABASE_ENGINES } from '$lib/server/db/schema';
+    import { ENGINE_META_ENTRIES, ENGINES_META } from '#lib/common/engines-meta.ts';
+    import Head from '#lib/components/common/Head.svelte';
+    import PageContentHeader from '#lib/components/common/PageContentHeader.svelte';
+    import ElementForm from '#lib/components/forms/ElementForm.svelte';
+    import InputContainer from '#lib/components/forms/InputContainer.svelte';
+    import SlugInput from '#lib/components/forms/SlugInput.svelte';
+    import { Database } from '#lib/components/icons.ts';
+    import { fetchApi } from '#lib/helpers/fetch.ts';
+    import { slugify } from '#lib/helpers/format.ts';
+    import type { DATABASE_ENGINES } from '#lib/server/db/schema.ts';
     import type {
         DATABASE_ALLOWED_STATUSES,
         DatabaseCheckResponse,
         databaseRequest,
         DatabaseResponse,
         databasesCheckRequest,
-    } from '$lib/server/schemas/api';
-    import { tick } from 'svelte';
+    } from '#lib/server/schemas/api.ts';
+    import { tick, untrack } from 'svelte';
     import type { PageProps } from './$types';
 
     let { data }: PageProps = $props();
+
+    const initialData = untrack(() => data);
     const { searchParams } = page.url;
-    let error = $state<null | string>(data.database?.error ?? null);
+    let error = $state<null | string>(initialData.database?.error ?? null);
 
     const urlEngine = (searchParams.has('engine') && Object.keys(ENGINES_META).includes(searchParams.get('engine')!)
         ? page.url.searchParams.get('engine')
         : null) as typeof DATABASE_ENGINES[number] | null;
-    let selectedEngine = $state<typeof DATABASE_ENGINES[number] | null>(data.database?.engine ?? urlEngine ?? null);
+    let selectedEngine = $state<typeof DATABASE_ENGINES[number] | null>(initialData.database?.engine ?? urlEngine ?? null);
 
-    let dbName = $state(data.database?.name ?? searchParams.get('name') ?? '');
+    let dbName = $state(initialData.database?.name ?? searchParams.get('name') ?? '');
     // svelte-ignore state_referenced_locally We want to grab the initial value of dbName, it's ok
-    let slug = $state(data.database?.slug ?? slugify(dbName));
+    let slug = $state(initialData.database?.slug ?? slugify(dbName));
 
-    let connectionString = $state(data.database?.connectionString ?? searchParams.get('connectionString') ?? '');
+    let connectionString = $state(initialData.database?.connectionString ?? searchParams.get('connectionString') ?? '');
     let connectionStringPlaceholder = $derived(
         (selectedEngine && ENGINES_META[selectedEngine].connectionStringPlaceholder) || '',
     );
 
-    let containerName = $state(data.database?.containerName ?? searchParams.get('container') ?? '');
+    let containerName = $state(initialData.database?.containerName ?? searchParams.get('container') ?? '');
 
     let isConnectionTesting = $state(false);
     let databaseConnectionStatus = $state<'untested' | 'success' | 'error'>('untested');
@@ -145,7 +147,7 @@
              title="{data.database ? 'Edit' : 'Add new'} database connection">
     <InputContainer label="Engine">
         <div class="flex gap-2">
-            {#each ENGINE_META_ENTRIES as [engineId, engine] (engineId)}
+            {#each ENGINE_META_ENTRIES as [ engineId, engine ] (engineId)}
                 <div class="w-32 gap-2 px-4 py-2 flex flex-col items-center bg-base-300 justify-center rounded-lg cursor-pointer border-2"
                      class:border-primary={selectedEngine === engineId}
                      class:border-transparent={selectedEngine !== engineId}

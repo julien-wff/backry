@@ -1,6 +1,6 @@
-import { buildDbUrlFromParams } from '$lib/server/databases/utils';
-import { runCommandSync } from '$lib/server/services/cmd';
-import type { ConnectionStringParams, EngineMethods } from '$lib/types/engine';
+import { buildDbUrlFromParams } from '#lib/server/databases/utils.ts';
+import { runCommandSync } from '#lib/server/services/cmd.ts';
+import type { ConnectionStringParams, EngineMethods } from '#lib/types/engine.ts';
 import { SQL } from 'bun';
 import { type ContainerInspectInfo } from 'dockerode';
 import { err, ok, type Result } from 'neverthrow';
@@ -41,7 +41,9 @@ export const postgresqlMethods = {
             const url = new URL(connectionString);
 
             if (!url.pathname || url.pathname === '/') {
-                const dbName = await con`SELECT current_database()`.then(res => res[0]?.current_database);
+                const dbName = await con`SELECT current_database()`.then(
+                    (res) => res[0]?.current_database,
+                );
                 if (!dbName) {
                     throw new Error('Could not retrieve database name');
                 }
@@ -51,21 +53,31 @@ export const postgresqlMethods = {
 
             return ok(url.toString());
         } catch (e) {
-            return err(e instanceof Error ? e.message : 'Error connecting to database');
+            return err(
+                e instanceof Error ? e.message : 'Error connecting to database',
+            );
         } finally {
             await con.close();
         }
     },
 
     isDockerContainerFromEngine(container: ContainerInspectInfo): boolean {
-        return container.Args[0] === 'postgres'
-            || container.Mounts.some(m => m.Destination === '/var/lib/postgresql/data')
-            || Object.keys(container.Config.Volumes ?? {}).some(v => v === '/var/lib/postgresql/data')
-            || container.Config.Env.some(e => e.startsWith('PGDATA='))
-            || container.Config.Env.some(e => e.startsWith('PG_VERSION='));
+        return (
+            container.Args[0] === 'postgres' ||
+            container.Mounts.some(
+                (m) => m.Destination === '/var/lib/postgresql/data',
+            ) ||
+            Object.keys(container.Config.Volumes ?? {}).some(
+                (v) => v === '/var/lib/postgresql/data',
+            ) ||
+            container.Config.Env.some((e) => e.startsWith('PGDATA=')) ||
+            container.Config.Env.some((e) => e.startsWith('PG_VERSION='))
+        );
     },
 
-    buildConnectionString(params: ConnectionStringParams): Result<string, string> {
+    buildConnectionString(
+        params: ConnectionStringParams,
+    ): Result<string, string> {
         if (!params.hostname) {
             return err('Hostname is required');
         }
@@ -74,18 +86,26 @@ export const postgresqlMethods = {
         return ok(url.toString());
     },
 
-    getCredentialsFromContainer(container: ContainerInspectInfo): ConnectionStringParams {
+    getCredentialsFromContainer(
+        container: ContainerInspectInfo,
+    ): ConnectionStringParams {
         const infos: ConnectionStringParams = {};
 
-        const userKey = container.Config.Env.find(e => e.startsWith('POSTGRES_USER='));
+        const userKey = container.Config.Env.find((e) =>
+            e.startsWith('POSTGRES_USER='),
+        );
         infos.username = userKey?.split('=')?.[1] ?? 'postgres';
 
-        const passwordKey = container.Config.Env.find(e => e.startsWith('POSTGRES_PASSWORD='));
+        const passwordKey = container.Config.Env.find((e) =>
+            e.startsWith('POSTGRES_PASSWORD='),
+        );
         if (passwordKey) {
             infos.password = passwordKey.split('=')[1];
         }
 
-        const dbKey = container.Config.Env.find(e => e.startsWith('POSTGRES_DB='));
+        const dbKey = container.Config.Env.find((e) =>
+            e.startsWith('POSTGRES_DB='),
+        );
         infos.database = dbKey?.split('=')?.[1] ?? infos.username;
 
         return infos;
@@ -99,13 +119,17 @@ export const postgresqlMethods = {
         return url.toString();
     },
 
-    async recreateDatabase(connectionString: string): Promise<Result<void, string>> {
+    async recreateDatabase(
+        connectionString: string,
+    ): Promise<Result<void, string>> {
         // We cannot be connected to the database we are recreating. If the db in question is not 'postgres', we connect to it.
         // If we are restoring the 'postgres' db, we need to connect to a temporary database 'backry-restore-tmp-[date]',
         // That we create for this purpose, and then drop after the operation.
         const url = new URL(connectionString);
         if (!url.pathname || url.pathname === '/') {
-            return err('Database name is required in the connection string to recreate it');
+            return err(
+                'Database name is required in the connection string to recreate it',
+            );
         }
 
         const dbToRecreate = url.pathname.slice(1);
@@ -147,7 +171,6 @@ export const postgresqlMethods = {
 
             // Recreate the database.
             await con`CREATE DATABASE ${con(dbToRecreate)}`;
-
         } catch (e) {
             return err(e instanceof Error ? e.message : 'Error recreating database');
         } finally {

@@ -1,8 +1,8 @@
-import { apiError, apiSuccess } from '$lib/server/api/responses';
-import { parseRequestBody } from '$lib/server/schemas';
-import { settingsChangeRequest } from '$lib/server/schemas/api';
-import { testDockerConnection } from '$lib/server/services/docker';
-import { type Settings, updateSettings } from '$lib/server/settings/settings';
+import { apiError, apiSuccess } from '#lib/server/api/responses.ts';
+import { parseRequestBody } from '#lib/server/schemas/index.ts';
+import { settingsChangeRequest } from '#lib/server/schemas/api.ts';
+import { testDockerConnection } from '#lib/server/services/docker.ts';
+import { type Settings, updateSettings } from '#lib/server/settings/settings.ts';
 import type { RequestHandler } from './$types';
 
 export const PATCH: RequestHandler = async ({ request }) => {
@@ -15,7 +15,10 @@ export const PATCH: RequestHandler = async ({ request }) => {
         const checkResult = await testDockerConnection(body.value.dockerURI);
 
         if (checkResult.isErr()) {
-            return apiError(`${checkResult.error.code}: ${checkResult.error.message}`, 400);
+            return apiError(
+                `${checkResult.error.code}: ${checkResult.error.message}`,
+                400,
+            );
         }
     }
 

@@ -1,13 +1,13 @@
-import { ENGINES_METHODS } from '$lib/server/databases/engines-methods';
-import { type backups, type storages } from '$lib/server/db/schema';
-import { createBackup, setBackupsToPruned, updateBackup } from '$lib/server/queries/backups';
-import { getJob } from '$lib/server/queries/jobs';
-import { createRun, updateRun } from '$lib/server/queries/runs';
-import { logger } from '$lib/server/services/logger';
-import { applyForgetPolicy, backupFromCommand } from '$lib/server/services/restic';
-import { fireNotificationsForTrigger } from '$lib/server/settings/notifications';
-import { backupEmitter } from '$lib/server/shared/events';
-import type { EngineMethods } from '$lib/types/engine';
+import { ENGINES_METHODS } from '#lib/server/databases/engines-methods.ts';
+import { type backups, type storages } from '#lib/server/db/schema.ts';
+import { createBackup, setBackupsToPruned, updateBackup } from '#lib/server/queries/backups.ts';
+import { getJob } from '#lib/server/queries/jobs.ts';
+import { createRun, updateRun } from '#lib/server/queries/runs.ts';
+import { logger } from '#lib/server/services/logger.ts';
+import { applyForgetPolicy, backupFromCommand } from '#lib/server/services/restic.ts';
+import { fireNotificationsForTrigger } from '#lib/server/settings/notifications.ts';
+import { backupEmitter } from '#lib/server/shared/events.ts';
+import type { EngineMethods } from '#lib/types/engine.ts';
 import { sql } from 'drizzle-orm';
 import { err, ok, type Result } from 'neverthrow';
 import path from 'node:path';
@@ -18,7 +18,10 @@ import path from 'node:path';
  * @param forcedDatabases The list of database IDs to run the backup for. If null, all databases in the job will be backed up.
  * @returns If error, the error message. If success, void.
  */
-export async function runBackupJob(jobId: number, forcedDatabases: number[] | null = null): Promise<Result<void, string>> {
+export async function runBackupJob(
+    jobId: number,
+    forcedDatabases: number[] | null = null,
+): Promise<Result<void, string>> {
     logger.info(`Starting backup for job #${jobId}`);
 
     const job = await getJob(jobId);
@@ -33,12 +36,20 @@ export async function runBackupJob(jobId: number, forcedDatabases: number[] | nu
     let prunedSnapshotsCount = 0;
 
     for (let i = 0; i < job.jobsDatabases.length; i++) {
-        if (forcedDatabases && !forcedDatabases.includes(job.jobsDatabases[i].database.id)) {
+        if (
+            forcedDatabases &&
+            !forcedDatabases.includes(job.jobsDatabases[i].database.id)
+        ) {
             logger.debug(`Database #${i} is not in the forced list, skipping`);
             continue;
         }
 
-        const res = await jobDatabaseBackup(job, i, run.id, forcedDatabases !== null);
+        const res = await jobDatabaseBackup(
+            job,
+            i,
+            run.id,
+            forcedDatabases !== null,
+        );
 
         if (res.isOk() && res.value[0] === null) {
             continue; // Skip if the database was disabled in the job
@@ -51,7 +62,7 @@ export async function runBackupJob(jobId: number, forcedDatabases: number[] | nu
         }
 
         // 1s delay between each database backup
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
     }
 
     updateRun(run.id, {
@@ -71,7 +82,6 @@ export async function runBackupJob(jobId: number, forcedDatabases: number[] | nu
     logger.info(`Backup for job #${jobId} finished`);
     return ok();
 }
-
 
 /**
  * Run a backup for a specific database in a job. Also apply the delete policy if it exists.
@@ -119,23 +129,24 @@ async function jobDatabaseBackup(
         },
         engine.getDumpCommand(databaseInfo.connectionString),
         fileName,
-        [
-            `jobId:${job.id}`,
-            `dbId:${databaseInfo.id}`,
-        ],
+        [ `jobId:${job.id}`, `dbId:${databaseInfo.id}` ],
         {
-            onStdout: e => e.message_type === 'status' && backupEmitter.emit('update', {
-                id: backup.id,
-                duration: (Date.now() - startTime) / 1000,
-                dumpSize: e.bytes_done ?? null,
-            }),
+            onStdout: (e) =>
+                e.message_type === 'status' &&
+                backupEmitter.emit('update', {
+                    id: backup.id,
+                    duration: (Date.now() - startTime) / 1000,
+                    dumpSize: e.bytes_done ?? null,
+                }),
         },
     );
 
     const backupSummary = res.isOk()
-        ? res.value.find(r => r.message_type === 'summary')
+        ? res.value.find((r) => r.message_type === 'summary')
         : null;
-    const noSummaryErrorMessage = !backupSummary ? 'No result found in command output' : null;
+    const noSummaryErrorMessage = !backupSummary
+        ? 'No result found in command output'
+        : null;
 
     const updatedBackup = await updateBackup(backup.id, {
         // @ts-expect-error only accepts string, sql is not supported in type definition (but is for drizzle)
@@ -150,7 +161,10 @@ async function jobDatabaseBackup(
     backupEmitter.emit('update', updatedBackup);
 
     if (res.isErr()) {
-        logger.error(res.error, `Error running backup for job #${job.id} database #${jobIndex}`);
+        logger.error(
+            res.error,
+            `Error running backup for job #${job.id} database #${jobIndex}`,
+        );
         return err(JSON.stringify(res.error));
     }
 
@@ -173,7 +187,6 @@ async function jobDatabaseBackup(
     logger.info(`Backup for job #${job.id} database #${jobIndex} finished`);
     return ok([ updatedBackup, prunedSnapshotsCount ]);
 }
-
 
 /**
  * Apply the delete policy to a backup file by deleting snapshots, updating them in the database, and update to the client.
@@ -200,28 +213,44 @@ async function applyPrunePolicyOnJobDatabase(
         databaseId,
     );
     if (forgetResult.isErr()) {
-        logger.error(forgetResult.error, `Error applying forget policy for job #${jobId}`);
+        logger.error(
+            forgetResult.error,
+            `Error applying forget policy for job #${jobId}`,
+        );
         return err(`Error applying forget policy: ${forgetResult.error.message}`);
     }
 
     // There are multiple forget results, one for each database somehow (despite the tags filter)
-    const forgetStats = forgetResult.value[0].find(s => s.paths[0].endsWith(filePath));
+    const forgetStats = forgetResult.value[0].find((s) =>
+        s.paths[0].endsWith(filePath),
+    );
     if (!forgetStats) {
-        logger.error(`No forget stats found for job #${jobId} database #${databaseId} while applying forget policy (path ${filePath} no found)`);
+        logger.error(
+            `No forget stats found for job #${jobId} database #${databaseId} while applying forget policy (path ${filePath} no found)`,
+        );
         return err('No forget stats found for the backup file');
     }
 
-    logger.info(`Forget policy applied for job #${jobId} database #${databaseId}: ${forgetStats.remove?.length ?? 0} snapshots removed, ${forgetStats.keep?.length ?? 0} kept`);
-    logger.debug({
-        snapshotKept: forgetStats.keep?.map(s => ({
-            id: s.short_id,
-            matches: forgetStats.reasons?.find(r => r.snapshot.short_id === s.short_id)?.matches,
-        })),
-        snapshotRemoved: forgetStats.remove?.map(s => s.short_id),
-    }, 'Forget summary');
+    logger.info(
+        `Forget policy applied for job #${jobId} database #${databaseId}: ${forgetStats.remove?.length ?? 0} snapshots removed, ${forgetStats.keep?.length ?? 0} kept`,
+    );
+    logger.debug(
+        {
+            snapshotKept: forgetStats.keep?.map((s) => ({
+                id: s.short_id,
+                matches: forgetStats.reasons?.find(
+                    (r) => r.snapshot.short_id === s.short_id,
+                )?.matches,
+            })),
+            snapshotRemoved: forgetStats.remove?.map((s) => s.short_id),
+        },
+        'Forget summary',
+    );
 
     if (forgetStats.remove && forgetStats.remove.length > 0) {
-        const updatedBackups = await setBackupsToPruned(forgetStats.remove.map(s => s.id));
+        const updatedBackups = await setBackupsToPruned(
+            forgetStats.remove.map((s) => s.id),
+        );
         for (const backup of updatedBackups) {
             backupEmitter.emit('update', backup);
         }

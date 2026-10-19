@@ -1,8 +1,8 @@
 <script lang="ts">
-    import Head from '$lib/components/common/Head.svelte';
-    import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
-    import { Bell } from '$lib/components/icons';
-    import NotificationElement from '$lib/components/notifications/NotificationElement.svelte';
+    import Head from '#lib/components/common/Head.svelte';
+    import PageContentHeader from '#lib/components/common/PageContentHeader.svelte';
+    import { Bell } from '#lib/components/icons.ts';
+    import NotificationElement from '#lib/components/notifications/NotificationElement.svelte';
     import type { PageData } from './$types';
 
     interface Props {

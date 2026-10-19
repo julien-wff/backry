@@ -1,12 +1,12 @@
 <script lang="ts">
-    import { invalidateAll } from '$app/navigation';
-    import BaseListElement from '$lib/components/common/BaseListElement.svelte';
-    import { HardDrive, Link } from '$lib/components/icons';
-    import { fetchApi } from '$lib/helpers/fetch';
-    import { formatSize } from '$lib/helpers/format';
-    import { type storages } from '$lib/server/db/schema';
-    import type { StorageResponse } from '$lib/server/schemas/api';
-    import { addToast } from '$lib/stores/toasts.svelte';
+    import { refreshAll } from '$app/navigation';
+    import BaseListElement from '#lib/components/common/BaseListElement.svelte';
+    import { HardDrive, Link } from '#lib/components/icons.ts';
+    import { fetchApi } from '#lib/helpers/fetch.ts';
+    import { formatSize } from '#lib/helpers/format.ts';
+    import { type storages } from '#lib/server/db/schema.ts';
+    import type { StorageResponse } from '#lib/server/schemas/api.ts';
+    import { addToast } from '#lib/stores/toasts.svelte.ts';
 
     interface Props {
         storage: typeof storages.$inferSelect;
@@ -20,7 +20,7 @@
         const res = await fetchApi<StorageResponse>('DELETE', `/api/storages/${storage.id}`, null);
 
         if (res.isOk()) {
-            await invalidateAll();
+            await refreshAll();
         } else {
             addToast(`Failed to delete storage #${storage.id}: ${res.error}`, 'error');
         }

@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { type IconType } from '$lib/components/icons';
+    import { type IconType } from '#lib/components/icons.ts';
 
     interface Props {
         title: string;
-        icon: typeof IconType;
+        icon: IconType;
         href: string;
         active?: number;
         inactive?: number;

@@ -7,8 +7,8 @@
         type IconType,
         OctagonAlert,
         Trash2,
-    } from '$lib/components/icons';
-    import { type BACKUP_STATUS, type ELEMENT_STATUS } from '$lib/server/db/schema';
+    } from '#lib/components/icons.ts';
+    import { type BACKUP_STATUS, type ELEMENT_STATUS } from '#lib/server/db/schema.ts';
 
     interface Props {
         status: typeof ELEMENT_STATUS[number] | typeof BACKUP_STATUS[number];
@@ -17,7 +17,7 @@
 
     let { status, tooltip }: Props = $props();
 
-    const STATUS_MAPPING: Record<typeof status, { label: string, icon: typeof IconType }> = {
+    const STATUS_MAPPING: Record<typeof status, { label: string, icon: IconType }> = {
         active: { label: 'Active', icon: CircleCheck },
         inactive: { label: 'Inactive', icon: CircleX },
         error: { label: 'Error', icon: OctagonAlert },
@@ -27,7 +27,7 @@
         pruned: { label: 'Pruned', icon: Trash2 },
     };
 
-    const Icon = STATUS_MAPPING[status].icon;
+    const Icon = $derived(STATUS_MAPPING[status].icon);
 </script>
 
 

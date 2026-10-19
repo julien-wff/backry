@@ -1,4 +1,3 @@
-import type { Icon as IconType } from '@lucide/svelte';
 import ArchiveRestore from '@lucide/svelte/icons/archive-restore';
 import ArrowDown from '@lucide/svelte/icons/arrow-down';
 import ArrowUp from '@lucide/svelte/icons/arrow-up';
@@ -51,8 +50,9 @@ import Trash2 from '@lucide/svelte/icons/trash-2';
 import Wrench from '@lucide/svelte/icons/wrench';
 import Zap from '@lucide/svelte/icons/zap';
 
+export type { LucideIcon as IconType } from '@lucide/svelte';
+
 export {
-    type IconType,
     ArchiveRestore,
     ArrowDown,
     ArrowUp,

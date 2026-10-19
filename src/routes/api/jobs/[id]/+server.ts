@@ -1,9 +1,9 @@
-import { apiError, apiSuccess } from '$lib/server/api/responses';
-import { runBackupJob } from '$lib/server/backups/run-backup-job';
-import { deleteJob, updateJob, updateJobStatus } from '$lib/server/queries/jobs';
-import { parseRequestBody } from '$lib/server/schemas';
-import { jobPatchRequest, jobRequest, type JobResponse } from '$lib/server/schemas/api';
-import { addOrUpdateCronJob, stopCronJob } from '$lib/server/shared/cron';
+import { apiError, apiSuccess } from '#lib/server/api/responses.ts';
+import { runBackupJob } from '#lib/server/backups/run-backup-job.ts';
+import { deleteJob, updateJob, updateJobStatus } from '#lib/server/queries/jobs.ts';
+import { parseRequestBody } from '#lib/server/schemas/index.ts';
+import { jobPatchRequest, jobRequest, type JobResponse } from '#lib/server/schemas/api.ts';
+import { addOrUpdateCronJob, stopCronJob } from '#lib/server/shared/cron.ts';
 import type { RequestHandler } from './$types';
 
 export const DELETE: RequestHandler = async ({ params }) => {
@@ -23,7 +23,6 @@ export const DELETE: RequestHandler = async ({ params }) => {
 
     return apiSuccess<JobResponse>(deletedJob);
 };
-
 
 export const PUT: RequestHandler = async ({ params, request }) => {
     const jobId = parseInt(params.id);
@@ -53,7 +52,6 @@ export const PUT: RequestHandler = async ({ params, request }) => {
 
     return apiSuccess<JobResponse>(updatedJob);
 };
-
 
 export const PATCH: RequestHandler = async ({ params, request }) => {
     const jobId = parseInt(params.id);

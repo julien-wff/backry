@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { CircleHelp, EllipsisVertical, FileCheck, History } from '$lib/components/icons';
+    import { CircleHelp, EllipsisVertical, FileCheck, History } from '#lib/components/icons.ts';
 </script>
 
 <div class="alert alert-vertical sm:alert-horizontal" role="alert">

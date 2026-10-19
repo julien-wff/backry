@@ -1,5 +1,3 @@
-import { json } from '@sveltejs/kit';
-
 /**
  * API response type, with either error or data
  * @template T - Type of the data
@@ -19,7 +17,7 @@ export type ApiResponse<T extends object> = {
  * @returns Response object
  */
 export const apiError = (error: string, status = 400) => {
-    return json(
+    return Response.json(
         {
             error,
             data: null,
@@ -35,7 +33,7 @@ export const apiError = (error: string, status = 400) => {
  * @returns Response object
  */
 export const apiSuccess = <T extends object>(data: T, status = 200) => {
-    return json(
+    return Response.json(
         {
             error: null,
             data,

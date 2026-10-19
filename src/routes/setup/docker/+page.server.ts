@@ -1,4 +1,4 @@
-import { getSettings } from '$lib/server/settings/settings';
+import { getSettings } from '#lib/server/settings/settings.ts';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async () => {

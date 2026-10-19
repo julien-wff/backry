@@ -1,10 +1,10 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
     import { page } from '$app/state';
-    import InputContainer from '$lib/components/forms/InputContainer.svelte';
-    import type { databases as databasesSchema } from '$lib/server/db/schema';
-    import type { jobListLimited } from '$lib/server/queries/jobs';
-    import { itemFromList, positiveInt } from '$lib/helpers/parse';
+    import InputContainer from '#lib/components/forms/InputContainer.svelte';
+    import type { databases as databasesSchema } from '#lib/server/db/schema.ts';
+    import type { jobListLimited } from '#lib/server/queries/jobs.ts';
+    import { itemFromList, positiveInt } from '#lib/helpers/parse.ts';
 
     interface Props {
         jobs: Awaited<ReturnType<typeof jobListLimited>>;
@@ -29,7 +29,7 @@
     }
 
     async function applyFilters() {
-        const params = page.url.searchParams;
+        const params = new URLSearchParams(page.url.search);
 
         if (selectedJobId) {
             params.set('job', String(selectedJobId));
@@ -49,7 +49,7 @@
             params.delete('status');
         }
 
-        await goto(`?${params.toString()}`, { invalidateAll: true, replaceState: true });
+        await goto(`?${params.toString()}`, { refreshAll: true, replace: true });
         onfilterschange?.();
     }
 </script>

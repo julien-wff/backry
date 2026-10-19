@@ -1,7 +1,7 @@
 <script lang="ts">
-    import type { ModalControls } from '$lib/helpers/modal';
-    import Modal from '$lib/components/common/Modal.svelte';
-    import type { EngineMeta } from '$lib/types/engine';
+    import type { ModalControls } from '#lib/helpers/modal.ts';
+    import Modal from '#lib/components/common/Modal.svelte';
+    import type { EngineMeta } from '#lib/types/engine.ts';
     import dedent from 'dedent';
 
     interface Props {

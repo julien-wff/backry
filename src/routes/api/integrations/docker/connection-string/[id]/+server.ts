@@ -1,8 +1,8 @@
-import { apiError, apiSuccess } from '$lib/server/api/responses';
-import { ENGINES_METHODS } from '$lib/server/databases/engines-methods';
-import { parseRequestBody } from '$lib/server/schemas';
-import { dockerConnectionStringRequest, type DockerConnectionStringResponse } from '$lib/server/schemas/api';
-import { getDockerEngineFromSettings, inspectContainer } from '$lib/server/services/docker';
+import { apiError, apiSuccess } from '#lib/server/api/responses.ts';
+import { ENGINES_METHODS } from '#lib/server/databases/engines-methods.ts';
+import { parseRequestBody } from '#lib/server/schemas/index.ts';
+import { dockerConnectionStringRequest, type DockerConnectionStringResponse } from '#lib/server/schemas/api.ts';
+import { getDockerEngineFromSettings, inspectContainer } from '#lib/server/services/docker.ts';
 import type { RequestHandler } from './$types';
 
 /**
@@ -35,5 +35,7 @@ export const POST: RequestHandler = async ({ params, request }) => {
         return apiError(connectionString.error);
     }
 
-    return apiSuccess<DockerConnectionStringResponse>({ result: connectionString.value.toString() });
+    return apiSuccess<DockerConnectionStringResponse>({
+        result: connectionString.value.toString(),
+    });
 };

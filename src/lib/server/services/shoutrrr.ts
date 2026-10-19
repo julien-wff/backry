@@ -1,7 +1,6 @@
-import { runCommandSync } from '$lib/server/services/cmd';
-import { logger } from '$lib/server/services/logger';
+import { runCommandSync } from '#lib/server/services/cmd.ts';
+import { logger } from '#lib/server/services/logger.ts';
 import { err, ok, type Result } from 'neverthrow';
-
 
 export const SHOUTRRR_CMD = process.env.BACKRY_SHOUTRRR_CMD || 'shoutrrr';
 
@@ -12,11 +11,19 @@ export const SHOUTRRR_CMD = process.env.BACKRY_SHOUTRRR_CMD || 'shoutrrr';
  * @param title Optional title for the notification (if supported by the service).
  * @see https://nicholas-fedor.github.io/shoutrrr/
  */
-export async function sendShoutrrrNotification(url: string, body: string, title: string | null): Promise<Result<void, string>> {
-    const res = await runCommandSync(
-        SHOUTRRR_CMD,
-        [ 'send', url, '-m', body, '-t', title ?? 'Backry' ],
-    );
+export async function sendShoutrrrNotification(
+    url: string,
+    body: string,
+    title: string | null,
+): Promise<Result<void, string>> {
+    const res = await runCommandSync(SHOUTRRR_CMD, [
+        'send',
+        url,
+        '-m',
+        body,
+        '-t',
+        title ?? 'Backry',
+    ]);
 
     if (res.isErr()) {
         const error = res.error.stderr.toString().trim();
@@ -27,17 +34,13 @@ export async function sendShoutrrrNotification(url: string, body: string, title:
     return ok();
 }
 
-
 /**
  * Gets the version of Shoutrrr.
  * @returns The version of Shoutrrr, or an error if it could not be determined.
  * @see https://nicholas-fedor.github.io/shoutrrr/
  */
 export async function getShoutrrrVersion(): Promise<Result<string, string>> {
-    const res = await runCommandSync(
-        SHOUTRRR_CMD,
-        [ '--version' ],
-    );
+    const res = await runCommandSync(SHOUTRRR_CMD, [ '--version' ]);
 
     if (res.isErr()) {
         const error = res.error.stderr.toString().trim();

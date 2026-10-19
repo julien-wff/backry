@@ -1,20 +1,20 @@
 <script lang="ts">
     import { page } from '$app/state';
-    import BackupFilterModalContent from '$lib/components/backups/BackupFilterModalContent.svelte';
-    import RunElement from '$lib/components/backups/RunElement.svelte';
-    import Head from '$lib/components/common/Head.svelte';
-    import Modal from '$lib/components/common/Modal.svelte';
-    import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
-    import { ListCheck, Plus } from '$lib/components/icons';
+    import BackupFilterModalContent from '#lib/components/backups/BackupFilterModalContent.svelte';
+    import RunElement from '#lib/components/backups/RunElement.svelte';
+    import Head from '#lib/components/common/Head.svelte';
+    import Modal from '#lib/components/common/Modal.svelte';
+    import PageContentHeader from '#lib/components/common/PageContentHeader.svelte';
+    import { ListCheck, Plus } from '#lib/components/icons.ts';
     import dayjs from 'dayjs';
     import relativeTime from 'dayjs/plugin/relativeTime';
     import utc from 'dayjs/plugin/utc';
     import type { PageData } from './$types';
-    import { fetchApi } from '$lib/helpers/fetch';
-    import type { RunsQueryResult } from '$lib/server/schemas/api';
+    import { fetchApi } from '#lib/helpers/fetch.ts';
+    import type { RunsQueryResult } from '#lib/server/schemas/api.ts';
     import { onMount } from 'svelte';
-    import NoBackupWithFiltersAlert from '$lib/components/backups/NoBackupWithFiltersAlert.svelte';
-    import type { ModalControls } from '$lib/helpers/modal';
+    import NoBackupWithFiltersAlert from '#lib/components/backups/NoBackupWithFiltersAlert.svelte';
+    import type { ModalControls } from '#lib/helpers/modal.ts';
 
     dayjs.extend(relativeTime);
     dayjs.extend(utc);
@@ -48,7 +48,7 @@
 
         isLoadingMore = true;
 
-        const params = new URLSearchParams(page.url.searchParams);
+        const params = new URLSearchParams(page.url.search);
         params.set('cursor', runsData.nextPageCursor.toString());
         params.set('limit', runsData.limit.toString());
 
@@ -102,7 +102,7 @@
             // If the run is in the current API data, remove it from there
             apiData.runs = apiData.runs.filter(apiRun => apiRun.id !== deletedRun.id);
         } else if (apiData) {
-            // If the run is in the page data, remove the x first backups from the API data, since invalidateAll will
+            // If the run is in the page data, remove the x first backups from the API data, since refreshAll will
             // load them into the page data
             // x is the number of backups in the deleted run
             const backupsToRemove = deletedRun.backups.length;
@@ -124,7 +124,7 @@
                 backups: apiRun.backups.filter(apiBackup => apiBackup.id !== deletedBackup.id),
             }));
         } else if (apiData) {
-            // If the backup is in the page data, remove the first backup of the first run, since invalidateAll will
+            // If the backup is in the page data, remove the first backup of the first run, since refreshAll will
             // load it into the API data
             const firstRunWithBackups = apiData.runs.findIndex(apiRun => apiRun.backups.length > 0);
             if (firstRunWithBackups === -1) {
