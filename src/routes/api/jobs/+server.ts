@@ -1,9 +1,9 @@
-import { apiError, apiSuccess } from '$lib/server/api/responses';
-import { runBackupJob } from '$lib/server/backups/run-backup-job';
-import { createJob } from '$lib/server/queries/jobs';
-import { parseRequestBody } from '$lib/server/schemas';
-import { jobRequest, type JobResponse } from '$lib/server/schemas/api';
-import { addOrUpdateCronJob } from '$lib/server/shared/cron';
+import { apiError, apiSuccess } from '#lib/server/api/responses.ts';
+import { runBackupJob } from '#lib/server/backups/run-backup-job.ts';
+import { createJob } from '#lib/server/queries/jobs.ts';
+import { parseRequestBody } from '#lib/server/schemas/index.ts';
+import { jobRequest, type JobResponse } from '#lib/server/schemas/api.ts';
+import { addOrUpdateCronJob } from '#lib/server/shared/cron.ts';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request }) => {

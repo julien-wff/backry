@@ -1,5 +1,5 @@
-import { formatDuration, formatSize } from '$lib/helpers/format';
-import type { NotificationRunPayload } from '$lib/types/notifications';
+import { formatDuration, formatSize } from '#lib/helpers/format.ts';
+import type { NotificationRunPayload } from '#lib/types/notifications.ts';
 import dayjs from 'dayjs';
 import { render } from 'ejs';
 import { fromThrowable, Result } from 'neverthrow';
@@ -47,6 +47,6 @@ export function renderNotificationTemplate(
 ): Result<string, string> {
     return fromThrowable(
         () => render(template, data, { async: false }),
-        e => e instanceof Error ? e.message : String(e),
+        (e) => (e instanceof Error ? e.message : String(e)),
     )();
 }

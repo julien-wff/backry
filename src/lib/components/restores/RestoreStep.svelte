@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { RESTORE_STEPS } from '$lib/common/constants';
-    import { CircleCheck, CircleDot, CircleX, LoaderCircle } from '$lib/components/icons';
-    import { getRestoreStepStatus } from '$lib/helpers/restore';
-    import type { restores } from '$lib/server/db/schema';
+    import { RESTORE_STEPS } from '#lib/common/constants.ts';
+    import { CircleCheck, CircleDot, CircleX, LoaderCircle } from '#lib/components/icons.ts';
+    import { getRestoreStepStatus } from '#lib/helpers/restore.ts';
+    import type { restores } from '#lib/server/db/schema.ts';
 
     interface Props {
         step: typeof RESTORE_STEPS[number];

@@ -1,8 +1,8 @@
-import { buildDbUrlFromParams } from '$lib/server/databases/utils';
-import { databases } from '$lib/server/db/schema';
-import { runCommandSync } from '$lib/server/services/cmd';
-import { logger } from '$lib/server/services/logger';
-import type { ConnectionStringParams, EngineMethods } from '$lib/types/engine';
+import { buildDbUrlFromParams } from '#lib/server/databases/utils.ts';
+import { databases } from '#lib/server/db/schema.ts';
+import { runCommandSync } from '#lib/server/services/cmd.ts';
+import { logger } from '#lib/server/services/logger.ts';
+import type { ConnectionStringParams, EngineMethods } from '#lib/types/engine.ts';
 import { type ContainerInspectInfo } from 'dockerode';
 import { err, ok, type Result } from 'neverthrow';
 
@@ -12,7 +12,10 @@ import { err, ok, type Result } from 'neverthrow';
  * @param databaseWithFlag Whether to include the database under the --database flag (mysql)
  *                         or as a positional argument (mysqldump).
  */
-function connectionStringToOptions(str: string, databaseWithFlag = true): string[] {
+function connectionStringToOptions(
+    str: string,
+    databaseWithFlag = true,
+): string[] {
     const url = URL.parse(str);
     if (!url) {
         return [];
@@ -65,9 +68,15 @@ function extractPassword(url: URL | null) {
 }
 
 export const mysqlMethods = {
-    checkCommand: process.env.BACKRY_MYSQL_CHECK_CMD ?? process.env.BACKRY_MYSQL_RESTORE_CMD ?? 'mysql',
+    checkCommand:
+        process.env.BACKRY_MYSQL_CHECK_CMD ??
+        process.env.BACKRY_MYSQL_RESTORE_CMD ??
+        'mysql',
     dumpCommand: process.env.BACKRY_MYSQL_DUMP_CMD ?? 'mysqldump',
-    restoreCommand: process.env.BACKRY_MYSQL_RESTORE_CMD ?? process.env.BACKRY_MYSQL_CHECK_CMD ?? 'mysql',
+    restoreCommand:
+        process.env.BACKRY_MYSQL_RESTORE_CMD ??
+        process.env.BACKRY_MYSQL_CHECK_CMD ??
+        'mysql',
     dumpFileExtension: 'sql',
 
     async getDumpCmdVersion(): Promise<Result<string, string>> {
@@ -89,7 +98,11 @@ export const mysqlMethods = {
     },
 
     getDumpCommand(connectionString, additionalArgs = []) {
-        return [ this.dumpCommand, ...additionalArgs, ...connectionStringToOptions(connectionString, false) ];
+        return [
+            this.dumpCommand,
+            ...additionalArgs,
+            ...connectionStringToOptions(connectionString, false),
+        ];
     },
 
     getDumpEnv(database: typeof databases.$inferSelect): Record<string, string> {
@@ -130,13 +143,19 @@ export const mysqlMethods = {
     },
 
     isDockerContainerFromEngine(container: ContainerInspectInfo): boolean {
-        return container.Args[0] === 'mysqld'
-            || container.Mounts.some(m => m.Destination === '/var/lib/mysql')
-            || Object.keys(container.Config.Volumes ?? {}).some(v => v === '/var/lib/mysql')
-            || container.Config.Env.some(e => e.startsWith('MYSQL_VERSION='));
+        return (
+            container.Args[0] === 'mysqld' ||
+            container.Mounts.some((m) => m.Destination === '/var/lib/mysql') ||
+            Object.keys(container.Config.Volumes ?? {}).some(
+                (v) => v === '/var/lib/mysql',
+            ) ||
+            container.Config.Env.some((e) => e.startsWith('MYSQL_VERSION='))
+        );
     },
 
-    buildConnectionString(params: ConnectionStringParams): Result<string, string> {
+    buildConnectionString(
+        params: ConnectionStringParams,
+    ): Result<string, string> {
         if (!params.hostname) {
             return err('Hostname is required');
         }
@@ -146,24 +165,34 @@ export const mysqlMethods = {
         return ok(url.toString());
     },
 
-    getCredentialsFromContainer(container: ContainerInspectInfo): ConnectionStringParams {
+    getCredentialsFromContainer(
+        container: ContainerInspectInfo,
+    ): ConnectionStringParams {
         const infos: ConnectionStringParams = {};
 
-        const rootPasswordKey = container.Config.Env.find(e => e.startsWith('MYSQL_ROOT_PASSWORD='));
+        const rootPasswordKey = container.Config.Env.find((e) =>
+            e.startsWith('MYSQL_ROOT_PASSWORD='),
+        );
         if (rootPasswordKey) {
             // Prioritize root user if password is set
             infos.username = 'root';
             infos.password = rootPasswordKey.split('=')[1];
         } else {
             // Else try to get non-root user
-            const userKey = container.Config.Env.find(e => e.startsWith('MYSQL_USER='));
+            const userKey = container.Config.Env.find((e) =>
+                e.startsWith('MYSQL_USER='),
+            );
             infos.username = userKey?.split('=')[1];
 
-            const passwordKey = container.Config.Env.find(e => e.startsWith('MYSQL_PASSWORD='));
+            const passwordKey = container.Config.Env.find((e) =>
+                e.startsWith('MYSQL_PASSWORD='),
+            );
             infos.password = passwordKey?.split('=')[1];
         }
 
-        const dbKey = container.Config.Env.find(e => e.startsWith('MYSQL_DATABASE='));
+        const dbKey = container.Config.Env.find((e) =>
+            e.startsWith('MYSQL_DATABASE='),
+        );
         infos.database = dbKey?.split('=')?.[1] ?? 'database';
 
         return infos;
@@ -181,7 +210,9 @@ export const mysqlMethods = {
         return url.toString();
     },
 
-    async recreateDatabase(connectionString: string): Promise<Result<void, string>> {
+    async recreateDatabase(
+        connectionString: string,
+    ): Promise<Result<void, string>> {
         const url = URL.parse(connectionString);
         if (!url) {
             return err('Invalid connection string');
@@ -194,10 +225,16 @@ export const mysqlMethods = {
         const dbName = url.pathname.slice(1).replace(/`/g, '``');
 
         if (!/^[A-Za-z0-9_\-$]+$/.test(dbName)) {
-            return err('Unsupported database name. Allowed: letters, digits, _, -, $');
+            return err(
+                'Unsupported database name. Allowed: letters, digits, _, -, $',
+            );
         }
 
-        if ([ 'mysql', 'information_schema', 'performance_schema', 'sys' ].includes(dbName)) {
+        if (
+            [ 'mysql', 'information_schema', 'performance_schema', 'sys' ].includes(
+                dbName,
+            )
+        ) {
             return err(`Refusing to drop and recreate system database "${dbName}"`);
         }
 
@@ -225,7 +262,11 @@ export const mysqlMethods = {
     },
 
     getRestoreBackupFromStdinCommand(connectionString: string): string[] {
-        return [ this.restoreCommand, ...connectionStringToOptions(connectionString), '--batch' ];
+        return [
+            this.restoreCommand,
+            ...connectionStringToOptions(connectionString),
+            '--batch',
+        ];
     },
 
     getRestoreEnv(connectionString: string): Record<string, string> {

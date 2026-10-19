@@ -1,6 +1,6 @@
-import { apiError, apiSuccess } from '$lib/server/api/responses';
-import { getApiStats } from '$lib/server/queries/shared';
-import { logger } from '$lib/server/services/logger';
+import { apiError, apiSuccess } from '#lib/server/api/responses.ts';
+import { getApiStats } from '#lib/server/queries/shared.ts';
+import { logger } from '#lib/server/services/logger.ts';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async () => {

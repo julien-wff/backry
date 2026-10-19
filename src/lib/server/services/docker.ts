@@ -1,10 +1,10 @@
-import { ENGINES_METHODS } from '$lib/server/databases/engines-methods';
-import { DATABASE_ENGINES } from '$lib/server/db/schema';
-import { logger } from '$lib/server/services/logger';
-import { getSettings } from '$lib/server/settings/settings';
+import { ENGINES_METHODS } from '#lib/server/databases/engines-methods.ts';
+import { DATABASE_ENGINES } from '#lib/server/db/schema.ts';
+import { logger } from '#lib/server/services/logger.ts';
+import { getSettings } from '#lib/server/settings/settings.ts';
 import Docker, { type ContainerInspectInfo, type ImageInspectInfo } from 'dockerode';
 import { err, ok, type Result } from 'neverthrow';
-import { prettyPrintServerInfo } from '$lib/helpers/docker';
+import { prettyPrintServerInfo } from '#lib/helpers/docker.ts';
 
 interface DockerError extends Error {
     code: string;
@@ -19,18 +19,20 @@ interface DockerError extends Error {
  * @returns Docker instance
  */
 export function getDockerEngine(uri: string) {
-    const isSocketPath = uri.startsWith('/')
-        || uri.startsWith('\\\\.\\pipe\\')
-        || uri.startsWith('unix://')
-        || uri.startsWith('npipe://');
+    const isSocketPath =
+        uri.startsWith('/') ||
+        uri.startsWith('\\\\.\\pipe\\') ||
+        uri.startsWith('unix://') ||
+        uri.startsWith('npipe://');
 
     if (isSocketPath) {
         return new Docker({ socketPath: uri });
     }
 
-    const isUrl = uri.startsWith('http://')
-        || uri.startsWith('https://')
-        || uri.startsWith('tcp://');
+    const isUrl =
+        uri.startsWith('http://') ||
+        uri.startsWith('https://') ||
+        uri.startsWith('tcp://');
 
     if (isUrl) {
         const url = new URL(uri);
@@ -38,13 +40,15 @@ export function getDockerEngine(uri: string) {
             host: url.hostname,
             port: url.port || undefined,
             protocol: [ 'http:', 'https:' ].includes(url.protocol)
-                ? url.protocol.slice(0, -1) as 'http' | 'https'
+                ? (url.protocol.slice(0, -1) as 'http' | 'https')
                 : undefined,
         });
     }
 
     // TODO: handle other cases (SSH, etc.)
-    logger.warn(`Docker URI format not recognized (${uri}), using default Docker connection`);
+    logger.warn(
+        `Docker URI format not recognized (${uri}), using default Docker connection`,
+    );
     return new Docker();
 }
 
@@ -52,10 +56,14 @@ export function getDockerEngine(uri: string) {
  * Get Docker engine instance from settings
  * @returns Either a Docker instance or an error message
  */
-export async function getDockerEngineFromSettings(): Promise<Result<Docker, string>> {
+export async function getDockerEngineFromSettings(): Promise<
+    Result<Docker, string>
+> {
     const settings = await getSettings();
     if (!settings.dockerURI) {
-        return err('Docker URI is not configured. Please configure it in Settings.');
+        return err(
+            'Docker URI is not configured. Please configure it in Settings.',
+        );
     }
 
     return ok(getDockerEngine(settings.dockerURI));
@@ -66,7 +74,9 @@ export async function getDockerEngineFromSettings(): Promise<Result<Docker, stri
  * @param uri Docker connection URI
  * @returns Either true if connection is successful or an error message
  */
-export async function testDockerConnection(uri: string): Promise<Result<boolean, DockerError>> {
+export async function testDockerConnection(
+    uri: string,
+): Promise<Result<boolean, DockerError>> {
     const docker = getDockerEngine(uri);
 
     try {
@@ -83,7 +93,9 @@ export async function testDockerConnection(uri: string): Promise<Result<boolean,
  * @param docker Docker instance
  * @returns Either an array of ContainerInspectInfo or an error message
  */
-export async function getContainers(docker: Docker): Promise<Result<ContainerInspectInfo[], string>> {
+export async function getContainers(
+    docker: Docker,
+): Promise<Result<ContainerInspectInfo[], string>> {
     try {
         const containers = await docker.listContainers({ all: true });
         const details = await Promise.all(
@@ -96,14 +108,16 @@ export async function getContainers(docker: Docker): Promise<Result<ContainerIns
     }
 }
 
-
 /**
  * Inspect a container by its ID
  * @param docker Docker instance
  * @param containerId Docker ID of the container
  * @return Either the ContainerInspectInfo or an error message
  */
-export async function inspectContainer(docker: Docker, containerId: string): Promise<Result<ContainerInspectInfo, string>> {
+export async function inspectContainer(
+    docker: Docker,
+    containerId: string,
+): Promise<Result<ContainerInspectInfo, string>> {
     try {
         return ok(await docker.getContainer(containerId).inspect());
     } catch (error) {
@@ -117,8 +131,13 @@ export async function inspectContainer(docker: Docker, containerId: string): Pro
  * @param containers Array of ContainerInspectInfo
  * @returns Object with database engines as keys and arrays of ContainerInspectInfo as values
  */
-export function classifyContainersByEngine(containers: ContainerInspectInfo[]): Record<typeof DATABASE_ENGINES[number], ContainerInspectInfo[]> {
-    const result = {} as Record<typeof DATABASE_ENGINES[number], ContainerInspectInfo[]>;
+export function classifyContainersByEngine(
+    containers: ContainerInspectInfo[],
+): Record<(typeof DATABASE_ENGINES)[number], ContainerInspectInfo[]> {
+    const result = {} as Record<
+        (typeof DATABASE_ENGINES)[number],
+        ContainerInspectInfo[]
+    >;
     for (const engine of DATABASE_ENGINES) {
         result[engine] = [];
         const engineMethod = ENGINES_METHODS[engine];
@@ -137,7 +156,14 @@ export function classifyContainersByEngine(containers: ContainerInspectInfo[]): 
  * @param docker Docker instance
  * @returns Either an object with database engines as keys and arrays of ContainerInspectInfo as values or an error message
  */
-export async function getContainersByEngines(docker: Docker): Promise<Result<Record<typeof DATABASE_ENGINES[number], ContainerInspectInfo[]>, string>> {
+export async function getContainersByEngines(
+    docker: Docker,
+): Promise<
+    Result<
+        Record<(typeof DATABASE_ENGINES)[number], ContainerInspectInfo[]>,
+        string
+    >
+> {
     const containersResult = await getContainers(docker);
     if (containersResult.isErr()) {
         return err(containersResult.error);
@@ -153,13 +179,19 @@ export async function getContainersByEngines(docker: Docker): Promise<Result<Rec
  * @param containers Array of ContainerInspectInfo
  * @returns Either an object with image names as keys and ImageInspectInfo as values or an error message
  */
-export async function getImagesFromContainers(docker: Docker, containers: ContainerInspectInfo[]): Promise<Result<Record<string, ImageInspectInfo>, string>> {
+export async function getImagesFromContainers(
+    docker: Docker,
+    containers: ContainerInspectInfo[],
+): Promise<Result<Record<string, ImageInspectInfo>, string>> {
     try {
         const images = await Promise.all(
-            containers.map(async (container) => [
-                container.Image,
-                await docker.getImage(container.Image).inspect(),
-            ] as const),
+            containers.map(
+                async (container) =>
+                    [
+                        container.Image,
+                        await docker.getImage(container.Image).inspect(),
+                    ] as const,
+            ),
         );
         return ok(Object.fromEntries(images));
     } catch (error) {
@@ -168,7 +200,9 @@ export async function getImagesFromContainers(docker: Docker, containers: Contai
     }
 }
 
-export async function getDockerInfo(docker: Docker): Promise<Result<string, string>> {
+export async function getDockerInfo(
+    docker: Docker,
+): Promise<Result<string, string>> {
     try {
         const info = await docker.info();
         return ok(prettyPrintServerInfo(info));
@@ -188,7 +222,10 @@ export const processContainerForClient = (container: ContainerInspectInfo) => ({
     name: container.Name.slice(1),
     image: container.Image,
     state: container.State,
-    composeStackName: container.Config.Labels?.['com.docker.compose.project'] || container.Config.Labels?.['com.docker.compose.service'] || null,
+    composeStackName:
+        container.Config.Labels?.['com.docker.compose.project'] ||
+        container.Config.Labels?.['com.docker.compose.service'] ||
+        null,
 });
 
 /**
@@ -198,5 +235,7 @@ export const processContainerForClient = (container: ContainerInspectInfo) => ({
  */
 export const processImageForClient = (image: ImageInspectInfo) => ({
     id: image.Id,
-    tagName: image.RepoTags?.[0] || `<none> (${image.Id.replace(/^sha256:/, '').slice(0, 12)})`,
+    tagName:
+        image.RepoTags?.[0] ||
+        `<none> (${image.Id.replace(/^sha256:/, '').slice(0, 12)})`,
 });

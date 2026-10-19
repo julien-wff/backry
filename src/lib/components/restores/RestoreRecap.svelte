@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { ENGINES_META } from '$lib/common/engines-meta';
-    import { formatSize, formatUtcDate } from '$lib/helpers/format';
-    import type { backups, databases } from '$lib/server/db/schema';
+    import { ENGINES_META } from '#lib/common/engines-meta.ts';
+    import { formatSize, formatUtcDate } from '#lib/helpers/format.ts';
+    import type { backups, databases } from '#lib/server/db/schema.ts';
 
     interface Props {
         backup: Pick<typeof backups.$inferSelect, 'fileName' | 'dumpSize' | 'snapshotId' | 'finishedAt'> | null;

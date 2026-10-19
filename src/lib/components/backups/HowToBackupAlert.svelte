@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { CircleHelp, Play, Timer } from '$lib/components/icons';
+    import { CircleHelp, Play, Timer } from '#lib/components/icons.ts';
 </script>
 
 <div class="alert alert-vertical sm:alert-horizontal" role="alert">

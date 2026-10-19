@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { invalidateAll } from '$app/navigation';
-    import Navbar from '$lib/components/navbar/Navbar.svelte';
+    import { refreshAll } from '$app/navigation';
+    import Navbar from '#lib/components/navbar/Navbar.svelte';
     import { onMount } from 'svelte';
     import type { LayoutProps } from './$types';
 
@@ -13,7 +13,7 @@
     onMount(() => {
         const reloadInterval = setInterval(() => {
             if (!document.hidden) {
-                invalidateAll();
+                refreshAll();
             } else {
                 reloadSkipped = true;
             }
@@ -25,7 +25,7 @@
     function handleVisibilityChange() {
         if (!document.hidden && reloadSkipped) {
             reloadSkipped = false;
-            invalidateAll();
+            refreshAll();
         }
     }
 </script>
@@ -45,6 +45,6 @@
     </main>
 </div>
 
-{#await import('$lib/components/common/Toasts.svelte') then Toasts}
+{#await import('#lib/components/common/Toasts.svelte') then Toasts}
     <Toasts.default/>
 {/await}

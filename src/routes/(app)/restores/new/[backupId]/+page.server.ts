@@ -1,7 +1,7 @@
-import { parseIdOrNewParam } from '$lib/server/api/params';
+import { parseIdOrNewParam } from '#lib/server/api/params.ts';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { getBackup } from '$lib/server/queries/backups';
+import { getBackup } from '#lib/server/queries/backups.ts';
 
 export const load: PageServerLoad = async ({ params }) => {
     const { id } = parseIdOrNewParam(params.backupId);
@@ -23,7 +23,10 @@ export const load: PageServerLoad = async ({ params }) => {
     }
 
     if (!backup.dumpSize) {
-        return error(400, `Backup has an invalid dump size (${backup.dumpSize}) and cannot be restored`);
+        return error(
+            400,
+            `Backup has an invalid dump size (${backup.dumpSize}) and cannot be restored`,
+        );
     }
 
     return {

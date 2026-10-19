@@ -1,15 +1,18 @@
 <script lang="ts">
-    import Head from '$lib/components/common/Head.svelte';
-    import InputContainer from '$lib/components/forms/InputContainer.svelte';
-    import { Info, OctagonAlert } from '$lib/components/icons';
-    import OnboardingCard from '$lib/components/onboarding/OnboardingCard.svelte';
-    import { SetupApiStore } from '$lib/helpers/setup.svelte';
+    import { untrack } from 'svelte';
+    import Head from '#lib/components/common/Head.svelte';
+    import InputContainer from '#lib/components/forms/InputContainer.svelte';
+    import { Info, OctagonAlert } from '#lib/components/icons.ts';
+    import OnboardingCard from '#lib/components/onboarding/OnboardingCard.svelte';
+    import { SetupApiStore } from '#lib/helpers/setup.svelte.ts';
     import type { PageProps } from './$types';
 
     let { data }: PageProps = $props();
 
+    const initialData = untrack(() => data);
+
     let dockerIntegration = $state(true);
-    let dockerHost = $state(data.dockerURI || '/var/run/docker.sock');
+    let dockerHost = $state(initialData.dockerURI || '/var/run/docker.sock');
 
     const apiSetup = new SetupApiStore('complete');
 

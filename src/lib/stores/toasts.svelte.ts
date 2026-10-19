@@ -1,4 +1,4 @@
-import { randomId } from '$lib/helpers/common';
+import { randomId } from '#lib/helpers/common.ts';
 
 export type ToastType = 'success' | 'error';
 

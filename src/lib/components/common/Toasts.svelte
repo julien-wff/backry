@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { CircleCheck, CircleX, OctagonAlert } from '$lib/components/icons';
-    import { removeToast, toasts } from '$lib/stores/toasts.svelte';
+    import { CircleCheck, CircleX, OctagonAlert } from '#lib/components/icons.ts';
+    import { removeToast, toasts } from '#lib/stores/toasts.svelte.ts';
     import { flip } from 'svelte/animate';
     import { fade } from 'svelte/transition';
 </script>

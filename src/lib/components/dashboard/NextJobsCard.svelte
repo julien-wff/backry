@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { Timer } from '$lib/components/icons';
-    import type { getDashboardStats } from '$lib/server/queries/shared';
+    import { Timer } from '#lib/components/icons.ts';
+    import type { getDashboardStats } from '#lib/server/queries/shared.ts';
     import dayjs from 'dayjs';
     import relativeTime from 'dayjs/plugin/relativeTime';
-    import { capitalizeFirstLetter } from '$lib/helpers/format';
+    import { capitalizeFirstLetter } from '#lib/helpers/format.ts';
 
     dayjs.extend(relativeTime);
 

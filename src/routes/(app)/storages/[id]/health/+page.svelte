@@ -1,16 +1,16 @@
 <script lang="ts">
-    import { invalidateAll } from '$app/navigation';
-    import Head from '$lib/components/common/Head.svelte';
-    import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
-    import ElementForm from '$lib/components/forms/ElementForm.svelte';
-    import InputContainer from '$lib/components/forms/InputContainer.svelte';
-    import { HeartPulse } from '$lib/components/icons';
-    import LocksDisplay from '$lib/components/storages/health/LocksDisplay.svelte';
-    import PruneDesyncDisplay from '$lib/components/storages/health/PruneDesyncDisplay.svelte';
-    import StaleSnapshotsDisplay from '$lib/components/storages/health/StaleSnapshotsDisplay.svelte';
-    import { fetchApi } from '$lib/helpers/fetch';
-    import type { ELEMENT_STATUS } from '$lib/server/db/schema';
-    import type { storagePatchRequest, StorageResponse } from '$lib/server/schemas/api';
+    import { refreshAll } from '$app/navigation';
+    import Head from '#lib/components/common/Head.svelte';
+    import PageContentHeader from '#lib/components/common/PageContentHeader.svelte';
+    import ElementForm from '#lib/components/forms/ElementForm.svelte';
+    import InputContainer from '#lib/components/forms/InputContainer.svelte';
+    import { HeartPulse } from '#lib/components/icons.ts';
+    import LocksDisplay from '#lib/components/storages/health/LocksDisplay.svelte';
+    import PruneDesyncDisplay from '#lib/components/storages/health/PruneDesyncDisplay.svelte';
+    import StaleSnapshotsDisplay from '#lib/components/storages/health/StaleSnapshotsDisplay.svelte';
+    import { fetchApi } from '#lib/helpers/fetch.ts';
+    import type { ELEMENT_STATUS } from '#lib/server/db/schema.ts';
+    import type { storagePatchRequest, StorageResponse } from '#lib/server/schemas/api.ts';
     import type { PageProps } from './$types';
 
     let { data }: PageProps = $props();
@@ -41,7 +41,7 @@
             {
                 status: newStatus,
             },
-        ).then(() => invalidateAll()); // Invalidate so page has the updated status
+        ).then(() => refreshAll()); // Invalidate so page has the updated status
     });
 </script>
 

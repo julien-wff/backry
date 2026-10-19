@@ -1,7 +1,8 @@
-import { logger } from '$lib/server/services/logger';
+import { logger } from '#lib/server/services/logger.ts';
 import { CronJob, validateCronExpression } from 'cron';
 
-type SystemCronId = `system:${'check-dbs' | 'check-storages' | 'update-storages-health' | 'db-maintenance'}`;
+type SystemCronId =
+    `system:${'check-dbs' | 'check-storages' | 'update-storages-health' | 'db-maintenance'}`;
 type JobCronId = `job:${number}`;
 export type CronId = SystemCronId | JobCronId;
 
@@ -14,11 +15,17 @@ const cronJobs: Map<CronId, CronJob> = new Map();
  * @param cron Cron expression.
  * @param callback Callback function to execute.
  */
-export const addOrUpdateCronJob = (id: CronId, cron: string, callback: () => any) => {
+export const addOrUpdateCronJob = (
+    id: CronId,
+    cron: string,
+    callback: () => any,
+) => {
     const oldCron = cronJobs.get(id);
     oldCron?.stop();
 
-    logger.debug(`${oldCron ? 'Editing' : 'Adding'} cron job ${id} with cron expression ${cron}`);
+    logger.debug(
+        `${oldCron ? 'Editing' : 'Adding'} cron job ${id} with cron expression ${cron}`,
+    );
 
     const job = new CronJob(
         cron,
@@ -55,9 +62,9 @@ export const stopCronJob = (id: CronId) => {
  */
 export function getNextJobs(count = 3) {
     return Array.from(cronJobs.entries())
-        .filter(e => e[0].startsWith('job:'))
+        .filter((e) => e[0].startsWith('job:'))
         .map(([ jobId, cron ]) =>
-            cron.nextDates(3).map(date => ({
+            cron.nextDates(3).map((date) => ({
                 jobId: parseInt(jobId.split(':')[1]),
                 date: date.toJSDate(),
             })),
@@ -74,7 +81,7 @@ export function getNextJobs(count = 3) {
  * @returns Array of Date objects. If the job is not found, returns an empty array.
  */
 export const cronNextExecutions = (id: CronId, count = 1) =>
-    (cronJobs.get(id)?.nextDates(count) ?? []).map(d => d.toJSDate());
+    (cronJobs.get(id)?.nextDates(count) ?? []).map((d) => d.toJSDate());
 
 /**
  * Parse cron from user input / env variable, and if undefined or invalid, uses fallback
@@ -83,7 +90,11 @@ export const cronNextExecutions = (id: CronId, count = 1) =>
  * @param consoleName If specified, will be used to log a warning if the cron is invalid
  * @return cron expression
  */
-export function validCronOrDefault(cron: any, fallback: string, consoleName?: string) {
+export function validCronOrDefault(
+    cron: any,
+    fallback: string,
+    consoleName?: string,
+) {
     if (typeof cron !== 'string' || !cron.trim()) {
         return fallback;
     }
@@ -91,7 +102,9 @@ export function validCronOrDefault(cron: any, fallback: string, consoleName?: st
     if (validateCronExpression(cron).valid) {
         return cron;
     } else {
-        logger.warn(`Invalid cron "${cron}" for ${consoleName}, using fallback "${fallback}"`);
+        logger.warn(
+            `Invalid cron "${cron}" for ${consoleName}, using fallback "${fallback}"`,
+        );
         return fallback;
     }
 }

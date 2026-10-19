@@ -1,8 +1,8 @@
 <script lang="ts">
-    import Modal from '$lib/components/common/Modal.svelte';
-    import { CircleHelp, Hammer } from '$lib/components/icons';
+    import Modal from '#lib/components/common/Modal.svelte';
+    import { CircleHelp, Hammer } from '#lib/components/icons.ts';
     import type { Snippet } from 'svelte';
-    import type { ModalControls } from '$lib/helpers/modal';
+    import type { ModalControls } from '#lib/helpers/modal.ts';
 
     interface Props {
         children: Snippet;

@@ -1,15 +1,14 @@
 <script lang="ts">
-    import { CirclePlus, DatabaseBackup, History } from '$lib/components/icons.js';
-    import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
-    import ElementForm from '$lib/components/forms/ElementForm.svelte';
-    import Head from '$lib/components/common/Head.svelte';
-    import type { PageProps } from './$types.js';
-    import InputContainer from '$lib/components/forms/InputContainer.svelte';
-    import { ENGINES_META } from '$lib/common/engines-meta';
-    import { OctagonAlert } from '$lib/components/icons';
-    import RestoreConfirmModal from '$lib/components/restores/RestoreConfirmModal.svelte';
-    import type { ModalControls } from '$lib/helpers/modal';
-    import DropExistingModal from '$lib/components/restores/DropExistingModal.svelte';
+    import { CirclePlus, DatabaseBackup, History, OctagonAlert } from '#lib/components/icons.ts';
+    import PageContentHeader from '#lib/components/common/PageContentHeader.svelte';
+    import ElementForm from '#lib/components/forms/ElementForm.svelte';
+    import Head from '#lib/components/common/Head.svelte';
+    import type { PageProps } from './$types.ts';
+    import InputContainer from '#lib/components/forms/InputContainer.svelte';
+    import { ENGINES_META } from '#lib/common/engines-meta.ts';
+    import RestoreConfirmModal from '#lib/components/restores/RestoreConfirmModal.svelte';
+    import type { ModalControls } from '#lib/helpers/modal.ts';
+    import DropExistingModal from '#lib/components/restores/DropExistingModal.svelte';
 
     let { data }: PageProps = $props();
 

@@ -1,7 +1,7 @@
-import { db } from '$lib/server/db';
-import { storages } from '$lib/server/db/schema';
-import { logger } from '$lib/server/services/logger';
-import { getRepositoryStats } from '$lib/server/services/restic';
+import { db } from '#lib/server/db/index.ts';
+import { storages } from '#lib/server/db/schema.ts';
+import { logger } from '#lib/server/services/logger.ts';
+import { getRepositoryStats } from '#lib/server/services/restic.ts';
 import { eq, or } from 'drizzle-orm';
 import fs from 'fs/promises';
 import { err, ok, type Result } from 'neverthrow';
@@ -23,7 +23,9 @@ export interface CheckPathError {
  * @param rawPath The path to check, can be relative or absolute.
  * @returns A promise that resolves to a Result containing the path information or an error.
  */
-export async function checkPathForCreate(rawPath: string | null): Promise<Result<CheckPathResult, CheckPathError>> {
+export async function checkPathForCreate(
+    rawPath: string | null,
+): Promise<Result<CheckPathResult, CheckPathError>> {
     if (!rawPath) {
         return err({ error: 'path is required' });
     }
@@ -34,9 +36,10 @@ export async function checkPathForCreate(rawPath: string | null): Promise<Result
     try {
         await fs.access(resolvedPath, fs.constants.R_OK | fs.constants.W_OK);
     } catch (e) {
-        return err(
-            { error: `path is not accessible: ${(e as Error).message}`, path: resolvedPath },
-        );
+        return err({
+            error: `path is not accessible: ${(e as Error).message}`,
+            path: resolvedPath,
+        });
     }
 
     // Check if folder is empty
@@ -48,7 +51,6 @@ export async function checkPathForCreate(rawPath: string | null): Promise<Result
         path: resolvedPath,
     });
 }
-
 
 /**
  * Check if all active or errored repositories are accessible and update their status accordingly.
@@ -65,7 +67,6 @@ export async function checkAllActiveRepositories() {
     }
 }
 
-
 /**
  * Check if a repository is accessible and update the storage status accordingly.
  * If accessible, also update storage statistics.
@@ -73,13 +74,20 @@ export async function checkAllActiveRepositories() {
  * @returns A promise that resolves to a boolean indicating if the repository is accessible.
  */
 export async function checkRepository(storage: typeof storages.$inferSelect) {
-    const checkResult = await getRepositoryStats(storage.url, storage.password!, storage.env, true);
+    const checkResult = await getRepositoryStats(
+        storage.url,
+        storage.password!,
+        storage.env,
+        true,
+    );
     logger.debug(`Checking repository #${storage.id} (${storage.url})`);
 
     // If the repository is not accessible, update the storage status to error
     if (checkResult.isErr()) {
         if (checkResult.error.message !== storage.error) {
-            logger.error(`Error checking storage #${storage.id} (${storage.url}): ${checkResult.error.message}`);
+            logger.error(
+                `Error checking storage #${storage.id} (${storage.url}): ${checkResult.error.message}`,
+            );
             await db
                 .update(storages)
                 .set({

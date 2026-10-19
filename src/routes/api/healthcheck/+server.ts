@@ -1,5 +1,5 @@
-import { apiError, apiSuccess } from '$lib/server/api/responses';
-import { getResticVersion } from '$lib/server/services/restic';
+import { apiError, apiSuccess } from '#lib/server/api/responses.ts';
+import { getResticVersion } from '#lib/server/services/restic.ts';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ request }) => {

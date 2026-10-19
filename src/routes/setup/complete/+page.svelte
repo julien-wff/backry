@@ -1,9 +1,9 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
-    import Head from '$lib/components/common/Head.svelte';
-    import { OctagonAlert } from '$lib/components/icons';
-    import OnboardingCard from '$lib/components/onboarding/OnboardingCard.svelte';
-    import { SetupApiStore } from '$lib/helpers/setup.svelte';
+    import Head from '#lib/components/common/Head.svelte';
+    import { OctagonAlert } from '#lib/components/icons.ts';
+    import OnboardingCard from '#lib/components/onboarding/OnboardingCard.svelte';
+    import { SetupApiStore } from '#lib/helpers/setup.svelte.ts';
 
     const apiSetup = new SetupApiStore(() => goto('/dashboard'));
 

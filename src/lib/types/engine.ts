@@ -1,4 +1,4 @@
-import type { databases } from '$lib/server/db/schema';
+import type { databases } from '#lib/server/db/schema.ts';
 import type { ContainerInspectInfo } from 'dockerode';
 import { type Result } from 'neverthrow';
 
@@ -115,7 +115,9 @@ export interface EngineMethods {
      * @param container Docker container inspect information.
      * @return Partially-filled connection string parameters.
      */
-    getCredentialsFromContainer(container: ContainerInspectInfo): ConnectionStringParams;
+    getCredentialsFromContainer(
+        container: ContainerInspectInfo,
+    ): ConnectionStringParams;
 
     /**
      * Hide the password in the connection string.
@@ -140,7 +142,10 @@ export interface EngineMethods {
      *             restore command. Default is false.
      * @returns Full command to run the restore.
      */
-    getRestoreBackupFromStdinCommand?(connectionString: string, drop?: boolean): string[];
+    getRestoreBackupFromStdinCommand?(
+        connectionString: string,
+        drop?: boolean,
+    ): string[];
 
     /**
      * Get the environment variables to use for the restore command, if any.

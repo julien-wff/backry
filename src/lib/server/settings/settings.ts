@@ -1,10 +1,10 @@
-import type { settings } from '$lib/server/db/schema';
+import type { settings } from '#lib/server/db/schema.ts';
 import {
     createDefaultSettings,
     getSettings as getSettingsDb,
     updateSettings as updateSettingsQuery,
-} from '$lib/server/queries/settings';
-import { logger } from '$lib/server/services/logger';
+} from '#lib/server/queries/settings.ts';
+import { logger } from '#lib/server/services/logger.ts';
 
 export type Settings = Omit<typeof settings.$inferSelect, 'id' | 'updatedAt'>;
 
@@ -45,7 +45,7 @@ export async function refreshSettingsCache() {
  * @return The updated settings.
  */
 export async function updateSettings(changes: Partial<Settings>) {
-    const settings = { ...await getSettings(), ...changes } as Settings;
+    const settings = { ...(await getSettings()), ...changes } as Settings;
     settingsCache = await updateSettingsQuery(settings);
     return settingsCache;
 }

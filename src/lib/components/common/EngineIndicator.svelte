@@ -1,13 +1,14 @@
 <script lang="ts">
-    import { ENGINES_META } from '$lib/common/engines-meta';
-    import type { DATABASE_ENGINES } from '$lib/server/db/schema';
+    import { untrack } from 'svelte';
+    import { ENGINES_META } from '#lib/common/engines-meta.ts';
+    import type { DATABASE_ENGINES } from '#lib/server/db/schema.ts';
 
     interface Props {
         engine: typeof DATABASE_ENGINES[number];
     }
 
     let { engine: engineId }: Props = $props();
-    const engine = ENGINES_META[engineId];
+    const engine = untrack(() => ENGINES_META[engineId]);
 </script>
 
 <div class="flex items-center gap-1">

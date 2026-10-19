@@ -1,5 +1,5 @@
-import { db } from '$lib/server/db';
-import { backups, databases, jobDatabases, jobs, RUN_ORIGIN, runs } from '$lib/server/db/schema';
+import { db } from '#lib/server/db/index.ts';
+import { backups, databases, jobDatabases, jobs, RUN_ORIGIN, runs } from '#lib/server/db/schema.ts';
 import { and, desc, eq, inArray, isNotNull, isNull, lt, sql, type SQL } from 'drizzle-orm';
 
 /**
@@ -7,15 +7,16 @@ import { and, desc, eq, inArray, isNotNull, isNull, lt, sql, type SQL } from 'dr
  * @param origin The origin of the run (e.g. 'cron', 'manual').
  * @return The created run object.
  */
-export const createRun = (origin: typeof RUN_ORIGIN[number]) =>
+export const createRun = (origin: (typeof RUN_ORIGIN)[number]) =>
     db.insert(runs).values({ origin }).returning().get();
 
 /**
  * Update a run in the database.
  */
-export const updateRun = (id: number, payload: Partial<typeof runs.$inferInsert>) =>
-    db.update(runs).set(payload).where(eq(runs.id, id)).returning().get();
-
+export const updateRun = (
+    id: number,
+    payload: Partial<typeof runs.$inferInsert>,
+) => db.update(runs).set(payload).where(eq(runs.id, id)).returning().get();
 
 /**
  * Get runs with backups filtered by job ID, database ID, and status.
@@ -28,12 +29,18 @@ export const updateRun = (id: number, payload: Partial<typeof runs.$inferInsert>
  *               If provided, only returns **backups** with IDs lower than the cursor.
  * @return Array of runs with their backups and related data.
  */
-export async function getRunsWithBackupFilter({ jobId, databaseId, status, limit, cursor }: {
-    jobId: number | null,
-    databaseId: number | null,
-    status: 'success' | 'error' | 'pruned' | null,
-    limit?: number,
-    cursor?: number,
+export async function getRunsWithBackupFilter({
+                                                  jobId,
+                                                  databaseId,
+                                                  status,
+                                                  limit,
+                                                  cursor,
+                                              }: {
+    jobId: number | null;
+    databaseId: number | null;
+    status: 'success' | 'error' | 'pruned' | null;
+    limit?: number;
+    cursor?: number;
 }) {
     limit ??= 20;
 
@@ -49,7 +56,11 @@ export async function getRunsWithBackupFilter({ jobId, databaseId, status, limit
     } else if (status === 'pruned') {
         filters.push(isNotNull(backups.prunedAt));
     } else if (status === 'success') {
-        filters.push(isNull(backups.error), isNull(backups.prunedAt), isNotNull(backups.finishedAt));
+        filters.push(
+            isNull(backups.error),
+            isNull(backups.prunedAt),
+            isNotNull(backups.finishedAt),
+        );
     }
 
     if (limit && cursor !== undefined) {
@@ -59,29 +70,20 @@ export async function getRunsWithBackupFilter({ jobId, databaseId, status, limit
     const rows = await db
         .select()
         .from(runs)
-        .innerJoin(
-            backups,
-            eq(runs.id, backups.runId),
-        )
-        .innerJoin(
-            jobDatabases,
-            eq(backups.jobDatabaseId, jobDatabases.id),
-        )
-        .innerJoin(
-            databases,
-            eq(jobDatabases.databaseId, databases.id),
-        )
-        .innerJoin(
-            jobs,
-            eq(jobDatabases.jobId, jobs.id),
-        )
+        .innerJoin(backups, eq(runs.id, backups.runId))
+        .innerJoin(jobDatabases, eq(backups.jobDatabaseId, jobDatabases.id))
+        .innerJoin(databases, eq(jobDatabases.databaseId, databases.id))
+        .innerJoin(jobs, eq(jobDatabases.jobId, jobs.id))
         .where(and(...filters))
         .orderBy(desc(runs.id), desc(backups.id))
         .limit(limit);
 
     // Group backups by run ID
     // In rows, each row contains a run and a single backup (runs are duplicated for each backup)
-    const backupsMap = new Map<number, (typeof backups.$inferSelect & { databaseId: number })[]>();
+    const backupsMap = new Map<
+        number,
+        (typeof backups.$inferSelect & { databaseId: number })[]
+    >();
     for (const row of rows) {
         if (!backupsMap.has(row.runs.id)) {
             backupsMap.set(row.runs.id, []);
@@ -108,12 +110,12 @@ export async function getRunsWithBackupFilter({ jobId, databaseId, status, limit
 
     return {
         runs: rows
-            .map(row => ({
+            .map((row) => ({
                 ...row.runs,
                 jobId: row.jobs.id,
                 backups: backupsMap.get(row.runs.id) || [],
             }))
-            .filter(run => {
+            .filter((run) => {
                 // Ensure there is at least one backup that matches the filters
                 if (run.backups.length === 0) {
                     return false;
@@ -134,56 +136,59 @@ export async function getRunsWithBackupFilter({ jobId, databaseId, status, limit
     };
 }
 
-
 /**
  * Get a run by its ID. Conclude the associated backups and their relations.
  * @param id The ID of the run to get.
  * @return The run object, or undefined if not found.
  */
-export const getRunFull = (id: number) => db.query.runs.findFirst({
-    where: eq(runs.id, id),
-    with: {
-        backups: {
-            with: {
-                jobDatabase: {
-                    with: {
-                        database: true,
-                        job: {
-                            with: {
-                                storage: true,
+export const getRunFull = (id: number) =>
+    db.query.runs.findFirst({
+        where: eq(runs.id, id),
+        with: {
+            backups: {
+                with: {
+                    jobDatabase: {
+                        with: {
+                            database: true,
+                            job: {
+                                with: {
+                                    storage: true,
+                                },
                             },
                         },
                     },
                 },
             },
         },
-    },
-});
+    });
 
 /**
  * Delete a run by its ID. This will also delete all associated backups by the foreign key constraint.
  * @param id The ID of the run to delete.
  * @return The deleted run object.
  */
-export const deleteRun = (id: number) => db.delete(runs).where(eq(runs.id, id)).returning().get();
+export const deleteRun = (id: number) =>
+    db.delete(runs).where(eq(runs.id, id)).returning().get();
 
 /**
  * Delete runs that have no backups associated to them anymore, because they were deleted.
  * @return Array of deleted run IDs.
  */
-export const deleteRunsWithNoBackups = () => db
-    .delete(runs)
-    .where(
-        and(
-            lt(runs.updatedAt, sql`date('now', '-1 day')`),
-            inArray(
-                runs.id,
-                db.select({ id: runs.id })
-                    .from(runs)
-                    .leftJoin(backups, eq(runs.id, backups.runId))
-                    .where(isNull(backups.id)),
+export const deleteRunsWithNoBackups = () =>
+    db
+        .delete(runs)
+        .where(
+            and(
+                lt(runs.updatedAt, sql`date('now', '-1 day')`),
+                inArray(
+                    runs.id,
+                    db
+                        .select({ id: runs.id })
+                        .from(runs)
+                        .leftJoin(backups, eq(runs.id, backups.runId))
+                        .where(isNull(backups.id)),
+                ),
             ),
-        ),
-    )
-    .returning({ id: runs.id })
-    .execute();
+        )
+        .returning({ id: runs.id })
+        .execute();

@@ -1,17 +1,17 @@
 <script lang="ts">
-    import { invalidateAll } from '$app/navigation';
-    import BackupElement from '$lib/components/backups/BackupElement.svelte';
-    import Modal from '$lib/components/common/Modal.svelte';
-    import RunOriginIndicator from '$lib/components/common/RunOriginIndicator.svelte';
-    import { EllipsisVertical, ExternalLink, Trash2 } from '$lib/components/icons.js';
-    import { fetchApi } from '$lib/helpers/fetch';
-    import type { getRunsWithBackupFilter } from '$lib/server/queries/runs';
-    import type { RunResponse } from '$lib/server/schemas/api';
-    import { addToast } from '$lib/stores/toasts.svelte';
+    import { refreshAll } from '$app/navigation';
+    import BackupElement from '#lib/components/backups/BackupElement.svelte';
+    import Modal from '#lib/components/common/Modal.svelte';
+    import RunOriginIndicator from '#lib/components/common/RunOriginIndicator.svelte';
+    import { EllipsisVertical, ExternalLink, Trash2 } from '#lib/components/icons.ts';
+    import { fetchApi } from '#lib/helpers/fetch.ts';
+    import type { getRunsWithBackupFilter } from '#lib/server/queries/runs.ts';
+    import type { RunResponse } from '#lib/server/schemas/api.ts';
+    import { addToast } from '#lib/stores/toasts.svelte.ts';
     import dayjs from 'dayjs';
     import { fade } from 'svelte/transition';
-    import type { databases, jobs } from '$lib/server/db/schema';
-    import type { ModalControls } from '$lib/helpers/modal';
+    import type { databases, jobs } from '#lib/server/db/schema.ts';
+    import type { ModalControls } from '#lib/helpers/modal.ts';
 
     type Run = Awaited<ReturnType<typeof getRunsWithBackupFilter>>['runs'][number];
 
@@ -28,7 +28,7 @@
     let deleteModalControls = $state<ModalControls>();
     let loading = $state(false);
 
-    // We deduplicated backups because when a page data run is deleted, the invalidateAll() will fetch one or more backups
+    // We deduplicated backups because when a page data run is deleted, the refreshAll() will fetch one or more backups
     // that already exist inside the API runs, just before they are manually removed via the onrundeleted callback.
     let deduplicatedBackups = $derived([
         ...run.backups.reduce(
@@ -55,7 +55,7 @@
 
         const res = await fetchApi<RunResponse>('DELETE', `/api/runs/${run.id}`, null);
         if (res.isOk()) {
-            await invalidateAll();
+            await refreshAll();
             onrundeleted?.();
         } else {
             addToast(`Failed to delete run #${run.id}: ${res.error}`, 'error');

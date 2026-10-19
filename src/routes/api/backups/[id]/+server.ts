@@ -1,7 +1,7 @@
-import { apiError, apiSuccess } from '$lib/server/api/responses';
-import { deleteBackup, getBackup } from '$lib/server/queries/backups';
-import type { BackupResponse } from '$lib/server/schemas/api';
-import { deleteSnapshots } from '$lib/server/services/restic';
+import { apiError, apiSuccess } from '#lib/server/api/responses.ts';
+import { deleteBackup, getBackup } from '#lib/server/queries/backups.ts';
+import type { BackupResponse } from '#lib/server/schemas/api.ts';
+import { deleteSnapshots } from '#lib/server/services/restic.ts';
 import type { RequestHandler } from './$types';
 
 export const DELETE: RequestHandler = async ({ params }) => {
@@ -22,7 +22,12 @@ export const DELETE: RequestHandler = async ({ params }) => {
     // Delete from restic if completed
     const storage = backup.jobDatabase.job.storage;
     if (backup.snapshotId) {
-        const res = await deleteSnapshots(storage.url, storage.password!, storage.env, [ backup.snapshotId ]);
+        const res = await deleteSnapshots(
+            storage.url,
+            storage.password!,
+            storage.env,
+            [ backup.snapshotId ],
+        );
         if (res.isErr()) {
             return apiError(res.error.message, 500);
         }

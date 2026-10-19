@@ -1,6 +1,6 @@
 <script lang="ts">
     import { page } from '$app/state';
-    import { ChevronLeft, Funnel, type IconType, ListCheck, Plus } from '$lib/components/icons';
+    import { ChevronLeft, Funnel, type IconType, ListCheck, Plus } from '#lib/components/icons.ts';
     import type { Snippet } from 'svelte';
 
     interface Props {

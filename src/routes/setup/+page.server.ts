@@ -1,5 +1,5 @@
-import { SETUP_STEPS } from '$lib/common/constants';
-import { getSettings } from '$lib/server/settings/settings';
+import { SETUP_STEPS } from '#lib/common/constants.ts';
+import { getSettings } from '#lib/server/settings/settings.ts';
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 

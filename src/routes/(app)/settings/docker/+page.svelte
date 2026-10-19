@@ -1,18 +1,21 @@
 <script lang="ts">
-    import { invalidateAll } from '$app/navigation';
-    import Head from '$lib/components/common/Head.svelte';
-    import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
-    import InputContainer from '$lib/components/forms/InputContainer.svelte';
-    import { Blocks, OctagonAlert } from '$lib/components/icons';
-    import { fetchApi } from '$lib/helpers/fetch';
-    import type { settingsChangeRequest } from '$lib/server/schemas/api';
-    import type { Settings } from '$lib/server/settings/settings';
+    import { untrack } from 'svelte';
+    import { refreshAll } from '$app/navigation';
+    import Head from '#lib/components/common/Head.svelte';
+    import PageContentHeader from '#lib/components/common/PageContentHeader.svelte';
+    import InputContainer from '#lib/components/forms/InputContainer.svelte';
+    import { Blocks, OctagonAlert } from '#lib/components/icons.ts';
+    import { fetchApi } from '#lib/helpers/fetch.ts';
+    import type { settingsChangeRequest } from '#lib/server/schemas/api.ts';
+    import type { Settings } from '#lib/server/settings/settings.ts';
     import type { PageProps } from './$types';
 
     let { data }: PageProps = $props();
 
-    let dockerURI = $state(data.settings.dockerURI ?? '');
-    let dockerIntegrationEnabled = $state(data.settings.dockerURI !== null);
+    const initialData = untrack(() => data);
+
+    let dockerURI = $state(initialData.settings.dockerURI ?? '');
+    let dockerIntegrationEnabled = $state(initialData.settings.dockerURI !== null);
 
     let loading = $state(false);
     let error = $state<string | null>(null);
@@ -37,7 +40,7 @@
             return;
         }
 
-        await invalidateAll();
+        await refreshAll();
         loading = false;
     }
 </script>

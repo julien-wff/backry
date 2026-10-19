@@ -1,9 +1,9 @@
 <script lang="ts">
-    import BaseListElement from '$lib/components/common/BaseListElement.svelte';
-    import { Clock, Database } from '$lib/components/icons';
-    import type { getRestoreFull } from '$lib/server/queries/restores';
-    import { getRestoreStatus } from '$lib/helpers/restore';
-    import { formatUtcDate } from '$lib/helpers/format';
+    import BaseListElement from '#lib/components/common/BaseListElement.svelte';
+    import { Clock, Database } from '#lib/components/icons.ts';
+    import type { getRestoreFull } from '#lib/server/queries/restores.ts';
+    import { getRestoreStatus } from '#lib/helpers/restore.ts';
+    import { formatUtcDate } from '#lib/helpers/format.ts';
 
     interface Props {
         restore: NonNullable<Awaited<ReturnType<typeof getRestoreFull>>>;

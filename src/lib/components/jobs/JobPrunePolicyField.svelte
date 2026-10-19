@@ -1,6 +1,6 @@
 <script lang="ts">
-    import InputContainer from '$lib/components/forms/InputContainer.svelte';
-    import JobPrunePolicyEditor from '$lib/components/jobs/JobPrunePolicyEditor.svelte';
+    import InputContainer from '#lib/components/forms/InputContainer.svelte';
+    import JobPrunePolicyEditor from '#lib/components/jobs/JobPrunePolicyEditor.svelte';
 
     interface Props {
         prunePolicy: string;

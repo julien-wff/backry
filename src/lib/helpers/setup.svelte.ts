@@ -1,7 +1,7 @@
 import { goto } from '$app/navigation';
-import type { SETUP_STEPS } from '$lib/common/constants';
-import { fetchApi } from '$lib/helpers/fetch';
-import type { settingsChangeRequest } from '$lib/server/schemas/api';
+import type { SETUP_STEPS } from '#lib/common/constants.ts';
+import { fetchApi } from '#lib/helpers/fetch.ts';
+import type { settingsChangeRequest } from '#lib/server/schemas/api.ts';
 import { type z } from 'zod';
 
 /**
@@ -11,10 +11,14 @@ export class SetupApiStore {
     loading = $state(false);
     error = $state<string | null>(null);
 
-    constructor(readonly nextAction: typeof SETUP_STEPS[number] | CallableFunction) {
+    constructor(
+        readonly nextAction: (typeof SETUP_STEPS)[number] | CallableFunction,
+    ) {
     }
 
-    async updateSettingsAndGoToNextStep(settings: z.infer<typeof settingsChangeRequest> = {}) {
+    async updateSettingsAndGoToNextStep(
+        settings: z.infer<typeof settingsChangeRequest> = {},
+    ) {
         if (this.loading) {
             return;
         }
@@ -27,7 +31,9 @@ export class SetupApiStore {
             '/api/settings',
             {
                 ...settings,
-                setupCurrentStep: typeof this.nextAction === 'string' ? this.nextAction : undefined,
+                setupCurrentStep: typeof this.nextAction === 'string'
+                    ? this.nextAction
+                    : undefined,
             },
         );
 

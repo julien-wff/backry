@@ -1,12 +1,12 @@
 <script lang="ts">
-    import { CircleHelp, Trash2 } from '$lib/components/icons';
+    import { CircleHelp, Trash2 } from '#lib/components/icons.ts';
     import {
         AVAILABLE_PRUNE_POLICIES,
         compilePolicyToFlags,
+        parsePolicyFlags,
         type PrunePolicies,
         type PrunePolicyIDs,
-        parsePolicyFlags,
-    } from '$lib/editors/prune-policy-edit';
+    } from '#lib/editors/prune-policy-edit.ts';
 
     interface Props {
         opened: boolean;
@@ -18,7 +18,7 @@
     let { opened, inputFieldArguments = $bindable(), cron, isCronValid }: Props = $props();
 
     let prunePolicies = $state<PrunePolicies>([]);
-    let policyKeys = $derived(prunePolicies.map(([policyKey]) => policyKey));
+    let policyKeys = $derived(prunePolicies.map(([ policyKey ]) => policyKey));
     let remainingFlags = $state<string[]>([]);
     let canUpdate = $state(false);
 
@@ -43,7 +43,7 @@
             .keys(AVAILABLE_PRUNE_POLICIES)
             .find((policyId) => !policyKeys.includes(policyId as PrunePolicyIDs)) as PrunePolicyIDs;
 
-        prunePolicies.push([unassignedPolicy, 10]);
+        prunePolicies.push([ unassignedPolicy, 10 ]);
     }
 </script>
 
@@ -73,11 +73,11 @@
     </div>
 {/if}
 
-{#each prunePolicies as [policyId], i (policyId)}
+{#each prunePolicies as [ policyId ], i (policyId)}
     <div class="mb-2 flex items-center gap-1">
         <div class="grid flex-1 grid-cols-4 gap-1">
             <select class="col-span-3 select" bind:value={prunePolicies[i][0]}>
-                {#each Object.entries(AVAILABLE_PRUNE_POLICIES) as [availablePolicyId, availablePolicyName] (availablePolicyId)}
+                {#each Object.entries(AVAILABLE_PRUNE_POLICIES) as [ availablePolicyId, availablePolicyName ] (availablePolicyId)}
                     <option value={availablePolicyId}
                             disabled={availablePolicyId !== policyId && policyKeys.includes(availablePolicyId as PrunePolicyIDs)}>
                         {availablePolicyName}

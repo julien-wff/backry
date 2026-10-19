@@ -1,5 +1,5 @@
 import type { PageServerLoad } from './$types';
-import { getDockerEngine, getDockerInfo } from '$lib/server/services/docker';
+import { getDockerEngine, getDockerInfo } from '#lib/server/services/docker.ts';
 import type { Result } from 'neverthrow';
 
 export const load: PageServerLoad = async ({ parent }) => {

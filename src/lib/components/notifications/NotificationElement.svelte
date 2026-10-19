@@ -1,12 +1,12 @@
 <script lang="ts">
-    import { invalidateAll } from '$app/navigation';
-    import BaseListElement from '$lib/components/common/BaseListElement.svelte';
-    import { Clock, EthernetPort, Zap } from '$lib/components/icons';
-    import { fetchApi } from '$lib/helpers/fetch';
-    import { formatUtcDate } from '$lib/helpers/format.js';
-    import type { notifications } from '$lib/server/db/schema';
-    import type { notificationPatchRequest, NotificationResponse } from '$lib/server/schemas/api';
-    import { addToast } from '$lib/stores/toasts.svelte';
+    import { refreshAll } from '$app/navigation';
+    import BaseListElement from '#lib/components/common/BaseListElement.svelte';
+    import { Clock, EthernetPort, Zap } from '#lib/components/icons.ts';
+    import { fetchApi } from '#lib/helpers/fetch.ts';
+    import { formatUtcDate } from '#lib/helpers/format.ts';
+    import type { notifications } from '#lib/server/db/schema.ts';
+    import type { notificationPatchRequest, NotificationResponse } from '#lib/server/schemas/api.ts';
+    import { addToast } from '#lib/stores/toasts.svelte.ts';
 
     interface Props {
         notification: typeof notifications.$inferSelect;
@@ -36,7 +36,7 @@
         );
 
         if (res.isOk()) {
-            await invalidateAll();
+            await refreshAll();
         } else {
             addToast(`Failed to delete notification ${notification.name}: ${res.error}`, 'error');
         }
@@ -55,7 +55,7 @@
         );
 
         if (res.isOk()) {
-            await invalidateAll();
+            await refreshAll();
         }
 
         loading = false;

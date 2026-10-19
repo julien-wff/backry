@@ -1,9 +1,9 @@
-import { apiError, apiSuccess } from '$lib/server/api/responses';
-import { getStorageFromRequest } from '$lib/server/api/storages';
-import { parseRequestBody } from '$lib/server/schemas';
-import { storageStaleSnapshotsDeleteRequest, type StorageStaleSnapshotsResponse } from '$lib/server/schemas/api';
-import { deleteSnapshots } from '$lib/server/services/restic';
-import { getStaleSnapshots } from '$lib/server/storages/health';
+import { apiError, apiSuccess } from '#lib/server/api/responses.ts';
+import { getStorageFromRequest } from '#lib/server/api/storages.ts';
+import { parseRequestBody } from '#lib/server/schemas/index.ts';
+import { storageStaleSnapshotsDeleteRequest, type StorageStaleSnapshotsResponse } from '#lib/server/schemas/api.ts';
+import { deleteSnapshots } from '#lib/server/services/restic.ts';
+import { getStaleSnapshots } from '#lib/server/storages/health.ts';
 import type { RequestHandler } from './$types';
 
 /**
@@ -34,7 +34,10 @@ export const DELETE: RequestHandler = async ({ request, params }) => {
         return storage.error;
     }
 
-    const body = await parseRequestBody(request, storageStaleSnapshotsDeleteRequest);
+    const body = await parseRequestBody(
+        request,
+        storageStaleSnapshotsDeleteRequest,
+    );
     if (body.isErr()) {
         return apiError(body.error);
     }

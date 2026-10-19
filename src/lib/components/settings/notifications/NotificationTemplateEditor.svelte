@@ -1,7 +1,7 @@
 <script lang="ts">
-    import CodeEditor from '$lib/components/common/CodeEditor.svelte';
-    import { OctagonAlert } from '$lib/components/icons';
-    import { NOTIFICATION_PAYLOAD_EXAMPLE, renderNotificationTemplate } from '$lib/editors/notification-template';
+    import CodeEditor from '#lib/components/common/CodeEditor.svelte';
+    import { OctagonAlert } from '#lib/components/icons.ts';
+    import { NOTIFICATION_PAYLOAD_EXAMPLE, renderNotificationTemplate } from '#lib/editors/notification-template.ts';
 
     interface Props {
         opened: boolean;

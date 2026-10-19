@@ -1,23 +1,24 @@
-import { db } from '$lib/server/db';
-import { backups, databases, jobDatabases, jobs, storages } from '$lib/server/db/schema';
+import { db } from '#lib/server/db/index.ts';
+import { backups, databases, jobDatabases, jobs, storages } from '#lib/server/db/schema.ts';
 import { and, desc, eq, inArray, isNotNull, isNull, lt, sql } from 'drizzle-orm';
 
-export const backupsListFull = async () => db.query.backups.findMany({
-    orderBy: [ desc(backups.startedAt) ],
-    with: {
-        jobDatabase: {
-            with: {
-                database: true,
-                job: {
-                    with: {
-                        storage: true,
+export const backupsListFull = async () =>
+    db.query.backups.findMany({
+        orderBy: [ desc(backups.startedAt) ],
+        with: {
+            jobDatabase: {
+                with: {
+                    database: true,
+                    job: {
+                        with: {
+                            storage: true,
+                        },
                     },
                 },
             },
+            run: true,
         },
-        run: true,
-    },
-});
+    });
 
 export const getBackup = async (id: number) =>
     db.query.backups.findFirst({
@@ -36,7 +37,6 @@ export const getBackup = async (id: number) =>
         },
     });
 
-
 /**
  * Get all restic snapshot IDs for a given storage ID from the list of backups.
  * @param storageId Storage ID
@@ -52,9 +52,8 @@ export const getSnapshotsIdsByStorageId = (storageId: number) =>
         .where(eq(storages.id, storageId))
         .orderBy(desc(backups.startedAt))
         .all()
-        .map(backup => backup.snapshotId)
+        .map((backup) => backup.snapshotId)
         .filter((snapshotId): snapshotId is string => snapshotId !== null);
-
 
 /**
  * Get selected information for backups that are not pruned and have no error (so the snapshot should still exist).
@@ -71,12 +70,14 @@ export const getUnprunedSnapshotByStorageId = (storageId: number) =>
             startedAt: backups.startedAt,
         })
         .from(backups)
-        .where(and(
-            isNotNull(backups.snapshotId),
-            isNull(backups.prunedAt),
-            isNull(backups.error),
-            eq(storages.id, storageId),
-        ))
+        .where(
+            and(
+                isNotNull(backups.snapshotId),
+                isNull(backups.prunedAt),
+                isNull(backups.error),
+                eq(storages.id, storageId),
+            ),
+        )
         .leftJoin(jobDatabases, eq(jobDatabases.id, backups.jobDatabaseId))
         .leftJoin(databases, eq(databases.id, jobDatabases.databaseId))
         .leftJoin(jobs, eq(jobs.id, jobDatabases.jobId))
@@ -84,15 +85,14 @@ export const getUnprunedSnapshotByStorageId = (storageId: number) =>
         .orderBy(desc(backups.startedAt))
         .all();
 
-
 export const deleteBackup = async (id: number) =>
-    db
-        .delete(backups)
-        .where(eq(backups.id, id))
-        .returning()
-        .get();
+    db.delete(backups).where(eq(backups.id, id)).returning().get();
 
-export const createBackup = async (jobDatabaseId: number, fileName: string, runId: number) =>
+export const createBackup = async (
+    jobDatabaseId: number,
+    fileName: string,
+    runId: number,
+) =>
     db
         .insert(backups)
         .values({
@@ -103,26 +103,25 @@ export const createBackup = async (jobDatabaseId: number, fileName: string, runI
         .returning()
         .get();
 
-export const updateBackup = async (id: number, payload: Partial<typeof backups.$inferInsert>) =>
-    db
-        .update(backups)
-        .set(payload)
-        .where(eq(backups.id, id))
-        .returning()
-        .get();
+export const updateBackup = async (
+    id: number,
+    payload: Partial<typeof backups.$inferInsert>,
+) =>
+    db.update(backups).set(payload).where(eq(backups.id, id)).returning().get();
 
 /**
  * Set all unfinished backups to error.
  * Used on startup to set all backups that are still running to error.
  */
-export const setUnfinishedBackupsToError = async () => db
-    .update(backups)
-    .set({
-        error: 'Job timed out',
-    })
-    .where(isNull(backups.finishedAt))
-    .returning()
-    .get();
+export const setUnfinishedBackupsToError = async () =>
+    db
+        .update(backups)
+        .set({
+            error: 'Job timed out',
+        })
+        .where(isNull(backups.finishedAt))
+        .returning()
+        .get();
 
 /**
  * Set the prunedAt timestamp for backups, given snapshot IDs.
@@ -135,9 +134,7 @@ export const setBackupsToPruned = (snapshotIds: string[]) =>
         .set({
             prunedAt: sql`(CURRENT_TIMESTAMP)`,
         })
-        .where(
-            inArray(backups.snapshotId, snapshotIds),
-        )
+        .where(inArray(backups.snapshotId, snapshotIds))
         .returning()
         .execute();
 
@@ -152,28 +149,26 @@ export const setBackupsToPrunedById = (backupIds: number[]) =>
         .set({
             prunedAt: sql`(CURRENT_TIMESTAMP)`,
         })
-        .where(
-            inArray(backups.id, backupIds),
-        )
+        .where(inArray(backups.id, backupIds))
         .returning()
         .execute();
-
 
 /**
  * Delete backups were pruned more than a given number of days ago.
  * @param days Number of days to keep backups
  * @return Array of deleted backups IDs
  */
-export const deleteOldPrunedBackups = (days: number) => db
-    .delete(backups)
-    .where(
-        and(
-            isNotNull(backups.prunedAt),
-            isNull(backups.error),
-            // @formatter:off
-            lt(backups.prunedAt, sql`date('now',${`-${days} day`})`),
-            // @formatter:on
-        ),
-    )
-    .returning({ id: backups.id })
-    .execute();
+export const deleteOldPrunedBackups = (days: number) =>
+    db
+        .delete(backups)
+        .where(
+            and(
+                isNotNull(backups.prunedAt),
+                isNull(backups.error),
+                // @formatter:off
+        lt(backups.prunedAt, sql`date('now',${`-${days} day`})`),
+        // @formatter:on
+            ),
+        )
+        .returning({ id: backups.id })
+        .execute();

@@ -1,4 +1,4 @@
-import { restoreEmitter, type RestoreUpdateEventPayload } from '$lib/server/shared/events';
+import { restoreEmitter, type RestoreUpdateEventPayload } from '#lib/server/shared/events.ts';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ params, request }) => {
@@ -36,7 +36,7 @@ export const GET: RequestHandler = async ({ params, request }) => {
             'Content-Type': 'text/event-stream',
             'X-Accel-Buffering': 'no',
             'Cache-Control': 'no-cache',
-            'Connection': 'keep-alive',
+            Connection: 'keep-alive',
         },
     });
 };

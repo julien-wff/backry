@@ -1,9 +1,9 @@
-import { ENGINE_META_ENTRIES } from '$lib/common/engines-meta';
-import { ENGINES_METHODS } from '$lib/server/databases/engines-methods';
-import { db } from '$lib/server/db';
-import { DATABASE_ENGINES, databases } from '$lib/server/db/schema';
-import { logger } from '$lib/server/services/logger';
-import type { EngineMethods } from '$lib/types/engine';
+import { ENGINE_META_ENTRIES } from '#lib/common/engines-meta.ts';
+import { ENGINES_METHODS } from '#lib/server/databases/engines-methods.ts';
+import { db } from '#lib/server/db/index.ts';
+import { DATABASE_ENGINES, databases } from '#lib/server/db/schema.ts';
+import { logger } from '#lib/server/services/logger.ts';
+import type { EngineMethods } from '#lib/types/engine.ts';
 import { eq, or } from 'drizzle-orm';
 import { Result } from 'neverthrow';
 
@@ -22,7 +22,6 @@ export async function checkAllActiveDatabases() {
     }
 }
 
-
 /**
  * Check if a database is accessible and update the storage status accordingly.
  * @param database The database object to check.
@@ -31,12 +30,16 @@ export async function checkAllActiveDatabases() {
 export async function checkDatabase(database: typeof databases.$inferSelect) {
     const engine = ENGINES_METHODS[database.engine];
     const checkResult = await engine.checkConnection(database.connectionString);
-    logger.debug(`Checking database connection #${database.id} (${database.engine})`);
+    logger.debug(
+        `Checking database connection #${database.id} (${database.engine})`,
+    );
 
     // If the repository is not accessible, update the storage status to error
     if (checkResult.isErr()) {
         if (checkResult.error !== database.error) {
-            logger.error(`Error checking database connection #${database.id} (${database.engine}): ${checkResult.error}`);
+            logger.error(
+                `Error checking database connection #${database.id} (${database.engine}): ${checkResult.error}`,
+            );
             await db
                 .update(databases)
                 .set({
@@ -62,12 +65,14 @@ export async function checkDatabase(database: typeof databases.$inferSelect) {
             .execute();
     }
 
-    logger.debug(`Database connection #${database.id} (${database.engine}) is accessible`);
+    logger.debug(
+        `Database connection #${database.id} (${database.engine}) is accessible`,
+    );
     return true;
 }
 
-
-export type EngineCheckKey = `${typeof DATABASE_ENGINES[number]}:${'dump' | 'check' | 'restore'}`;
+export type EngineCheckKey =
+    `${(typeof DATABASE_ENGINES)[number]}:${'dump' | 'check' | 'restore'}`;
 
 export interface EngineCheckResult {
     version: string | null;
@@ -82,12 +87,13 @@ export interface EngineCheckResult {
  * @param result The result of the command check.
  * @returns An EngineCheckResult object.
  */
-const newCheckResult = (cmd: string, result: Result<string, string>) => ({
-    version: result.isOk() ? result.value : null,
-    error: result.isErr() ? result.error : null,
-    cmd,
-    cmdResolved: Bun.which(cmd),
-}) satisfies EngineCheckResult;
+const newCheckResult = (cmd: string, result: Result<string, string>) =>
+    ({
+        version: result.isOk() ? result.value : null,
+        error: result.isErr() ? result.error : null,
+        cmd,
+        cmdResolved: Bun.which(cmd),
+    }) satisfies EngineCheckResult;
 
 /**
  * Get the versions of all database engines' commands or errors if they are not accessible.
@@ -96,22 +102,38 @@ const newCheckResult = (cmd: string, result: Result<string, string>) => ({
 export async function getAllEnginesVersionsOrError() {
     const result = {} as Record<EngineCheckKey, EngineCheckResult>;
 
-    await Promise.all(ENGINE_META_ENTRIES.map(async ([ engineId ]) => {
-        const engine: EngineMethods = ENGINES_METHODS[engineId];
+    await Promise.all(
+        ENGINE_META_ENTRIES.map(async ([ engineId ]) => {
+            const engine: EngineMethods = ENGINES_METHODS[engineId];
 
-        // Dump command
-        result[`${engineId}:dump`] = newCheckResult(engine.dumpCommand, await engine.getDumpCmdVersion());
+            // Dump command
+            result[`${engineId}:dump`] = newCheckResult(
+                engine.dumpCommand,
+                await engine.getDumpCmdVersion(),
+            );
 
-        // Restore command (if different from dump)
-        if (engine.restoreCommand !== engine.dumpCommand) {
-            result[`${engineId}:restore`] = newCheckResult(engine.restoreCommand, await engine.getRestoreCmdVersion());
-        }
+            // Restore command (if different from dump)
+            if (engine.restoreCommand !== engine.dumpCommand) {
+                result[`${engineId}:restore`] = newCheckResult(
+                    engine.restoreCommand,
+                    await engine.getRestoreCmdVersion(),
+                );
+            }
 
-        // Check command (if available and different from dump and restore)
-        if (engine.checkCommand && engine.getCheckCmdVersion && engine.checkCommand !== engine.dumpCommand && engine.checkCommand !== engine.restoreCommand) {
-            result[`${engineId}:check`] = newCheckResult(engine.checkCommand, await engine.getCheckCmdVersion());
-        }
-    }));
+            // Check command (if available and different from dump and restore)
+            if (
+                engine.checkCommand &&
+                engine.getCheckCmdVersion &&
+                engine.checkCommand !== engine.dumpCommand &&
+                engine.checkCommand !== engine.restoreCommand
+            ) {
+                result[`${engineId}:check`] = newCheckResult(
+                    engine.checkCommand,
+                    await engine.getCheckCmdVersion(),
+                );
+            }
+        }),
+    );
 
     return result;
 }

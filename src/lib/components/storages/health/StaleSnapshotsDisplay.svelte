@@ -1,16 +1,16 @@
 <script lang="ts">
     import { page } from '$app/state';
-    import Modal from '$lib/components/common/Modal.svelte';
-    import { OctagonAlert, ShieldCheck, Trash2 } from '$lib/components/icons';
-    import { fetchApi } from '$lib/helpers/fetch';
-    import { formatSize } from '$lib/helpers/format';
+    import Modal from '#lib/components/common/Modal.svelte';
+    import { OctagonAlert, ShieldCheck, Trash2 } from '#lib/components/icons.ts';
+    import { fetchApi } from '#lib/helpers/fetch.ts';
+    import { formatSize } from '#lib/helpers/format.ts';
     import {
         type storageStaleSnapshotsDeleteRequest,
         type StorageStaleSnapshotsResponse,
-    } from '$lib/server/schemas/api';
-    import type { ResticSnapshot } from '$lib/types/restic';
+    } from '#lib/server/schemas/api.ts';
+    import type { ResticSnapshot } from '#lib/types/restic.ts';
     import { onMount } from 'svelte';
-    import type { ModalControls } from '$lib/helpers/modal';
+    import type { ModalControls } from '#lib/helpers/modal.ts';
 
     interface Props {
         healthy?: boolean;

@@ -1,5 +1,5 @@
-import { parseIdOrNewParam } from '$lib/server/api/params';
-import { getDatabase } from '$lib/server/queries/databases';
+import { parseIdOrNewParam } from '#lib/server/api/params.ts';
+import { getDatabase } from '#lib/server/queries/databases.ts';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 

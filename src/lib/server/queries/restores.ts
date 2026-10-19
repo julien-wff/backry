@@ -1,14 +1,18 @@
-import { db } from '$lib/server/db';
-import { restores } from '$lib/server/db/schema';
+import { db } from '#lib/server/db/index.ts';
+import { restores } from '#lib/server/db/schema.ts';
 import { desc, eq, isNull, sql } from 'drizzle-orm';
 
-export const getRestoreFull = (id: number) => db
-    .query
-    .restores
-    .findFirst({
+export const getRestoreFull = (id: number) =>
+    db.query.restores.findFirst({
         with: {
             backup: {
-                columns: { id: true, fileName: true, dumpSize: true, snapshotId: true, finishedAt: true },
+                columns: {
+                    id: true,
+                    fileName: true,
+                    dumpSize: true,
+                    snapshotId: true,
+                    finishedAt: true,
+                },
                 with: {
                     jobDatabase: {
                         columns: {},
@@ -27,14 +31,18 @@ export const getRestoreFull = (id: number) => db
         where: eq(restores.id, id),
     });
 
-export const getAllRestoresFull = () => db
-    .query
-    .restores
-    .findMany({
+export const getAllRestoresFull = () =>
+    db.query.restores.findMany({
         orderBy: desc(restores.createdAt),
         with: {
             backup: {
-                columns: { id: true, fileName: true, dumpSize: true, snapshotId: true, finishedAt: true },
+                columns: {
+                    id: true,
+                    fileName: true,
+                    dumpSize: true,
+                    snapshotId: true,
+                    finishedAt: true,
+                },
                 with: {
                     jobDatabase: {
                         columns: {},
@@ -52,31 +60,28 @@ export const getAllRestoresFull = () => db
         },
     });
 
-export const createRestore = (val: typeof restores.$inferInsert) => db
-    .insert(restores)
-    .values(val)
-    .returning()
-    .get();
+export const createRestore = (val: typeof restores.$inferInsert) =>
+    db.insert(restores).values(val).returning().get();
 
-export const updateRestore = (id: number, val: Partial<typeof restores.$inferInsert>) => db
-    .update(restores)
-    .set(val)
-    .where(eq(restores.id, id))
-    .returning()
-    .get();
+export const updateRestore = (
+    id: number,
+    val: Partial<typeof restores.$inferInsert>,
+) => db.update(restores).set(val).where(eq(restores.id, id)).returning().get();
 
-export const setRestoreToFinished = (id: number, logs: string | null = null) => db
-    .update(restores)
-    .set({ finishedAt: sql`(CURRENT_TIMESTAMP)`, restoreLogs: logs })
-    .where(eq(restores.id, id))
-    .returning()
-    .get();
+export const setRestoreToFinished = (id: number, logs: string | null = null) =>
+    db
+        .update(restores)
+        .set({ finishedAt: sql`(CURRENT_TIMESTAMP)`, restoreLogs: logs })
+        .where(eq(restores.id, id))
+        .returning()
+        .get();
 
-export const setUnfinishedRestoresToError = async () => db
-    .update(restores)
-    .set({
-        error: 'Restore interrupted by Backry shutdown',
-        finishedAt: sql`(CURRENT_TIMESTAMP)`,
-    })
-    .where(isNull(restores.finishedAt))
-    .execute();
+export const setUnfinishedRestoresToError = async () =>
+    db
+        .update(restores)
+        .set({
+            error: 'Restore interrupted by Backry shutdown',
+            finishedAt: sql`(CURRENT_TIMESTAMP)`,
+        })
+        .where(isNull(restores.finishedAt))
+        .execute();

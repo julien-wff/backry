@@ -1,21 +1,21 @@
 <script lang="ts">
-    import { invalidateAll } from '$app/navigation';
+    import { refreshAll } from '$app/navigation';
     import { page } from '$app/state';
-    import BackupFilterModalContent from '$lib/components/backups/BackupFilterModalContent.svelte';
-    import HowToBackupAlert from '$lib/components/backups/HowToBackupAlert.svelte';
-    import NoBackupWithFiltersAlert from '$lib/components/backups/NoBackupWithFiltersAlert.svelte';
-    import RunElement from '$lib/components/backups/RunElement.svelte';
-    import Head from '$lib/components/common/Head.svelte';
-    import Modal from '$lib/components/common/Modal.svelte';
-    import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
-    import { FileCheck, ListCheck } from '$lib/components/icons';
-    import { subscribeApi } from '$lib/helpers/fetch';
-    import type { ModalControls } from '$lib/helpers/modal';
-    import type { BackupUpdateEventPayload } from '$lib/server/shared/events';
+    import BackupFilterModalContent from '#lib/components/backups/BackupFilterModalContent.svelte';
+    import HowToBackupAlert from '#lib/components/backups/HowToBackupAlert.svelte';
+    import NoBackupWithFiltersAlert from '#lib/components/backups/NoBackupWithFiltersAlert.svelte';
+    import RunElement from '#lib/components/backups/RunElement.svelte';
+    import Head from '#lib/components/common/Head.svelte';
+    import Modal from '#lib/components/common/Modal.svelte';
+    import PageContentHeader from '#lib/components/common/PageContentHeader.svelte';
+    import { FileCheck, ListCheck } from '#lib/components/icons.ts';
+    import { subscribeApi } from '#lib/helpers/fetch.ts';
+    import type { ModalControls } from '#lib/helpers/modal.ts';
+    import type { BackupUpdateEventPayload } from '#lib/server/shared/events.ts';
     import dayjs from 'dayjs';
     import relativeTime from 'dayjs/plugin/relativeTime';
     import utc from 'dayjs/plugin/utc';
-    import { onMount } from 'svelte';
+    import { onMount, untrack } from 'svelte';
     import type { PageData } from './$types';
 
     dayjs.extend(relativeTime);
@@ -26,8 +26,10 @@
     }
 
     let { data }: Props = $props();
-    let runsData = $state(data.runsData);
-    let knownBackupIds = $state(new Set(data.runsData.runs.flatMap(run => run.backups.map(backup => backup.id))));
+    
+    const initialData = untrack(() => data);
+    let runsData = $state(initialData.runsData);
+    let knownBackupIds = $state(new Set(initialData.runsData.runs.flatMap(run => run.backups.map(backup => backup.id))));
     $effect(() => {
         runsData = data.runsData;
     });
@@ -41,7 +43,7 @@
     function handleSubscriptionUpdate(chunk: BackupUpdateEventPayload) {
         if (!knownBackupIds.has(chunk.id)) {
             knownBackupIds.add(chunk.id);
-            invalidateAll();
+            refreshAll();
         } else {
             runsData = {
                 ...runsData,
@@ -87,7 +89,7 @@
 <a class="btn btn-primary btn-soft"
    class:btn-disabled={runsData.nextPageCursor === null}
    class:hidden={runsData.runs.length === 0}
-   data-sveltekit-noscroll
+   data-sveltekit-reset={false}
    href="backups/all?{page.url.searchParams}"
    role="button">
     <ListCheck class="w-4 h-4"/>

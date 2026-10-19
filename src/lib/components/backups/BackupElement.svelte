@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { invalidateAll } from '$app/navigation';
-    import BaseListElement from '$lib/components/common/BaseListElement.svelte';
+    import { refreshAll } from '$app/navigation';
+    import BaseListElement from '#lib/components/common/BaseListElement.svelte';
     import {
         Clock,
         ExternalLink,
@@ -9,12 +9,12 @@
         HardDriveDownload,
         History,
         Timer,
-    } from '$lib/components/icons';
-    import type { BACKUP_STATUS, backups, databases } from '$lib/server/db/schema';
-    import type { BackupResponse } from '$lib/server/schemas/api';
-    import { addToast } from '$lib/stores/toasts.svelte';
-    import { fetchApi } from '$lib/helpers/fetch';
-    import { formatDuration, formatSize, formatUtcDate } from '$lib/helpers/format.js';
+    } from '#lib/components/icons.ts';
+    import type { BACKUP_STATUS, backups, databases } from '#lib/server/db/schema.ts';
+    import type { BackupResponse } from '#lib/server/schemas/api.ts';
+    import { addToast } from '#lib/stores/toasts.svelte.ts';
+    import { fetchApi } from '#lib/helpers/fetch.ts';
+    import { formatDuration, formatSize, formatUtcDate } from '#lib/helpers/format.ts';
 
     interface Props {
         backup: typeof backups.$inferSelect;
@@ -42,7 +42,7 @@
         const res = await fetchApi<BackupResponse>('DELETE', `/api/backups/${backup.id}`, null);
 
         if (res.isOk()) {
-            await invalidateAll();
+            await refreshAll();
             ondelete?.();
         } else {
             addToast(`Failed to delete backup #${backup.id}: ${res.error}`, 'error');

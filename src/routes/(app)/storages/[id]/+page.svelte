@@ -1,13 +1,13 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
-    import Head from '$lib/components/common/Head.svelte';
-    import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
-    import ElementForm from '$lib/components/forms/ElementForm.svelte';
-    import EnvVarInput from '$lib/components/forms/EnvVarInput.svelte';
-    import InputContainer from '$lib/components/forms/InputContainer.svelte';
-    import { ArchiveRestore, CloudUpload, PackageOpen } from '$lib/components/icons';
-    import ExistingRepoModal from '$lib/components/storages/edit/ExistingRepoModal.svelte';
-    import { fetchApi } from '$lib/helpers/fetch';
+    import Head from '#lib/components/common/Head.svelte';
+    import PageContentHeader from '#lib/components/common/PageContentHeader.svelte';
+    import ElementForm from '#lib/components/forms/ElementForm.svelte';
+    import EnvVarInput from '#lib/components/forms/EnvVarInput.svelte';
+    import InputContainer from '#lib/components/forms/InputContainer.svelte';
+    import { ArchiveRestore, CloudUpload, PackageOpen } from '#lib/components/icons.ts';
+    import ExistingRepoModal from '#lib/components/storages/edit/ExistingRepoModal.svelte';
+    import { fetchApi } from '#lib/helpers/fetch.ts';
     import {
         type storageInitRepositoryRequest,
         type storageRequest,
@@ -15,24 +15,26 @@
         type storagesCheckRequest,
         type StoragesCheckResponse,
         type StoragesInitRepositoryResponse,
-    } from '$lib/server/schemas/api';
-    import { tick } from 'svelte';
+    } from '#lib/server/schemas/api.ts';
+    import { tick, untrack } from 'svelte';
     import type { PageProps } from './$types';
-    import type { ModalControls } from '$lib/helpers/modal';
+    import type { ModalControls } from '#lib/helpers/modal.ts';
 
     let { data }: PageProps = $props();
 
-    let isExistingRepository = $state(!!data.storage);
+    const initialData = untrack(() => data);
+
+    let isExistingRepository = $state(!!initialData.storage);
     let error = $state<string | null>(null);
     let isLoading = $state(false);
     let arePreChecksValid = $state(false);
 
-    let repoName = $state(data.storage?.name ?? '');
-    let repoUrl = $state(data.storage?.url ?? '');
-    let password = $state(data.storage?.password ?? '');
+    let repoName = $state(initialData.storage?.name ?? '');
+    let repoUrl = $state(initialData.storage?.url ?? '');
+    let password = $state(initialData.storage?.password ?? '');
 
     let envVars = $state<{ key: string; value: string }[]>(
-        Object.entries(data.storage?.env ?? {}).map(([ key, value ]) => ({ key, value })),
+        Object.entries(initialData.storage?.env ?? {}).map(([ key, value ]) => ({ key, value })),
     );
     let envRecords = $derived(envVars.reduce((acc, { key, value }) => {
         acc[key] = value;

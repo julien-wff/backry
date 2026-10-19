@@ -1,10 +1,10 @@
 <script lang="ts">
-    import Head from '$lib/components/common/Head.svelte';
-    import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
-    import LatestBackupsCard from '$lib/components/dashboard/LatestBackupsCard.svelte';
-    import NextJobsCard from '$lib/components/dashboard/NextJobsCard.svelte';
-    import StatsCard from '$lib/components/dashboard/StatsCard.svelte';
-    import StatusCard from '$lib/components/dashboard/StatusCard.svelte';
+    import Head from '#lib/components/common/Head.svelte';
+    import PageContentHeader from '#lib/components/common/PageContentHeader.svelte';
+    import LatestBackupsCard from '#lib/components/dashboard/LatestBackupsCard.svelte';
+    import NextJobsCard from '#lib/components/dashboard/NextJobsCard.svelte';
+    import StatsCard from '#lib/components/dashboard/StatsCard.svelte';
+    import StatusCard from '#lib/components/dashboard/StatusCard.svelte';
     import {
         CloudUpload,
         Database,
@@ -13,9 +13,8 @@
         HardDrive,
         LayoutDashboard,
         Timer,
-    } from '$lib/components/icons';
-    import { formatSize } from '$lib/helpers/format';
-    import { formatDuration } from '$lib/helpers/format.js';
+    } from '#lib/components/icons.ts';
+    import { formatDuration, formatSize } from '#lib/helpers/format.ts';
     import type { PageProps } from './$types';
 
     let { data }: PageProps = $props();

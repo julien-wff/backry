@@ -1,4 +1,4 @@
-import { formatSize } from '$lib/helpers/format';
+import { formatSize } from '#lib/helpers/format.ts';
 
 /**
  * Format and pretty-print Docker server information.
@@ -36,7 +36,8 @@ export function prettyPrintServerInfo(info: any): string {
     };
 
     // Helper to join array elements with a separator
-    const join = (arr: any[], separator: string): string => (arr || []).join(separator);
+    const join = (arr: any[], separator: string): string =>
+        (arr || []).join(separator);
 
     // --- Main format logic ---
 
@@ -96,7 +97,9 @@ export function prettyPrintServerInfo(info: any): string {
     appendLine(` Swarm: ${info.Swarm?.LocalNodeState || ''}`);
 
     if (info.Runtimes && Object.keys(info.Runtimes).length > 0) {
-        const names = Object.keys(info.Runtimes).toSorted((a, b) => a.localeCompare(b));
+        const names = Object.keys(info.Runtimes).toSorted((a, b) =>
+            a.localeCompare(b),
+        );
         appendLine(` Runtimes: ${join(names, ' ')}`);
         appendLine(` Default Runtime: ${info.DefaultRuntime || ''}`);
     }
@@ -141,7 +144,9 @@ export function prettyPrintServerInfo(info: any): string {
     const registryConfig = info.RegistryConfig;
     if (registryConfig) {
         const hasInsecureCIDRs = registryConfig.InsecureRegistryCIDRs?.length > 0;
-        const hasInsecureIndexConfigs = Object.values(registryConfig.IndexConfigs || {})?.some((c: any) => !c.Secure);
+        const hasInsecureIndexConfigs = Object.values(
+            registryConfig.IndexConfigs || {},
+        )?.some((c: any) => !c.Secure);
 
         if (hasInsecureCIDRs || hasInsecureIndexConfigs) {
             appendLine(' Insecure Registries:');
@@ -168,7 +173,9 @@ export function prettyPrintServerInfo(info: any): string {
         }
     }
 
-    appendLine(` Live Restore Enabled: ${info.LiveRestoreEnabled ? 'true' : 'false'}`);
+    appendLine(
+        ` Live Restore Enabled: ${info.LiveRestoreEnabled ? 'true' : 'false'}`,
+    );
 
     if (info.ProductLicense !== '') {
         appendLine(` Product License: ${info.ProductLicense}`);

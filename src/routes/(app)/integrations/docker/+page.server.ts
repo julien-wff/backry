@@ -1,16 +1,19 @@
-import { DATABASE_ENGINES } from '$lib/server/db/schema';
-import { getDatabasesWithContainer } from '$lib/server/queries/databases';
+import { DATABASE_ENGINES } from '#lib/server/db/schema.ts';
+import { getDatabasesWithContainer } from '#lib/server/queries/databases.ts';
 import {
     getContainersByEngines,
     getDockerEngineFromSettings,
     getImagesFromContainers,
     processContainerForClient,
     processImageForClient,
-} from '$lib/server/services/docker';
+} from '#lib/server/services/docker.ts';
 import { error } from '@sveltejs/kit';
 import type { ContainerInspectInfo } from 'dockerode';
 
-type FormattedContainers = Record<typeof DATABASE_ENGINES[number], ReturnType<typeof processContainerForClient>[]>;
+type FormattedContainers = Record<
+    (typeof DATABASE_ENGINES)[number],
+    ReturnType<typeof processContainerForClient>[]
+>;
 type FormattedImages = Record<string, ReturnType<typeof processImageForClient>>;
 
 export const load = async () => {
@@ -29,19 +32,28 @@ export const load = async () => {
         };
     }
 
-    const containers = Object.keys(containersByEngine.value).reduce((acc, key) => [
-        ...acc,
-        ...containersByEngine.value[key as keyof typeof containersByEngine.value],
-    ], [] as ContainerInspectInfo[]);
+    const containers = Object.keys(containersByEngine.value).reduce(
+        (acc, key) => [
+            ...acc,
+            ...containersByEngine.value[key as keyof typeof containersByEngine.value],
+        ],
+        [] as ContainerInspectInfo[],
+    );
     const images = await getImagesFromContainers(docker.value, containers);
 
-    const containersByEngineFormatted: Record<string, ReturnType<typeof processContainerForClient>[]> = {};
+    const containersByEngineFormatted: Record<
+        string,
+        ReturnType<typeof processContainerForClient>[]
+    > = {};
     for (const [ engine, containers ] of Object.entries(containersByEngine.value)) {
-        containersByEngineFormatted[engine as typeof DATABASE_ENGINES[number]] = containers.map(processContainerForClient);
+        containersByEngineFormatted[engine as (typeof DATABASE_ENGINES)[number]] =
+            containers.map(processContainerForClient);
     }
 
     const imagesFormatted: FormattedImages = {};
-    for (const [ imageId, image ] of Object.entries(images.isOk() ? images.value : {})) {
+    for (const [ imageId, image ] of Object.entries(
+        images.isOk() ? images.value : {},
+    )) {
         imagesFormatted[imageId] = processImageForClient(image);
     }
 

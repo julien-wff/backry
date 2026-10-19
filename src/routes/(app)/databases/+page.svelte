@@ -1,13 +1,13 @@
 <script lang="ts">
     import { page } from '$app/state';
-    import { ENGINES_META } from '$lib/common/engines-meta';
-    import Head from '$lib/components/common/Head.svelte';
-    import Modal from '$lib/components/common/Modal.svelte';
-    import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
-    import DatabaseElement from '$lib/components/databases/DatabaseElement.svelte';
-    import DatabaseFilterModalContent from '$lib/components/databases/DatabaseFilterModalContent.svelte';
-    import { Database } from '$lib/components/icons';
-    import type { ModalControls } from '$lib/helpers/modal';
+    import { ENGINES_META } from '#lib/common/engines-meta.ts';
+    import Head from '#lib/components/common/Head.svelte';
+    import Modal from '#lib/components/common/Modal.svelte';
+    import PageContentHeader from '#lib/components/common/PageContentHeader.svelte';
+    import DatabaseElement from '#lib/components/databases/DatabaseElement.svelte';
+    import DatabaseFilterModalContent from '#lib/components/databases/DatabaseFilterModalContent.svelte';
+    import { Database } from '#lib/components/icons.ts';
+    import type { ModalControls } from '#lib/helpers/modal.ts';
     import type { PageData } from './$types';
 
     interface Props {

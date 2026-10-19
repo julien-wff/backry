@@ -8,8 +8,8 @@
         LayoutDashboard,
         Settings,
         Timer,
-    } from '$lib/components/icons';
-    import NavbarElement from '$lib/components/navbar/NavbarElement.svelte';
+    } from '#lib/components/icons.ts';
+    import NavbarElement from '#lib/components/navbar/NavbarElement.svelte';
 
     interface Props {
         errors: {

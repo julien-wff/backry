@@ -1,6 +1,6 @@
-import { getBackup } from '$lib/server/queries/backups';
-import { streamFileContent } from '$lib/server/services/restic';
-import { logger } from '$lib/server/services/logger';
+import { getBackup } from '#lib/server/queries/backups.ts';
+import { streamFileContent } from '#lib/server/services/restic.ts';
+import { logger } from '#lib/server/services/logger.ts';
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
@@ -15,7 +15,12 @@ export const GET: RequestHandler = async ({ params }) => {
         return error(404, 'Backup not found');
     }
 
-    if (backup.error || !backup.finishedAt || !backup.snapshotId || !backup.dumpSize) {
+    if (
+        backup.error ||
+        !backup.finishedAt ||
+        !backup.snapshotId ||
+        !backup.dumpSize
+    ) {
         return error(400, 'Backup is not in a successful state');
     }
 
@@ -34,10 +39,14 @@ export const GET: RequestHandler = async ({ params }) => {
     exitPromise
         .then((res) => {
             if (res.isErr()) {
-                logger.error(`Failed streaming backup ${backup.id}: ${res.error.message}`);
+                logger.error(
+                    `Failed streaming backup ${backup.id}: ${res.error.message}`,
+                );
             }
         })
-        .catch((e) => logger.error(`Unexpected stream error for backup ${backup.id}: ${e}`));
+        .catch((e) =>
+            logger.error(`Unexpected stream error for backup ${backup.id}: ${e}`),
+        );
 
     return new Response(stream, {
         status: 200,
@@ -46,7 +55,7 @@ export const GET: RequestHandler = async ({ params }) => {
             'Content-Disposition': `attachment; filename="${backup.fileName}"`,
             'Content-Length': backup.dumpSize.toString(),
             'Cache-Control': 'no-store',
-            'Pragma': 'no-cache',
+            Pragma: 'no-cache',
         },
     });
 };

@@ -1,8 +1,8 @@
 import type { RequestHandler } from './$types';
-import { getRunsWithBackupFilter } from '$lib/server/queries/runs';
-import { apiSuccess } from '$lib/server/api/responses';
-import type { RunsQueryResult } from '$lib/server/schemas/api';
-import { parseBackupFilters } from '$lib/server/api/backups';
+import { getRunsWithBackupFilter } from '#lib/server/queries/runs.ts';
+import { apiSuccess } from '#lib/server/api/responses.ts';
+import type { RunsQueryResult } from '#lib/server/schemas/api.ts';
+import { parseBackupFilters } from '#lib/server/api/backups.ts';
 
 export const GET: RequestHandler = async ({ url }) => {
     const runsData = await getRunsWithBackupFilter(

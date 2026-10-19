@@ -1,8 +1,7 @@
-import { parseIdOrNewParam } from '$lib/server/api/params';
-import { getNotification } from '$lib/server/queries/notifications';
+import { parseIdOrNewParam } from '#lib/server/api/params.ts';
+import { getNotification } from '#lib/server/queries/notifications.ts';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-
 
 export const load: PageServerLoad = async ({ params }) => {
     const { id, isNew } = parseIdOrNewParam(params.id);

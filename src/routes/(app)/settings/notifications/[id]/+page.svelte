@@ -1,15 +1,20 @@
 <script lang="ts">
+    import { untrack } from 'svelte';
     import { goto } from '$app/navigation';
-    import CodeEditor from '$lib/components/common/CodeEditor.svelte';
-    import Head from '$lib/components/common/Head.svelte';
-    import PageContentHeader from '$lib/components/common/PageContentHeader.svelte';
-    import ElementForm from '$lib/components/forms/ElementForm.svelte';
-    import InputContainer from '$lib/components/forms/InputContainer.svelte';
-    import { Bell } from '$lib/components/icons';
-    import NotificationTemplateEditor from '$lib/components/settings/notifications/NotificationTemplateEditor.svelte';
-    import { fetchApi } from '$lib/helpers/fetch';
-    import type { NOTIFICATION_TRIGGER } from '$lib/server/db/schema';
-    import type { notificationRequest, NotificationResponse, notificationTestRequest } from '$lib/server/schemas/api';
+    import CodeEditor from '#lib/components/common/CodeEditor.svelte';
+    import Head from '#lib/components/common/Head.svelte';
+    import PageContentHeader from '#lib/components/common/PageContentHeader.svelte';
+    import ElementForm from '#lib/components/forms/ElementForm.svelte';
+    import InputContainer from '#lib/components/forms/InputContainer.svelte';
+    import { Bell } from '#lib/components/icons.ts';
+    import NotificationTemplateEditor from '#lib/components/settings/notifications/NotificationTemplateEditor.svelte';
+    import { fetchApi } from '#lib/helpers/fetch.ts';
+    import type { NOTIFICATION_TRIGGER } from '#lib/server/db/schema.ts';
+    import type {
+        notificationRequest,
+        NotificationResponse,
+        notificationTestRequest,
+    } from '#lib/server/schemas/api.ts';
     import type { PageData } from './$types';
 
     interface Props {
@@ -18,15 +23,17 @@
 
     let { data }: Props = $props();
 
+    const initialData = untrack(() => data);
+
     let error = $state<string | null>(null);
     let isSubmitting = $state(false);
     let isNotificationTesting = $state(false);
 
-    let notificationName = $state(data.notification?.name ?? '');
-    let trigger = $state<typeof NOTIFICATION_TRIGGER[number] | null>(data.notification?.trigger ?? null);
-    let shoutrrrUrl = $state(data.notification?.url ?? '');
-    let body = $state(data.notification?.body ?? '');
-    let title = $state(data.notification?.title ?? '');
+    let notificationName = $state(initialData.notification?.name ?? '');
+    let trigger = $state<typeof NOTIFICATION_TRIGGER[number] | null>(initialData.notification?.trigger ?? null);
+    let shoutrrrUrl = $state(initialData.notification?.url ?? '');
+    let body = $state(initialData.notification?.body ?? '');
+    let title = $state(initialData.notification?.title ?? '');
 
     async function testNotification() {
         isNotificationTesting = true;

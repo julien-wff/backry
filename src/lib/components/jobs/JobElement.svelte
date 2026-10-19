@@ -1,14 +1,14 @@
 <script lang="ts">
-    import { goto, invalidateAll } from '$app/navigation';
-    import BaseListElement from '$lib/components/common/BaseListElement.svelte';
-    import CollapsableElementList from '$lib/components/common/CollapsableElementList.svelte';
-    import Modal from '$lib/components/common/Modal.svelte';
-    import { Clock, CloudUpload, Database, FileCheck, RefreshCw } from '$lib/components/icons';
-    import { fetchApi } from '$lib/helpers/fetch';
-    import type { jobsListFull } from '$lib/server/queries/jobs';
-    import { type jobPatchRequest, type JobResponse, type jobRunRequest } from '$lib/server/schemas/api';
-    import { addToast } from '$lib/stores/toasts.svelte';
-    import type { ModalControls } from '$lib/helpers/modal';
+    import { goto, refreshAll } from '$app/navigation';
+    import BaseListElement from '#lib/components/common/BaseListElement.svelte';
+    import CollapsableElementList from '#lib/components/common/CollapsableElementList.svelte';
+    import Modal from '#lib/components/common/Modal.svelte';
+    import { Clock, CloudUpload, Database, FileCheck, RefreshCw } from '#lib/components/icons.ts';
+    import { fetchApi } from '#lib/helpers/fetch.ts';
+    import type { jobsListFull } from '#lib/server/queries/jobs.ts';
+    import { type jobPatchRequest, type JobResponse, type jobRunRequest } from '#lib/server/schemas/api.ts';
+    import { addToast } from '#lib/stores/toasts.svelte.ts';
+    import type { ModalControls } from '#lib/helpers/modal.ts';
 
     interface Props {
         job: Awaited<ReturnType<typeof jobsListFull>>[number];
@@ -58,7 +58,7 @@
         const res = await fetchApi<JobResponse>('DELETE', `/api/jobs/${job.id}`, null);
 
         if (res.isOk()) {
-            await invalidateAll();
+            await refreshAll();
         } else {
             addToast(`Failed to delete job #${job.id}: ${res.error}`, 'error');
         }
@@ -73,7 +73,7 @@
         });
 
         if (res.isOk()) {
-            await invalidateAll();
+            await refreshAll();
         }
 
         loading = false;

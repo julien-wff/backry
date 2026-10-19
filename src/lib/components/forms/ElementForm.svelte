@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { OctagonAlert } from '$lib/components/icons';
+    import { OctagonAlert } from '#lib/components/icons.ts';
     import type { Snippet } from 'svelte';
 
     interface Props {

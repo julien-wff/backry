@@ -1,8 +1,8 @@
-import { validateNotificationTemplates } from '$lib/server/api/notifications';
-import { apiError, apiSuccess } from '$lib/server/api/responses';
-import { createNotification } from '$lib/server/queries/notifications';
-import { parseRequestBody } from '$lib/server/schemas';
-import { notificationRequest, type NotificationResponse } from '$lib/server/schemas/api';
+import { validateNotificationTemplates } from '#lib/server/api/notifications.ts';
+import { apiError, apiSuccess } from '#lib/server/api/responses.ts';
+import { createNotification } from '#lib/server/queries/notifications.ts';
+import { parseRequestBody } from '#lib/server/schemas/index.ts';
+import { notificationRequest, type NotificationResponse } from '#lib/server/schemas/api.ts';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request }) => {

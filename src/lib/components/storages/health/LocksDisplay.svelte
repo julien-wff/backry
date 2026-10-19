@@ -1,10 +1,10 @@
 <script lang="ts">
     import { page } from '$app/state';
-    import { LockKeyholeOpen, OctagonAlert, ShieldCheck } from '$lib/components/icons';
-    import { fetchApi } from '$lib/helpers/fetch';
-    import { staleLocksCount } from '$lib/helpers/storage';
-    import type { StorageLocksResponse } from '$lib/server/schemas/api';
-    import type { ResticLock } from '$lib/types/restic';
+    import { LockKeyholeOpen, OctagonAlert, ShieldCheck } from '#lib/components/icons.ts';
+    import { fetchApi } from '#lib/helpers/fetch.ts';
+    import { staleLocksCount } from '#lib/helpers/storage.ts';
+    import type { StorageLocksResponse } from '#lib/server/schemas/api.ts';
+    import type { ResticLock } from '#lib/types/restic.ts';
     import { onMount } from 'svelte';
 
     interface Props {
